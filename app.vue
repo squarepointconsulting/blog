@@ -1,6 +1,6 @@
 <script setup>
 useHead({
-  title: 'Nuxt 3 Bulma Blog Template',
+  title: 'HomeFacts',
   link: [
     {
       rel: 'stylesheet',
