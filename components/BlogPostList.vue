@@ -2,7 +2,7 @@
 
 <template>
   <div class="container">
-    <section class="articles">
+    <section >
       <div class="column is-8 is-offset-2">
         <div class="card article">
           <NuxtLink to="/blog/my-second-blog-post">

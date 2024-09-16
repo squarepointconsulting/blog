@@ -1,86 +1,97 @@
 <template>
   <main>
 
-    <TheHero>     
-      Maximizing the value of your home. <br />
-      <div class="profile-container">
-    <!-- Avatar Section -->
-    <UAvatar
-    src="https://photos.zillowstatic.com/fp/998244c38c42954e637ea8b153cb9c7c-cc_ft_576.jpg"
-    alt="Avatar" size="xl"
-  /> 
-  <UButton
-    icon="i-heroicons-pencil-square"
-    size="sm"
-    color="primary"
-    variant="solid"
-    label=""
-    :trailing="false"
-  />  
-    
-    <!-- Information Section -->
-    <div class="info-section">
-      <h2>{{ formData.name }}</h2>
-      <p>Email: {{ formData.email }}</p>
-      <p>Phone: {{ formData.phone }}</p>
+    <TheHero>
+      <div class="title">Maximizing the value of your home</div>
+      <div class="subtitle">{{ formData.name }} </div>
 
-      <!-- Edit Button -->
-      <UButton color="primary" @click="isEditing = true">
-        Edit Profile
-      </UButton>
-      <UButton
-    icon="i-heroicons-pencil-square"
-    size="sm"
-    color="primary"
-    variant="solid"
-    label=""
-    :trailing="false"
-  />  
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-white shadow-md rounded-lg">
+    
+    <!-- Left Column: Avatar and Label -->
+    <div class="flex items-center space-x-4">
+      <img
+        class="w-16 h-16 rounded-full"
+        src="https://i.pravatar.cc/150"
+        alt="User Avatar"
+      />
+      <div>
+        <h2 class="text-xl font-semibold">John Doe</h2>
+        <p class="text-gray-500">Your Label Here</p>
+      </div>
     </div>
 
-    <!-- Edit Form (Shown when editing is enabled) -->
-    <UModal v-model="isEditing">
-      <template #header>
-        <h3>Edit Profile</h3>
-      </template>
-      <template #body>
-        <UInput
-          label="Name"
-          v-model="formData.name"
-          placeholder="Enter your name"
-        />
-        <UInput
-          label="Email"
-          v-model="formData.email"
-          placeholder="Enter your email"
-        />
-        <UInput
-          label="Phone"
-          v-model="formData.phone"
-          placeholder="Enter your phone number"
-        />
-      </template>
-      <template #footer>
-        <UButton flat color="error" @click="isEditing = false">
-          Cancel
-        </UButton>
-        <UButton color="primary" @click="saveChanges">
-          Save Changes
-        </UButton>
-      </template>
-    </UModal>
-  </div>      
-      
-  </TheHero>
-  
+    <!-- Center Column: Current Score Image -->
+    <div class="flex justify-center items-center">
+      <img
+        class="w-24 h-24 object-cover"
+        src="https://via.placeholder.com/150x150?text=Score:90"
+        alt="Current Score"
+      />
+    </div>
+
+    <!-- Right Column: Score Trend Chart and Asset Value -->
+    <div class="flex flex-col items-center justify-center">
+      <canvas ref="chartCanvas" class="w-full h-32"></canvas>
+      <p class="mt-4 text-lg font-semibold">
+        Current Asset Value: $1,230
+      </p>
+    </div>
+  </div>
+
+
+      <div class="profile-container">
+        <!-- Avatar Section -->
+        <UAvatar src="https://photos.zillowstatic.com/fp/998244c38c42954e637ea8b153cb9c7c-cc_ft_576.jpg" alt="Avatar"
+          size="3xl" /> &nbsp;
+        <!-- Edit Button -->
+        <UButton color="primary" @click="isEditing = true" icon="i-heroicons-pencil-square" />
+
+
+
+
+        <!-- Information Section -->
+        <div class="info-section">
+          <h2></h2>
+          <p>Email: {{ formData.email }}</p>
+          <p>Phone: {{ formData.phone }}</p>
+
+
+        </div>
+
+        <!-- Edit Form (Shown when editing is enabled) -->
+        <UModal v-model="isEditing">
+          <UCard>
+            <template #header>
+              <h3>Edit Profile</h3>
+            </template>
+            <template class="h-32">
+              <UInput label="Name" v-model="formData.name" placeholder="Enter your name" />
+              <UInput label="Email" v-model="formData.email" placeholder="Enter your email" />
+              <UInput label="Phone" v-model="formData.phone" placeholder="Enter your phone number" />
+            </template>
+            <template #footer>
+              <UButton color="red" @click="isEditing = false">
+                Cancel
+              </UButton>&nbsp;
+              <UButton color="primary" @click="saveChanges">
+                Save Changes
+              </UButton>
+            </template>
+          </UCard>
+        </UModal>
+      </div>
+      <BlogPostList />
+    </TheHero>
+
 
   </main>
+
 
 </template>
 
 <script setup>
 import { ref } from 'vue'
-  //   <--! BlogPostList -->
+//   <--! BlogPostList -->
 const isEditing = ref(false)
 
 const formData = ref({
