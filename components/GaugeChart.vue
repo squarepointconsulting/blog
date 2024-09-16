@@ -60,7 +60,7 @@ const renderGaugeChart = () => {
 }
 
 onMounted(async () => {
-    renderGaugeChart()
+    await renderGaugeChart()
 })
 </script>
 
