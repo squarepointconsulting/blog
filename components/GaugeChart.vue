@@ -1,14 +1,12 @@
 <template>
     <div class="gauge-chart-container">
-
         <div class="relative">
             <!-- Main Content -->
             <div>
                 <canvas ref="gaugeChart"></canvas>
             </div>
-
             <!-- Overlapping Div -->
-            <div class="absolute bottom-12 left-30 text-black p-4 z-10">
+            <div class="absolute bottom-10 left-20 text-black">
                 <p>90</p>
             </div>
         </div>
@@ -51,7 +49,7 @@ const renderGaugeChart = () => {
                 },
                 title: {
                     display: true,
-                    text: 'VillaFacts Score',
+                    text: 'Your VillaFacts Score',
                 },
                 legend: {
                     display: false,
@@ -68,8 +66,7 @@ onMounted(() => {
 
 <style scoped>
 .gauge-chart-container {
-    width: 100%;
-    height: 200px;
+    width: 80%;
     position: relative;
 }
 </style>

@@ -4,7 +4,7 @@
       <div class="title">Maximizing the value of your home</div>
       <div class="subtitle">{{ formData.name }} </div>
 
-      <div class="grid grid-cols-5 gap-6 p-4 bg-white shadow-md rounded-lg">
+      <div class="grid grid-cols-5 gap-6 p-4 bg-white shadow-md rounded-lg border border-col">
 
         <!-- Left Column: Avatar and Label -->
         <div class="flex items-center space-x-4">
