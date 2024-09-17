@@ -8,7 +8,7 @@
 
         <!-- Left Column: Avatar and Label -->
         <div class="flex items-center space-x-4" >
-          <img class="w-12 h-12 rounded-full object-fill"
+          <img class="w-24 h-24 rounded-full object-fill"
             src="https://photos.zillowstatic.com/fp/998244c38c42954e637ea8b153cb9c7c-cc_ft_576.jpg" alt="User Avatar" />
           &nbsp;
           <!-- Edit Button -->
