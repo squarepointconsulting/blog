@@ -7,8 +7,8 @@
       <div class="grid grid-cols-5 gap-6 p-4 bg-white shadow-md rounded-lg border border-col">
 
         <!-- Left Column: Avatar and Label -->
-        <div class="flex items-center space-x-4">
-          <img class="w-48 h-48 rounded-full"
+        <div class="flex items-center space-x-4" >
+          <img class="w-12 h-12 rounded-full object-fill"
             src="https://photos.zillowstatic.com/fp/998244c38c42954e637ea8b153cb9c7c-cc_ft_576.jpg" alt="User Avatar" />
           &nbsp;
           <!-- Edit Button -->
