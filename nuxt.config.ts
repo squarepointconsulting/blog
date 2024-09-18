@@ -20,5 +20,57 @@ export default defineNuxtConfig({
       appId: process.env.NUXT_FIREBASE_appId,
       measurementId: process.env.NUXT_FIREBASE_measurementId,
     },
-  }
+  },
+  pwa: {
+    registerType: 'autoUpdate', // Automatically updates service worker
+    manifest: {
+      name: 'VillaFacts',
+      short_name: 'VillaFacts',
+      description: 'Maximizing the return on your most valuable asset',
+      theme_color: '#ffffff',
+      start_url: '/',
+      display: 'standalone',
+      background_color: '#ffffff',
+      icons: [
+        {
+          src: '/icon-192x192.png',
+          sizes: '192x192',
+          type: 'image/png',
+        },
+        {
+          src: '/icon-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+        },
+      ],
+    },
+    workbox: {
+      navigateFallback: '/', // Ensure we fallback to the main page if not precached
+      runtimeCaching: [
+        {
+          urlPattern: 'https://fonts.googleapis.com/.*',
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'google-fonts',
+            expiration: {
+              maxEntries: 10,
+              maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+            },
+          },
+        },
+        {
+          urlPattern: '/*',
+          handler: 'NetworkFirst', // Use 'NetworkFirst' to ensure dynamic pages are handled
+          options: {
+            cacheName: 'dynamic-content',
+            networkTimeoutSeconds: 10, // Fallback to cache if the network times out
+          },
+        },
+      ],
+    },
+    devOptions: {
+      enabled: true,
+      type: 'module',
+    },
+  },
 })
