@@ -20,14 +20,78 @@ useHead({
     }
   ]
 })
+
+import { signOut } from 'firebase/auth';
+const isMobileNavOpen = ref(false)
+const auth = useFirebaseAuth()
+const router = useRouter()
+const user = useCurrentUser()
+const avatarUrl = user.photoURL
+
+function handleSignOut() {
+  signOut(auth)
+    .then(() => router.replace('login'))
+}
+
 </script>
 
 <template>
-  <TheNavbar />
-  <div>
-    <NuxtPage />
+  <div class="flex flex-col h-screen">
+    <!-- Header -->
+    <header class="flex justify-between items-center bg-gray-800 text-white p-4">
+      <div class="flex items-center space-x-4">
+        <!-- Left slot for icons -->
+        <slot name="left-icons">
+          <span v-if="user"><img class="w-12 h-12 rounded-full object-fill bg-white"
+            :src="avatarUrl"
+            /> </span>
+          <span v-if="user"> {{ user.displayName }}</span>
+          <span></span>
+          <span v-if="user"><UButton @click="handleSignOut">Log Out</UButton>
+          </span>
+        </slot>
+      </div>
+      <div class="flex items-center space-x-4">
+        <!-- Right slot for icons -->
+        <slot name="right-icons">
+          <span><UIcon name="i-heroicons-bell" class="w-8 h-8" /></span>
+          <span><UIcon name="i-heroicons-cog-8-tooth" class="w-8 h-8" /></span>
+        </slot>
+      </div>
+    </header>
+  
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-4 bg-gray-100">
+      <NuxtPage />
+    </main>
+  
+    <!-- Footer -->
+    <footer class="flex justify-between items-center bg-gray-800 text-white p-4">
+      <div class="flex items-center space-x-4">
+        <!-- Left slot for icons -->
+        <slot name="footer-left-icons">
+          <span>
+            <NuxtLink to="/">
+            <UIcon name="i-heroicons-home" class="w-8 h-8" /></NuxtLink></span>
+        </slot>
+      </div>
+      <div class="flex items-center space-x-4">
+        <!-- Center slot for icons -->
+        <slot name="footer-center-icons">
+          <span><NuxtLink to="/">
+            <UIcon name="i-heroicons-calendar-days" class="w-8 h-8" /></NuxtLink></span>
+        </slot>
+      </div>
+      <div class="flex items-center space-x-4">
+        <!-- Right slot for icons -->
+        <slot name="footer-right-icons">
+          <span><NuxtLink to="/">
+            <UIcon name="i-heroicons-clipboard-document-check" class="w-8 h-8" /></NuxtLink></span>
+        </slot>
+      </div>
+    </footer>
   </div>
-</template>
+  </template>
 
 <style>
 html,

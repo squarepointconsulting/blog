@@ -63,7 +63,7 @@
   <style scoped>
   .line-chart-container {
     width: 100%;
-    height: 400px;
+    height: 150px;
     position: relative;
   }
   </style>
