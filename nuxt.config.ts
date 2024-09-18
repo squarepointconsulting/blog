@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-09-15',
   ssr: false,
   devtools: {enabled: true},
-  modules: ['@nuxt/ui', 'nuxt-vuefire'],
+  modules: ['@nuxt/ui', 'nuxt-vuefire', '@vite-pwa/nuxt'],
   vuefire: {
     auth: {
       enabled: true,
