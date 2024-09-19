@@ -26,7 +26,18 @@ const isMobileNavOpen = ref(false)
 const auth = useFirebaseAuth()
 const router = useRouter()
 const user = useCurrentUser()
-const avatarUrl = user.photoURL
+
+const gravatarData = await useFetch("https://www.gravatar.com/avatar/0b743d20b65b963cfbca71218d65e9b6a38acf7f469d4dd9203c8707395acaa9")
+const avatarUrl = gravatarData.data.value
+
+
+// const avatarUrl =  fetch("https://api.gravatar.com/v3/profiles/0b743d20b65b963cfbca71218d65e9b6a38acf7f469d4dd9203c8707395acaa9") //  "https://0.gravatar.com/avatar/131326d51e7c0019e584bd61951e81c4"
+//                       .then(function (response) {
+//                         response.json()
+//                       })
+//                       .then(function(data) {
+//                         data
+//                       })
 
 function handleSignOut() {
   signOut(auth)
@@ -42,9 +53,7 @@ function handleSignOut() {
       <div class="flex items-center space-x-4">
         <!-- Left slot for icons -->
         <slot name="left-icons">
-          <span v-if="user"><img class="w-12 h-12 rounded-full object-fill bg-white"
-            :src="avatarUrl"
-            /> </span>
+          <span v-if="user"><Gravatar /></span>
           <span v-if="user"> {{ user.displayName }}</span>
           <span></span>
           <span v-if="user"><UButton @click="handleSignOut">Log Out</UButton>
