@@ -1,7 +1,5 @@
 <template>
-    <div class="line-chart-container">
       <canvas ref="lineChart"></canvas>
-    </div>
   </template>
   
   <script setup>

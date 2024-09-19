@@ -1,14 +1,10 @@
 <script setup>
 useHead({
-  title: 'HomeFacts',
+  title: 'VillaFacts',
   link: [
     {
       rel: 'stylesheet',
       href: 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'
-    },
-    {
-      rel: 'stylesheet',
-      href: 'https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.9.1/css/OverlayScrollbars.min.css'
     },
     {
       rel: 'stylesheet',
@@ -27,23 +23,10 @@ const auth = useFirebaseAuth()
 const router = useRouter()
 const user = useCurrentUser()
 
-const gravatarData = await useFetch("https://www.gravatar.com/avatar/0b743d20b65b963cfbca71218d65e9b6a38acf7f469d4dd9203c8707395acaa9")
-const avatarUrl = gravatarData.data.value
-
-
-// const avatarUrl =  fetch("https://api.gravatar.com/v3/profiles/0b743d20b65b963cfbca71218d65e9b6a38acf7f469d4dd9203c8707395acaa9") //  "https://0.gravatar.com/avatar/131326d51e7c0019e584bd61951e81c4"
-//                       .then(function (response) {
-//                         response.json()
-//                       })
-//                       .then(function(data) {
-//                         data
-//                       })
-
 function handleSignOut() {
   signOut(auth)
     .then(() => router.replace('login'))
 }
-
 </script>
 
 <template>
@@ -145,10 +128,7 @@ a:hover {
   border: 3px solid #ccc;
   border-radius: 50%;
 }
-.media-center {
-  display: block;
-  margin-bottom: 1rem;
-}
+
 .article,
 .promo-block {
   margin-top: 6rem;

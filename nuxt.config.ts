@@ -27,22 +27,10 @@ export default defineNuxtConfig({
       name: 'VillaFacts',
       short_name: 'VillaFacts',
       description: 'Maximizing the return on your most valuable asset',
-      theme_color: '#ffffff',
+      theme_color: '#808080',
       start_url: '/',
       display: 'standalone',
-      background_color: '#ffffff',
-      icons: [
-        {
-          src: '/icon-192x192.png',
-          sizes: '192x192',
-          type: 'image/png',
-        },
-        {
-          src: '/icon-512x512.png',
-          sizes: '512x512',
-          type: 'image/png',
-        },
-      ],
+      background_color: '#808080',
     },
     workbox: {
       navigateFallback: '/', // Ensure we fallback to the main page if not precached
@@ -68,9 +56,9 @@ export default defineNuxtConfig({
         },
       ],
     },
-    devOptions: {
-      enabled: true,
-      type: 'module',
-    },
+    // devOptions: {
+    //   enabled: true,
+    //   type: 'module',
+    // },
   },
 })
