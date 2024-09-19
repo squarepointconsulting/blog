@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@nuxt/ui": "^2.18.4",
+    "@vite-pwa/nuxt": "^0.10.5",
     "nuxt": "^3.13.2",
     "nuxt-vuefire": "^1.0.4"
   },
