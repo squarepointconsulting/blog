@@ -56,9 +56,9 @@ export default defineNuxtConfig({
         },
       ],
     },
-    devOptions: {
-      enabled: true,
-      type: 'module',
-    },
+    // devOptions: {
+    //   enabled: true,
+    //   type: 'module',
+    // },
   },
 })

@@ -2,12 +2,12 @@ import { getFirestore, collection } from "firebase/firestore";
 
 export default defineNuxtPlugin((nuxtApp) => {
   const db = getFirestore(nuxtApp.$firebaseApp);
-  const modelsRef = collection(db, "models");
+  const usersRef = collection(db, "users");
 
   return {
     provide: {
       db,
-      modelsRef,
+      usersRef,
     },
   };
 });

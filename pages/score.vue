@@ -1,5 +1,3 @@
-
-
 <template>
     <!-- Blog posts list -->
     <div class="space-y-4">
@@ -17,8 +15,15 @@
 
 <script setup>
 import { onMounted } from "vue"
+import { getDocs } from 'firebase/firestore'
 
-const { $modelsRef } = useNuxtApp();
+const { $usersRef } = useNuxtApp();
+const querySnapshot = await getDocs($usersRef)
 
-onMounted(() => console.log($modelsRef))
+onMounted(() => {
+    querySnapshot.forEach((doc) => {
+        console.log(doc.id)
+    })
+    
+})
 </script>
