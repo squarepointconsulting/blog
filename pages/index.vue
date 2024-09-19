@@ -80,7 +80,7 @@ const saveChanges = () => {
 
     </article>
     <article class="p-4 bg-white shadow-md rounded-md">
-      <p class="mt-4 text-lg font-semibold font-black">
+      <p class="mt-4 text-lg font-black">
         Current Asset Value: $1,230
       </p>
     </article>
