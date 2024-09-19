@@ -1,3 +1,5 @@
+
+
 <template>
     <!-- Blog posts list -->
     <div class="space-y-4">
@@ -12,3 +14,11 @@
         <!-- Add more blog posts as needed -->
     </div>
 </template>
+
+<script setup>
+import { onMounted } from "vue"
+
+const { $modelsRef } = useNuxtApp();
+
+onMounted(() => console.log($modelsRef))
+</script>
