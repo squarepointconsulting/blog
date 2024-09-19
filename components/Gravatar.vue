@@ -13,7 +13,9 @@
   import { ref, computed, onMounted } from 'vue'
   import SHA256 from 'crypto-js/sha256'
   import { useFetch } from '#app'
-  
+  const user = useCurrentUser()
+
+  //const email = ref('christopher.k.eckert@squarepointconsulting.com')
   const email = ref('christopher.k.eckert@squarepointconsulting.com')
   const gravatarUrl = ref('')
   
@@ -25,7 +27,10 @@
   
   // Fetch the Gravatar image using useFetch
   const fetchGravatar = async () => {
-    const url = getGravatarUrl(email.value)
+    const user = await getCurrentUser()
+    console.log (user)
+
+    const url = getGravatarUrl(user.email)
   
     const { data, error } = await useFetch(url, {
       method: 'GET',
