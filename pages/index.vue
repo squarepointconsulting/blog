@@ -69,7 +69,7 @@ const chartOptions = ref({
           </div>
           <!-- Row 2 -->
           <div class="w-full flex justify-center items-center">
-            <p class="font-bold text-center">{{ home.villafactsScore }}</p>
+            <p class="font-bold text-center">{{ home.villafactScore }}</p>
           </div>
         </div>
       </div>
@@ -90,7 +90,7 @@ const chartOptions = ref({
         <h2 class="text-lg font-bold">Level Up
           <UIcon name="i-heroicons-chevron-double-right" class="w-4 h-4" />
         </h2>
-        <p class="text-gray-700">Increase your home's VillaFacts Score to increase your net asset value. Complete these
+        <p class="text-gray-700">Increase your home's VillaFact Score to increase your net asset value. Complete these
           simple
           activities to build your profile.</p>
       </NuxtLink>

@@ -1,6 +1,6 @@
 <script setup>
 useHead({
-  title: 'VillaFacts',
+  title: 'VillaFact',
   link: [
     {
       rel: 'stylesheet',
@@ -24,6 +24,17 @@ function handleSignOut() {
   signOut(auth)
     .then(() => router.replace('login'))
 }
+
+const isOpen = ref(false)
+
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+function navigateToPage() {
+  router.push('/settings');
+}
+
 </script>
 
 <template>
@@ -34,16 +45,31 @@ function handleSignOut() {
         <!-- Left slot for icons -->
         <slot name="left-icons">
           <span v-if="user"> <NuxtLink to="/profile"><Gravatar /></NuxtLink></span>
-          <span><p>VillaFacts</p></span>
+          <span><p>VillaFact</p></span>
         </slot>
       </div>
       <div class="flex items-center space-x-4">
         <!-- Right slot for icons -->
         <slot name="right-icons">
-          <span><UIcon name="i-heroicons-bell" class="w-8 h-8" /></span>
-          <span><UIcon name="i-heroicons-cog-8-tooth" class="w-8 h-8" /></span>
+          <span><UButton icon="i-heroicons-bell" label="" @click="isOpen = true" class="bg-transparent hover:bg-sky-700" /></span>
+          <span><UButton icon="i-heroicons-cog-8-tooth" label="" @click="navigateToPage" class="bg-transparent hover:bg-sky-700" /></span>
         </slot>
       </div>
+      <USlideover v-model="isOpen">
+      <div class="p-4 flex-1">
+        <UButton
+          color="gray"
+          variant="ghost"
+          size="sm"
+          icon="i-heroicons-x-mark-20-solid"
+          class="flex sm:hidden absolute end-5 top-5 z-10"
+          square
+          padded
+          @click="isOpen = false"
+        />
+        <p class="h-full">You don't have any notifications.</p>
+      </div>
+    </USlideover>
     </header>
   
     <!-- Main Content -->

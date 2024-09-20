@@ -29,7 +29,7 @@ export const chartOptions = {
         },
         title: {
           display: true,
-          text: 'VillaFacts Score',
+          text: 'VillaFact Score',
         },
         legend: {
           display: false,

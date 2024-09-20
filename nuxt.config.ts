@@ -24,8 +24,8 @@ export default defineNuxtConfig({
   pwa: {
     registerType: 'autoUpdate', // Automatically updates service worker
     manifest: {
-      name: 'VillaFacts',
-      short_name: 'VillaFacts',
+      name: 'VillaFact',
+      short_name: 'VillaFact',
       description: 'Maximizing the return on your most valuable asset',
       theme_color: '#808080',
       start_url: '/',
