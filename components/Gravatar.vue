@@ -28,8 +28,6 @@
   // Fetch the Gravatar image using useFetch
   const fetchGravatar = async () => {
     const user = await getCurrentUser()
-    console.log (user)
-
     const url = getGravatarUrl(user.email)
   
     const { data, error } = await useFetch(url, {
