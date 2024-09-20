@@ -8,7 +8,13 @@ function signInWithGoogle() {
 const provider = new GoogleAuthProvider()
 provider.setCustomParameters({ prompt: 'select_account' });
 signInWithPopup(auth, provider)
-    .then(() => router.replace('/'))
+.then((userCredential) => {
+    // Signed in
+    const user = userCredential.user;
+    console.log(user)
+    // TODO: Update User in firebase
+  })    
+.then(() => router.replace('/'))
 }
 </script>
 

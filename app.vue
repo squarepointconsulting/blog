@@ -13,7 +13,8 @@ useHead({
     {
       rel: 'stylesheet',
       href: 'https://unpkg.com/bulma@0.9.3/css/bulma.min.css'
-    }
+    },
+    { rel: 'manifest', href: '/manifest.json' },
   ]
 })
 
