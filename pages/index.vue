@@ -76,15 +76,10 @@ const chartOptions = ref({
     </article>
 
     <article class="p-4 bg-white shadow-md rounded-md">
-      <div class="flex min-w-[393px] w-full">
-        <div class="flex-1 p-4">
-          <div class="chart-container-line" style="text-align: center;">
+      <div class="flex min-w-[350px] w-full">
+        <div class="flex-1">
+          <div class="chart-container-line">
             <LineChart />
-          </div>
-          <div class="">
-            <p class="" style="text-align: center;">
-              Current Asset Value: $1,230
-            </p>
           </div>
         </div>
       </div>
@@ -125,6 +120,6 @@ const chartOptions = ref({
   height: 100px;
 }
 .chart-container-line {
-  width: 350px;
+  width: 325px;
 }
 </style>

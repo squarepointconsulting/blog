@@ -1,5 +1,5 @@
 <template>
-      <canvas ref="lineChart"></canvas>
+      <canvas ref="lineChart" width="300"></canvas>
   </template>
   
   <script setup>
