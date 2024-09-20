@@ -44,15 +44,15 @@ function navigateToSettingsPage() {
       <div class="flex items-center space-x-4">
         <!-- Left slot for icons -->
         <slot name="left-icons">
-          <span v-if="user"> <NuxtLink to="/profile"><Gravatar class="hover:scale-110" /></NuxtLink></span>
+          <span v-if="user"> <NuxtLink to="/profile"><Gravatar class="" /></NuxtLink></span>
           <span><p>VillaFact</p></span>
         </slot>
       </div>
       <div class="flex items-center space-x-4">
         <!-- Right slot for icons -->
         <slot name="right-icons">
-          <span><UButton icon="i-heroicons-bell" label="" @click="isOpen = true" class="bg-transparent hover:scale-110 hover:bg-transparent" /></span>
-          <span><UButton icon="i-heroicons-cog-8-tooth" label="" @click="navigateToSettingsPage" class="bg-transparent hover:scale-110 hover:bg-transparent" /></span>
+          <span><UButton icon="i-heroicons-bell" label="" @click="isOpen = true" class="bg-transparent hover:bg-transparent" /></span>
+          <span><UButton icon="i-heroicons-cog-8-tooth" label="" @click="navigateToSettingsPage" class="bg-transparent hover:bg-transparent" /></span>
         </slot>
       </div>
       <USlideover v-model="isOpen">
