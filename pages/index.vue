@@ -43,9 +43,6 @@ const chartOptions = ref({
 })
 
 </script>
-
-
-
 <template>
   <div v-if="home" class="space-y-4">
     <article class="p-4 bg-white shadow-md rounded-md">
@@ -81,7 +78,7 @@ const chartOptions = ref({
     <article class="p-4 bg-white shadow-md rounded-md">
       <div class="flex min-w-[393px] w-full">
         <div class="flex-1 p-4">
-          <div class="" style="text-align: center;">
+          <div class="chart-container-line" style="text-align: center;">
             <LineChart />
           </div>
           <div class="">
@@ -126,5 +123,8 @@ const chartOptions = ref({
 <style scoped>
 .chart-container {
   height: 100px;
+}
+.chart-container-line {
+  width: 350px;
 }
 </style>

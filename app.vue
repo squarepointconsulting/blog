@@ -18,10 +18,6 @@ useHead({
   ]
 })
 
-import { signOut } from 'firebase/auth';
-const isMobileNavOpen = ref(false)
-const auth = useFirebaseAuth()
-const router = useRouter()
 const user = useCurrentUser()
 
 function handleSignOut() {
@@ -37,11 +33,8 @@ function handleSignOut() {
       <div class="flex items-center space-x-4">
         <!-- Left slot for icons -->
         <slot name="left-icons">
-          <span v-if="user"><Gravatar /></span>
-          <span v-if="user"> {{ user.displayName }}</span>
-          <span></span>
-          <span v-if="user"><UButton @click="handleSignOut">Log Out</UButton>
-          </span>
+          <span v-if="user"> <NuxtLink to="/profile"><Gravatar /></NuxtLink></span>
+          <span><p>VillaFacts</p></span>
         </slot>
       </div>
       <div class="flex items-center space-x-4">

@@ -11,7 +11,7 @@ signInWithPopup(auth, provider)
 .then((userCredential) => {
     // Signed in
     const user = userCredential.user;
-    console.log(user)
+    console.log(Date.now().toString(), " User logged in: ", user.uid)
     // TODO: Update User in firebase
   })    
 .then(() => router.replace('/'))
@@ -27,9 +27,6 @@ signInWithPopup(auth, provider)
       <UButton @click="signInWithGoogle">
         Login with Google
       </UButton>
-      <template #footer>
-        <UButton>Logout</UButton>
-      </template>
     </UCard>
   </div>
 </template>
