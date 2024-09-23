@@ -20,7 +20,6 @@ Ca<template>
 import PhotosGallery from "./PhotosGallery.vue";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 
-
 function dataURLToBlob(dataURL) {
   const arr = dataURL.split(',');
   const mime = arr[0].match(/:(.*?);/)[1];
@@ -51,8 +50,6 @@ async function uploadImageToFirebase(dataURL) {
     throw error;
   }
 }
-
-
 
 export default {
   components: {

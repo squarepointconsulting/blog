@@ -62,7 +62,7 @@ const mainClass = computed(() => {
       <div class="flex items-center space-x-4">
         <!-- Left slot for icons -->
         <slot name="left-icons">
-          <span v-if="user"> <NuxtLink to="/profile"><Gravatar class="" /></NuxtLink></span>
+          <span v-if="user"> <NuxtLink to="/profile"><Gravatar :size=10 /></NuxtLink></span>
           <span><p>VillaFact</p></span>
         </slot>
       </div>
