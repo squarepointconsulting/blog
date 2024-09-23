@@ -7,6 +7,7 @@
         </article>
         <article class="p-4 bg-white shadow-md rounded-md">
             <h2 class="text-lg font-bold">Project Bath Remodel</h2>
+            <input type="file" accept="image/x-png,image/jpeg,image/gif"/>
             <p class="text-gray-700">Photos. Details. Costs. Tags. </p>
         </article>
         <!-- Add more blog posts as needed -->
