@@ -35,6 +35,24 @@ function navigateToSettingsPage() {
   router.push('/settings');
 }
 
+import { computed } from 'vue';
+import { useRoute } from 'nuxt/app';
+
+const route = useRoute();
+
+// Conditionally apply padding based on the current route
+const mainClass = computed(() => {
+  const baseClass = "flex-1 overflow-y-auto bg-gray-100"
+  const paddedBaseClass = "flex-1 overflow-y-auto bg-gray-100 p-4"
+  
+  if (route.name === 'camera') {
+    return baseClass
+  }
+  else {
+    return paddedBaseClass
+  }
+});
+
 </script>
 
 <template>
@@ -44,7 +62,7 @@ function navigateToSettingsPage() {
       <div class="flex items-center space-x-4">
         <!-- Left slot for icons -->
         <slot name="left-icons">
-          <span v-if="user"> <NuxtLink to="/profile"><Gravatar class="" /></NuxtLink></span>
+          <span v-if="user"> <NuxtLink to="/profile"><Gravatar :size=10 /></NuxtLink></span>
           <span><p>VillaFact</p></span>
         </slot>
       </div>
@@ -72,8 +90,8 @@ function navigateToSettingsPage() {
     </USlideover>
     </header>
   
-    <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto p-4 bg-gray-100">
+    <!-- Main Content  CKE TODO remove 'p-4' below when on page is "camera"-->
+    <main :class="mainClass">
       <NuxtPage />
     </main>
   
@@ -90,15 +108,15 @@ function navigateToSettingsPage() {
       <div class="flex items-center space-x-4">
         <!-- Center slot for icons -->
         <slot name="footer-center-icons">
-          <span><NuxtLink to="/">
-            <UIcon name="i-heroicons-calendar-days" class="w-8 h-8" /></NuxtLink></span>
+          <span><NuxtLink to="/camera">
+            <UIcon name="i-heroicons-camera" class="w-8 h-8" /></NuxtLink></span>
         </slot>
       </div>
       <div class="flex items-center space-x-4">
         <!-- Right slot for icons -->
         <slot name="footer-right-icons">
           <span><NuxtLink to="/">
-            <UIcon name="i-heroicons-clipboard-document-check" class="w-8 h-8" /></NuxtLink></span>
+            <UIcon name="i-heroicons-calendar-days" class="w-8 h-8" /></NuxtLink></span>
         </slot>
       </div>
     </footer>

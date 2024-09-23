@@ -1,7 +1,7 @@
 <template>
     <div>
       <div v-if="gravatarUrl">
-        <img class="w-10 h-10 rounded-full object-fill bg-white" :src="gravatarUrl" alt="Avatar" />
+        <img :class="imageClass" :src="gravatarUrl" alt="Avatar" />
       </div>
       <div v-else>
         <p>Loading avatar...</p>
@@ -15,9 +15,8 @@
   import { useFetch } from '#app'
   const user = useCurrentUser()
 
-  //const email = ref('christopher.k.eckert@squarepointconsulting.com')
-  const email = ref('christopher.k.eckert@squarepointconsulting.com')
   const gravatarUrl = ref('')
+  const imageClass = ref('') // Define your class name
   
   // Function to generate Gravatar URL
   const getGravatarUrl = (email) => {
@@ -28,25 +27,30 @@
   // Fetch the Gravatar image using useFetch
   const fetchGravatar = async () => {
     const user = await getCurrentUser()
-    console.log (user)
-
+    console.log(`user.photoURL: ${user.photoURL}`)
     const url = getGravatarUrl(user.email)
+
+    imageClass.value = `w-${props.size} h-${props.size} rounded-full object-fill bg-white`
+    gravatarUrl.value = user.photoURL;
+
+    // const { data, error } = await useFetch(url, {
+    //   method: 'GET',
+    //   headers: {
+    //     Accept: 'image/png', // Optional: Define the type of image
+    //   },
+    // })
   
-    const { data, error } = await useFetch(url, {
-      method: 'GET',
-      headers: {
-        Accept: 'image/png', // Optional: Define the type of image
-      },
-    })
-  
-    if (!error.value) {
-      gravatarUrl.value = url // Directly use the URL, no need for data
-    } else {
-      console.error('Error fetching Gravatar:', error.value)
-    }
+    // if (!error.value) {
+    //   gravatarUrl.value = url // Directly use the URL, no need for data
+    // } else {
+    //   console.error('Error fetching Gravatar:', error.value)
+    // }
   }
   
   onMounted(() => {
     fetchGravatar()
   })
+
+  const props = defineProps(['size'])
+
   </script>
