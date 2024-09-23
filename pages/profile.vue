@@ -18,12 +18,11 @@ function handleSignOut() {
         <!-- Inner Div 1 -->
         <div class="flex-1 flex flex-col justify-center items-center">
           <div class="w-full flex justify-center items-center">
-            <p><img class="w-24 h-24 rounded-full object-fill" style="text-align: center;" src="https://placehold.co/600x400"
-                alt="Avatar" /></p>
+            <Gravatar :size="42" />
           </div>
           <!-- Row 2 -->
           <div class="w-full flex justify-center items-center p-1">
-            <p class="">Profile Info</p>
+            <p class="">{{ user.displayName }}</p>
           </div>
         </div>
 
@@ -32,8 +31,7 @@ function handleSignOut() {
           <!-- Row 1 -->
           <div class="w-full flex justify-center items-center">
             <div class="">
-              <p>{{ user.displayName }}</p>
-              <p>{{ user.email }}</p>
+              <p>&nbsp;</p>
             </div>
           </div>
           <!-- Row 2 -->
