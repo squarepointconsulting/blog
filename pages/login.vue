@@ -1,5 +1,6 @@
 <script setup>
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth'; 
+import { getAnalytics, logEvent } from "firebase/analytics";
 
 const auth = useFirebaseAuth()
 const router = useRouter()
@@ -13,6 +14,9 @@ signInWithPopup(auth, provider)
     const user = userCredential.user;
     console.log(Date.now().toString(), " User logged in: ", user.uid)
     // TODO: Update User in firebase
+    //const analytics = getAnalytics();
+    const { $analytics } = useNuxtApp();
+    logEvent($analytics, `user_logged_in: ${user.uid}`);
   })    
 .then(() => router.replace('/'))
 }

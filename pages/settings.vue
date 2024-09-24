@@ -9,7 +9,7 @@
             <h2 class="text-lg font-bold">Project Bath Remodel</h2>
             <div>
     <input type="file" accept="image/*,video/*" multiple @change="handleFileChange" />
-    <button @click="uploadFiles">Upload</button>
+    <UButton @click="uploadFiles">Upload</UButton>
   </div>
             <p class="text-gray-700">Photos. Details. Costs. Tags. </p>
         </article>
