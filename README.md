@@ -1,20 +1,12 @@
-# Nuxt Content v2 Blog with Bulma
-
-Look at the [Content documentation](https://content-v2.nuxtjs.org/) to learn more.
+# VillaFact
 
 ## Setup
 
 Make sure to install the dependencies:
 
 ```bash
-# yarn
-yarn install
-
 # npm
 npm install
-
-# pnpm
-pnpm install --shamefully-hoist
 ```
 
 ## Development Server
@@ -39,4 +31,3 @@ Locally preview production build:
 npm run preview
 ```
 
-Checkout the [deployment documentation](https://v3.nuxtjs.org/docs/deployment) for more information.
