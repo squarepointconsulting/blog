@@ -12,7 +12,7 @@ function handleSignOut() {
 
 <template>
     <!-- Blog posts list -->
-    <div class="space-y-4">
+    <div class="space-y-4" v-if="user">
         <article class="p-4 bg-white shadow-md rounded-md">
             <div class="flex w-full">
         <!-- Inner Div 1 -->
