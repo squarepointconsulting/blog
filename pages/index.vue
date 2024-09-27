@@ -44,48 +44,10 @@ const chartOptions = ref({
 
 </script>
 <template>
-  <div v-if="home" class="space-y-4">
-    <article class="p-4 bg-white shadow-md rounded-md">
-      <div class="flex w-full">
-        <!-- Inner Div 1 -->
-        <div class="flex-1 flex flex-col justify-center items-center">
-          <div class="w-full flex justify-center items-center">
-            <p><img class="w-24 h-24 rounded-full object-fill" style="text-align: center;" :src="home.imageUrl"
-                alt="My Biggest Asset" /></p>
-          </div>
-          <!-- Row 2 -->
-          <div class="w-full flex justify-center items-center p-1">
-            <p class="">{{ home.address.street1 }}</p>
-          </div>
-        </div>
-
-        <!-- Inner Div 2 -->
-        <div class="flex-1 flex flex-col justify-center items-center">
-          <!-- Row 1 -->
-          <div class="w-full flex justify-center items-center">
-            <div class="chart-container">
-              <GaugeChart />
-            </div>
-          </div>
-          <!-- Row 2 -->
-          <div class="w-full flex justify-center items-center">
-            <p class="font-bold text-center">{{ home.villafactScore }}</p>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="p-4 bg-white shadow-md rounded-md">
-      <div class="flex min-w-[350px] w-full">
-        <div class="flex-1">
-          <div class="chart-container-line">
-            <LineChart />
-          </div>
-        </div>
-      </div>
-
-    </article>
-    <article class="p-4 bg-white shadow-md rounded-md">
+  <div class="space-y-4">
+  <HomeSummary />
+  <HomeValue />
+  <article class="p-4 bg-white shadow-md rounded-md">
       <NuxtLink to="/score">
         <h2 class="text-lg font-bold">Level Up
           <UIcon name="i-heroicons-chevron-double-right" class="w-4 h-4" />
@@ -114,12 +76,5 @@ const chartOptions = ref({
     </article>
   </div>
 </template>
-
 <style scoped>
-.chart-container {
-  height: 100px;
-}
-.chart-container-line {
-  width: 325px;
-}
 </style>
