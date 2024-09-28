@@ -101,7 +101,7 @@ onMounted(() => {
     </article>
     <transition name="fade">
         <article v-if="homeSource && isEditing" class="p-4 bg-white shadow-md rounded-md relative">
-            <div class="flex flex-col space-y-2 border">
+            <div class="flex flex-col space-y-2">
                 <UInput v-model="homeSource.address.street1" type="text" placeholder="Street 1"
                     class="p-2 border-gray-300 rounded-md" />
                 <UInput v-model="homeSource.address.street2" type="text" placeholder="Street 2"
@@ -118,7 +118,7 @@ onMounted(() => {
                             class="focus:outline-none">
                 </UButton>
             </div>
-            <div class="flex items-center space-x-4">
+            <div class="flex place-content-center space-x-4">
                 <!-- Right slot for icons -->
                 <slot name="right-icons">
                     <span>
