@@ -7,7 +7,7 @@ const { $db } = useNuxtApp();
 const home = ref()
 const props = defineProps({
   homeId: {
-    type: Object,
+    type: String,
     required: true,
   },
 });

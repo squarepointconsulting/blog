@@ -34,7 +34,7 @@ watch(homeSource, (homeSource) => {
 
 const props = defineProps({
     homeId: {
-        type: Object,
+        type: String,
         required: true,
     },
 });
