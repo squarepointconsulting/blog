@@ -88,7 +88,7 @@ onMounted(() => {
                 </div>
                 <!-- Row 2 -->
                 <div class="w-full flex justify-center items-center">
-                    <p class="font-bold text-center">{{ homeSource.villafactScore }}</p>
+                    <p class="font-bold text-center">{{ homeSource.villaFactScore ? homeSource.villaFactScore : homeSource.villafactScore}}</p>
                 </div>
             </div>
             <!-- Edit Button -->

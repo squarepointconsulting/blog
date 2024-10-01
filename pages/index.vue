@@ -1,41 +1,18 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import { useCollection } from 'vuefire'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 
-
-
-// const homeId = route.params.id;
-// find the home id for the "default" home for this user.
-// for now, that is just the first home for this user. 
 const homeId = ref("")
-//const homeId = ref("FK9dzfK8PK7QRazTHn5f")
 const user = await getCurrentUser()
-console.log(`user.uid: ${user.uid}`)
-
 const { $db } = useNuxtApp();
 const q = query(collection($db, "properties"), where("ownerId", "==", user.uid));
 const querySnapshot = await getDocs(q);
-console.log(querySnapshot.empty)
-
-
-
-// homeId.value = getDocs(q).then((querySnapshot) => {
-//   console.log(querySnapshot)
-//   if (!querySnapshot.empty) {
-//     return querySnapshot[0].id
-//   }
-//  })
-
-
-//homeId.value = homes.first.id
-//console.log(`homeId.value: ${ homeId.value}`)
 
 onMounted(() => {
-    querySnapshot.forEach((doc) => {
-      homeId.value = doc.id;
-      console.log(doc.id);    
-    })
+  // TODO: This is dumb. Allow user to choose "default" home.   
+  querySnapshot.forEach((doc) => {
+    homeId.value = doc.id;
+  })
     
 })
 
