@@ -1,10 +1,24 @@
 <script setup>
-// const homeId = route.params.id;
-const homeId = "FK9dzfK8PK7QRazTHn5f"
+import { onMounted, ref } from 'vue'
+import { collection, query, where, getDocs } from 'firebase/firestore'
+
+const homeId = ref("")
+const user = await getCurrentUser()
+const { $db } = useNuxtApp();
+const q = query(collection($db, "properties"), where("ownerId", "==", user.uid));
+const querySnapshot = await getDocs(q);
+
+onMounted(() => {
+  // TODO: This is dumb. Allow user to choose "default" home.   
+  querySnapshot.forEach((doc) => {
+    homeId.value = doc.id;
+  })
+    
+})
 
 </script>
 <template>
-  <div class="space-y-4">
+  <div class="space-y-4" v-if="homeId" >
   <HomeSummary :homeId="homeId" />
   <HomeValue :homeId="homeId" />
   <article class="p-4 bg-white shadow-md rounded-md">

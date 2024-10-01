@@ -27,24 +27,9 @@
   // Fetch the Gravatar image using useFetch
   const fetchGravatar = async () => {
     const user = await getCurrentUser()
-    console.log(`user.photoURL: ${user.photoURL}`)
     const url = getGravatarUrl(user.email)
-
     imageClass.value = `w-${props.size} h-${props.size} rounded-full object-fill bg-white`
     gravatarUrl.value = user.photoURL;
-
-    // const { data, error } = await useFetch(url, {
-    //   method: 'GET',
-    //   headers: {
-    //     Accept: 'image/png', // Optional: Define the type of image
-    //   },
-    // })
-  
-    // if (!error.value) {
-    //   gravatarUrl.value = url // Directly use the URL, no need for data
-    // } else {
-    //   console.error('Error fetching Gravatar:', error.value)
-    // }
   }
   
   onMounted(() => {
