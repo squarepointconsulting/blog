@@ -62,6 +62,10 @@ onMounted(() => {
         }
     })
 })
+
+const homeImageUrl = "https://photos.zillowstatic.com/fp/998244c38c42954e637ea8b153cb9c7c-cc_ft_576.jpg"
+const newHomeImageUrl = "https://firebasestorage.googleapis.com/v0/b/villafact-firebase.appspot.com/o/properties%2FFK9dzfK8PK7QRazTHn5f%2Fproject_records%2Fds9dzfK8oK7QRazTgs5a%2F998244c38c42954e637ea8b153cb9c7c-cc_ft_768.webp?alt=media&token=ad56201b-4137-41d4-9f16-1dad88f1598d"
+
 </script>
 <template>
     <article v-if="homeSource && !isEditing" class="p-4 bg-white shadow-md rounded-md">

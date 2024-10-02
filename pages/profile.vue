@@ -19,7 +19,7 @@ const newHome = ref({
   currentAppraisedValue: 1000000,
   geoip: '',
   villaFactScore: 500,
-  imageUrl: false,
+  imageUrl: "/images/home-placeholder.png",
   ownerId: user.uid,
   updated_at: null,
 })
