@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import { getDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore'
+import { collection, addDoc, getDoc, doc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import GaugeChart from '~/components/GaugeChart.vue'
 
@@ -18,11 +18,12 @@ const editHome = ref({
         zip: "",
     },
     currentAppraisedValue: 0,
-    geoip: '',
+    geoip: "",
     villaFactScore: 0,
-    imageUrl: "images/home-placeholder.png",
-    ownerId: '',
+    imageUrl: "",
+    ownerId: "",
     updated_at: null,
+    project_records: [],
 })
 
 // When homeSource is updated
@@ -48,6 +49,26 @@ async function updateHome() {
     isEditing.value = false
 }
 
+
+
+async function addProject() {
+    const user = await useCurrentUser()
+    console.log(user.value)
+    const updated_at_timestamp = serverTimestamp()
+    const projectRecord = {
+        type: "property_avatar",
+        timestamp: updated_at_timestamp,
+        completedByUserUid: user.value.uid,
+        completedByUserDisplayName: user.value.displayName,
+        attachments: [],
+    }
+    // Get a reference to the home document. Or do we have that already?
+
+    console.log(projectRecord)
+    const docRef = await addDoc(collection($db, "properties", props.homeId, "project_records"), projectRecord);
+    console.log("Document written with ID: ", docRef.id);
+}
+
 async function deleteHome() {
     await deleteDoc(doc($db, "properties", props.homeId))
     router.push('/profile');
@@ -63,9 +84,6 @@ onMounted(() => {
         }
     })
 })
-
-const homeImageUrl = "https://photos.zillowstatic.com/fp/998244c38c42954e637ea8b153cb9c7c-cc_ft_576.jpg"
-const newHomeImageUrl = "https://firebasestorage.googleapis.com/v0/b/villafact-firebase.appspot.com/o/properties%2FFK9dzfK8PK7QRazTHn5f%2Fproject_records%2Fds9dzfK8oK7QRazTgs5a%2F998244c38c42954e637ea8b153cb9c7c-cc_ft_768.webp?alt=media&token=ad56201b-4137-41d4-9f16-1dad88f1598d"
 
 const files = ref([]);
 const handleFileChange = (event) => {
@@ -96,6 +114,11 @@ const handleFileUpload = (event) => {
                         homeSource.value.imageUrl = url
                         updateHome().then(() => {
                             console.log("Updated!!!")
+                            // Here is where we create the new project_task record for the home.
+                            addProject().then(() => {
+                                console.log("we did it!")
+                            })
+
                         })
                     })
             });
@@ -140,7 +163,7 @@ const handleFileUpload = (event) => {
                 <!-- Row 2 -->
                 <div class="w-full flex justify-center items-center">
                     <p class="font-bold text-center">{{ homeSource.villaFactScore ? homeSource.villaFactScore :
-                        homeSource.villafactScore}}</p>
+                        homeSource.villafactScore }}</p>
                 </div>
             </div>
             <!-- Edit Button -->
