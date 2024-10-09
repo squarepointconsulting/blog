@@ -111,6 +111,7 @@ const handleFileUpload = (event) => {
                     .then((url) => {
                         // `url` is the download URL for 'images/stars.jpg'
                         console.log(url)
+                        homeSource.value.imageUrl = url
                         editHome.value.imageUrl = url
                         updateHome().then(() => {
                             console.log("Updated!!!")
@@ -139,7 +140,7 @@ const handleFileUpload = (event) => {
             <!-- Inner Div 1 -->
             <div class="flex-1 flex flex-col justify-center items-center">
                 <div class="w-full flex justify-center items-center">
-                    <UButton @click="updatePhoto">
+                    <UButton @click="updatePhoto" class="bg-transparent hover:bg-transparent">
                         <img class="w-24 h-24 rounded-full object-fill" style="text-align: center;"
                             :src="homeSource.imageUrl" alt="{{ homeSource.address.street1 }}" />
                     </UButton>
