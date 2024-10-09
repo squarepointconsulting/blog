@@ -105,31 +105,23 @@ const handleFileUpload = (event) => {
         try {
             const fileRef = storageRef($storage, `properties/${props.homeId}/${file.name}`);
             uploadBytes(fileRef, file).then((snapshot) => {
-                console.log('Uploaded file!');
-                console.log(snapshot)
                 getDownloadURL(fileRef)
                     .then((url) => {
-                        // `url` is the download URL for 'images/stars.jpg'
-                        console.log(url)
                         homeSource.value.imageUrl = url
                         editHome.value.imageUrl = url
+                        editHome.value.updated_at = serverTimestamp()
+                        editHome.value.villaFactScore =  homeSource.value.villaFactScore * 1.1
+                        homeSource.value.villaFactScore = editHome.value.villaFactScore
                         updateHome().then(() => {
-                            console.log("Updated!!!")
-                            // Here is where we create the new project_task record for the home.
-                            addProject().then(() => {
-                                console.log("we did it!")
-                            })
-
+                            addProject()
                         })
                     })
             });
-            console.log(fileRef)
         }
         catch (error) {
             console.error('Error uploading files:', error);
             alert('Failed to upload files.');
         }
-
     }
 }
 
