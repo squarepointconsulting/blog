@@ -62,7 +62,7 @@ const mainClass = computed(() => {
       <div class="flex items-center space-x-4">
         <!-- Left slot for icons -->
         <slot name="left-icons">
-          <span v-if="user"> <NuxtLink to="/profile"><Gravatar :size=10 /></NuxtLink></span>
+          <span v-if="false"> <NuxtLink to="/profile"><Gravatar :size=10 /></NuxtLink></span>
           <span><p>VillaFact</p></span>
         </slot>
       </div>
@@ -70,7 +70,7 @@ const mainClass = computed(() => {
         <!-- Right slot for icons -->
         <slot name="right-icons">
           <span><UButton icon="i-heroicons-bell" label="" @click="isOpen = true" class="bg-transparent hover:bg-transparent" /></span>
-          <span><UButton icon="i-heroicons-cog-8-tooth" label="" @click="navigateToSettingsPage" class="bg-transparent hover:bg-transparent" /></span>
+          <span v-if="user"> <NuxtLink to="/profile"><Gravatar :size=8 /></NuxtLink></span>
         </slot>
       </div>
       <USlideover v-model="isOpen">
@@ -108,7 +108,7 @@ const mainClass = computed(() => {
       <div class="flex items-center space-x-4">
         <!-- Center slot for icons -->
         <slot name="footer-center-icons">
-          <span><NuxtLink to="/camera">
+          <span v-if="false"><NuxtLink to="/camera">
             <UIcon name="i-heroicons-camera" class="w-8 h-8" /></NuxtLink></span>
         </slot>
       </div>
