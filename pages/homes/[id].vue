@@ -12,30 +12,57 @@ const homeId = route.params.id;
 const { $db } = useNuxtApp();
 const docRef = doc($db, 'properties', homeId);
 const home = useDocument(docRef)
+const tasksRef = collection($db, 'properties', homeId, 'project_records');
+const tasks = useCollection(tasksRef);
+
 
 const items = [{
-label: 'Tab1',
-icon: 'i-heroicons-information-circle',
-content: 'This is the content shown for Tab1'
-}, {
-label: 'Tab2',
-icon: 'i-heroicons-arrow-down-tray',
-disabled: true,
-content: 'And, this is the content for Tab2'
-}, {
-label: 'Tab3',
-icon: 'i-heroicons-eye-dropper',
-content: 'Finally, this is the content for Tab3'
+  label: 'Projects',
+  key: 'projects',
+  icon: 'i-pajamas-issue-type-feature',
+  content: 'This is the content shown for Tab1'
+},  {
+  label: 'Quests',
+  key: 'quests',
+  icon: 'i-pajamas-issue-type-objective',
+  content: 'Check back soon for more quests!'
 }]
+
+const columns = [
+{ label: 'Date', key: 'timestamp'},
+{
+  key: 'type',
+  label: 'Type',
+}, {
+  key: 'completedByUserDisplayName',
+  label: 'User',
+},
+]
 
 </script>
 
 <template>
   <div v-if="home" class="space-y-4">
-  <HomeSummary :homeId="homeId" />
-  <HomeValue :homeId="homeId"/>
-  <article class="p-4 bg-white shadow-md rounded-md">
-    <UTabs :items="items" />
+    <HomeSummary :homeId="homeId" />
+    <HomeValue :homeId="homeId" />
+    <article class="p-4 bg-white shadow-md rounded-md">
+
+      <UTabs :items="items" class="w-full">
+        <template #item="{ item }">
+          <div v-if="item.key === 'projects'" class="space-y-3">
+            <UTable :rows="tasks" :columns="columns">
+              <template #timestamp-data="{ row }">
+                {{ row.timestamp.toDate().toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'numeric', 
+    day: 'numeric' 
+}) }}
+                </template>
+            </UTable>
+          </div>
+        </template>
+      </UTabs>
+
     </article>
   </div>
   <div v-else class="space-y-4">
@@ -44,4 +71,3 @@ content: 'Finally, this is the content for Tab3'
     </article>
   </div>
 </template>
-

@@ -111,7 +111,7 @@ const handleFileUpload = (event) => {
                     .then((url) => {
                         // `url` is the download URL for 'images/stars.jpg'
                         console.log(url)
-                        homeSource.value.imageUrl = url
+                        editHome.value.imageUrl = url
                         updateHome().then(() => {
                             console.log("Updated!!!")
                             // Here is where we create the new project_task record for the home.
