@@ -156,6 +156,7 @@ onMounted(() => {
                 <UInput v-model="homeSource.address.zip" type="text" placeholder="Zip Code"
                     class="p-2 border-gray-300 rounded-md" />
             </div>
+            <Gallery />
             <div class="absolute top-2 right-2">
                 <UButton @click="isEditing = false" icon="i-heroicons-x-circle" class="focus:outline-none">
                 </UButton>
