@@ -14,6 +14,7 @@ const docRef = doc($db, 'properties', homeId);
 const home = useDocument(docRef)
 const tasksRef = collection($db, 'properties', homeId, 'project_records');
 const tasks = useCollection(tasksRef);
+const isEditing = ref(false);
 
 
 const items = [{
@@ -50,7 +51,8 @@ const columns = [
       <UTabs :items="items" class="w-full">
         <template #item="{ item }">
           <div v-if="item.key === 'projects'" class="space-y-3">
-            <UTable :rows="tasks" :columns="columns">
+            <UButton icon="i-heroicons-plus" @click="isEditing = true" label="Add Project" color="green" />
+            <UTable v-if="!isEditing"  :rows="tasks" :columns="columns">
               <template #timestamp-data="{ row }">
                 {{ row.timestamp.toDate().toLocaleDateString('en-US', { 
     year: 'numeric', 
@@ -64,6 +66,7 @@ const columns = [
       </UTabs>
 
     </article>
+    
   </div>
   <div v-else class="space-y-4">
     <article class="p-4 bg-white shadow-md rounded-md">
