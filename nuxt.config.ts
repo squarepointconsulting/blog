@@ -61,4 +61,15 @@ export default defineNuxtConfig({
       type: 'module',
     },
   },
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            pdfjs: ['pdfjs-dist'],
+          },
+        },
+      },
+    },
+  },
 })

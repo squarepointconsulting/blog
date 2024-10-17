@@ -1,9 +1,7 @@
 <script setup>
 
 import { useRoute } from 'vue-router';
-// import { useCollection } from 'vuefire'
-// import { collection, doc} from 'firebase/firestore'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, updateDoc } from 'firebase/firestore'
 
 const route = useRoute();
 const homeId = route.params.id;
@@ -39,13 +37,6 @@ watch(homeSource, (homeSource) => {
   }
 })
 
-const props = defineProps({
-  homeId: {
-    type: String,
-    required: true,
-  },
-});
-
 async function updateHome() {
   const docRef = doc($db, "properties", props.homeId);
   await updateDoc(docRef, {
@@ -53,12 +44,6 @@ async function updateHome() {
   })
   isEditing.value = false
 }
-
-
-
-
-
-
 
 const items = [{
   label: 'Exterior',
@@ -78,17 +63,6 @@ const items = [{
   content: 'Dishwashers and refrigerators and stuff',
   disabled: true,
 },]
-
-const columns = [
-  { label: 'Date', key: 'timestamp' },
-  {
-    key: 'type',
-    label: 'Type',
-  }, {
-    key: 'completedByUserDisplayName',
-    label: 'User',
-  },
-]
 
 const sections = [{
   label: 'Roof',
@@ -111,13 +85,15 @@ const sections = [{
   description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
 },]
 
-
-
 onMounted(() => {
   const docRef = doc($db, "properties", homeId);
   getDoc(docRef).then((docSnap) => {
     if (docSnap.exists()) {
       homeSource.value = docSnap.data()
+      form.value = {
+        ...homeSource.value.roof
+      }
+
     } else {
       console.error("No such document!");
     }
@@ -125,7 +101,7 @@ onMounted(() => {
 })
 
 
-// import { Carousel, Slide } from 'vue3-carousel';
+import { Carousel, Slide } from 'vue3-carousel';
 
 const form = ref({
   squareFeet: '',
@@ -157,9 +133,33 @@ const handleFileUpload = (event) => {
 const isImage = (file) => file.type.startsWith('image/');
 const isVideo = (file) => file.type.startsWith('video/');
 
-const submitForm = () => {
+const submitForm = async () => {
   console.log('Form submitted:', form.value);
-  // Handle form submission logic, such as saving data to a database.
+  try {
+    // Update the home document in Firestore
+    const docRef = doc($db, "properties", homeId);
+    await updateDoc(docRef, {
+      roof: {
+        ...form.value,
+        files: uploadedFiles.value
+      }
+    });
+    console.log('Home updated successfully');
+    // Optionally, reset the form or show a success message
+    // form.value = {
+    //   squareFeet: '',
+    //   materials: '',
+    //   dateInstalled: '',
+    //   installer: '',
+    //   price: '',
+    //   notes: '',
+    //   files: [],
+    // };
+    // uploadedFiles.value = [];
+  } catch (error) {
+    console.error('Error updating home:', error);
+    // Optionally, show an error message to the user
+  }
 };
 
 </script>
@@ -247,27 +247,9 @@ const submitForm = () => {
                     </div>
                   </div>
                   <Gallery />
-                  <div class="absolute top-2 right-2">
-                    <UButton @click="isEditing = false" icon="i-heroicons-x-circle" class="focus:outline-none">
-                    </UButton>
-                  </div>
-                  <div class="flex place-content-center space-x-4">
-                    <!-- Right slot for icons -->
-                    <slot name="right-icons">
-                      <span>
-                        <UButton @click="updateHome" icon="i-heroicons-check-circle" class="" />
-                      </span>
-                      <span>
-                        <UButton @click="deleteHome" label="Delete Home" class=" bg-red-700 " />
-                      </span>
-                    </slot>
-                  </div>
-
                   <!-- Hidden File Input -->
                   <input ref="fileInput" type="file" class="hidden" @change="handleFileChange" />
                 </article>
-
-
               </template>
 
               <template #installation="{ description }">
@@ -288,8 +270,6 @@ const submitForm = () => {
                 </div>
               </template>
             </UAccordion>
-
-
           </div>
         </template>
       </UTabs>
@@ -302,3 +282,4 @@ const submitForm = () => {
     </article>
   </div>
 </template>
+
