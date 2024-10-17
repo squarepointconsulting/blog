@@ -2,6 +2,7 @@
 
 import { useRoute } from 'vue-router';
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
+import { Carousel, Slide } from 'vue3-carousel';
 
 const route = useRoute();
 const homeId = route.params.id;
@@ -67,10 +68,10 @@ const items = [{
 const sections = [{
   label: 'Roof',
   icon: 'i-heroicons-information-circle',
-  defaultOpen: true,
+  defaultOpen: false,
   slot: 'roof-info'
 }, {
-  label: 'Installation',
+  label: 'Gutters',
   icon: 'i-heroicons-arrow-down-tray',
   defaultOpen: false,
   slot: 'installation'
@@ -101,8 +102,6 @@ onMounted(() => {
 })
 
 
-import { Carousel, Slide } from 'vue3-carousel';
-
 const form = ref({
   squareFeet: '',
   materials: '',
@@ -117,14 +116,17 @@ const uploadedFiles = ref([]);
 
 const handleFileUpload = (event) => {
   const files = Array.from(event.target.files);
+  console.log('Files selected:', files);
   files.forEach((file) => {
     const reader = new FileReader();
     reader.onload = () => {
+      console.log('File processed:', file.name);
       uploadedFiles.value.push({
         name: file.name,
         preview: reader.result,
         type: file.type,
       });
+      console.log('Current uploadedFiles:', uploadedFiles.value);
     };
     reader.readAsDataURL(file);
   });
@@ -161,6 +163,10 @@ const submitForm = async () => {
     // Optionally, show an error message to the user
   }
 };
+
+watch(uploadedFiles, (newFiles) => {
+  console.log('uploadedFiles changed:', newFiles);
+}, { deep: true });
 
 </script>
 
@@ -231,9 +237,11 @@ const submitForm = async () => {
 
                     <!-- Display uploaded files in a carousel -->
                     <div v-if="uploadedFiles.length > 0" class="mt-6">
-                      <h3 class="text-xl font-semibold mb-4">Uploaded Files</h3>
-                      <Carousel :wrapAround="true" :itemsToShow="1">
-                        <Slide v-for="(file, index) in uploadedFiles" :key="index">
+                      <h3 class="text-xl font-semibold mb-4">The Uploaded Files</h3>
+                      <p>Number of uploaded files: {{ uploadedFiles.length }}</p>
+                      <Carousel :wrapAround="false" :itemsToShow="1">
+                        <Slide v-for="(file, index) in uploadedFiles" :key="index" class="outline-solid outline-2 outline-blue-500">
+                          <p>File: {{ file.name }} ({{ file.type }})</p>
                           <img v-if="isImage(file)" :src="file.preview" :alt="file.name" class="w-full rounded" />
                           <video v-else-if="isVideo(file)" controls class="w-full rounded">
                             <source :src="file.preview" type="video/mp4" />
@@ -246,9 +254,6 @@ const submitForm = async () => {
                       </Carousel>
                     </div>
                   </div>
-                  <Gallery />
-                  <!-- Hidden File Input -->
-                  <input ref="fileInput" type="file" class="hidden" @change="handleFileChange" />
                 </article>
               </template>
 
@@ -282,4 +287,17 @@ const submitForm = async () => {
     </article>
   </div>
 </template>
+
+<style scoped>
+.carousel-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.carousel-image {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+</style>
 
