@@ -319,6 +319,11 @@ const submitForm = async () => {
                         <input type="number" v-model="form.price" id="price" class="border rounded p-2"
                           placeholder="Enter price" />
                       </div>
+                      <div class="flex flex-col md:col-span-2">
+                        <label for="notes" class="mb-1">Notes:</label>
+                        <textarea v-model="form.notes" id="notes" class="border rounded p-2" placeholder="Enter notes"
+                          rows="3"></textarea>
+                      </div>
                       <div v-if="homeSource.roof.files.length > 0" class="flex flex-col md:col-span-2">
                         <UCarousel v-slot="{ item }" :items="homeSource.roof.files" indicators>                   
                           <img width="300" height="400" draggable="false" :src="item.preview" :alt="item.name" class="rounded" />                              
@@ -338,11 +343,6 @@ const submitForm = async () => {
                               <img width="300" height="400" draggable="false" v-else :src="item.preview" :alt="item.name" class="rounded" />                              
                           </UCarousel>
                         </div>
-                      </div>
-                      <div class="flex flex-col md:col-span-2">
-                        <label for="notes" class="mb-1">Notes:</label>
-                        <textarea v-model="form.notes" id="notes" class="border rounded p-2" placeholder="Enter notes"
-                          rows="3"></textarea>
                       </div>
                       <div class="md:col-span-2 mt-4">
                         <button type="submit" class="bg-blue-500 text-white rounded p-2 w-full">
