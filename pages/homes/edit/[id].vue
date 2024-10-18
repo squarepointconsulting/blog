@@ -123,11 +123,22 @@ const handleFileUpload = (event) => {
     const reader = new FileReader();
     reader.onload = () => {
       console.log('File processed:', file.name);
-      uploadedFiles.value.push({
-        name: file.name,
-        preview: reader.result,
-        type: file.type,
-      });
+      if (file.type.startsWith('application/pdf')) {
+        console.log('PDF file detected');
+        generatePdfThumbnail(file).then((thumbnail) => {
+          uploadedFiles.value.push({
+            name: file.name,
+            preview: thumbnail,
+            type: file.type,
+          });
+        });
+      } else {
+        uploadedFiles.value.push({
+          name: file.name,
+          preview: reader.result,
+          type: file.type,
+          });
+        }
       console.log('Current uploadedFiles:', uploadedFiles.value);
     };
     reader.readAsDataURL(file);
@@ -166,9 +177,38 @@ const submitForm = async () => {
   }
 };
 
-watch(uploadedFiles, (newFiles) => {
-  console.log('uploadedFiles changed:', newFiles);
-}, { deep: true });
+// DEBUG CODE
+// watch(uploadedFiles, (newFiles) => {
+//   console.log('uploadedFiles changed:', newFiles);
+// }, { deep: true });
+
+
+  // Generate a thumbnail using a PDF library (e.g., pdfjs-dist)
+  import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf';
+
+  // Set the worker source
+  GlobalWorkerOptions.workerSrc = new URL(
+    'pdfjs-dist/build/pdf.worker.mjs',
+    import.meta.url
+  ).toString();
+
+  async function generatePdfThumbnail(file) {
+    const pdf = await getDocument(await file.arrayBuffer()).promise;
+    const page = await pdf.getPage(1);
+    const viewport = page.getViewport({ scale: 1 });
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const context = canvas.getContext('2d');
+    await page.render({ canvasContext: context, viewport }).promise;
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => {
+        resolve(blob);
+      }, 'image/png');
+    });
+  }
+
+
 
 </script>
 
@@ -227,21 +267,16 @@ watch(uploadedFiles, (newFiles) => {
                         <!-- Display uploaded files in a carousel -->
                         <div v-if="uploadedFiles.length > 0" class="mt-6">
                           <h3 class="text-xl font-semibold mb-4">The Uploaded Files</h3>
-                          <p>Number of uploaded files: {{ uploadedFiles.length }}</p>
-                          <Carousel :wrapAround="false" :itemsToShow="1">
-                            <Slide v-for="(file, index) in uploadedFiles" :key="index"
-                              class="outline-solid outline-2 outline-blue-500">
-                              <p>File: {{ file.name }} ({{ file.type }})</p>
-                              <img v-if="isImage(file)" :src="file.preview" :alt="file.name" class="w-full rounded" />
-                              <video v-else-if="isVideo(file)" controls class="w-full rounded">
-                                <source :src="file.preview" type="video/mp4" />
+                          <UCarousel v-slot="{ item }" :items="uploadedFiles" indicators>
+                            <p>{{ item.type }}</p>
+                            <video width="300" height="400" draggable="false" v-if="isVideo(item)" controls class="rounded">
+                                <source :src="item.preview" type="video/mp4" />
                                 Your browser does not support the video tag.
                               </video>
-                              <a v-else :href="file.preview" target="_blank" class="text-blue-500 underline">
-                                {{ file.name }}
-                              </a>
-                            </Slide>
-                          </Carousel>
+                              
+                              <img width="300" height="400" draggable="false" v-else :src="item.preview" :alt="item.name" class="rounded" />                              
+
+                          </UCarousel>
                         </div>
 
                       </div>
