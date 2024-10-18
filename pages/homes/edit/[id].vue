@@ -116,7 +116,7 @@ const form = ref({
 
 const uploadedFiles = ref([]);
 
-const handleFileUpload = (event) => {
+const handleFileUpload = async (event) => {
   const files = Array.from(event.target.files);
   console.log('Files selected:', files);
   files.forEach((file) => {
@@ -125,10 +125,14 @@ const handleFileUpload = (event) => {
       console.log('File processed:', file.name);
       if (file.type.startsWith('application/pdf')) {
         console.log('PDF file detected');
+ 
         generatePdfThumbnail(file).then((thumbnail) => {
+          thumbnailBlob.value = thumbnail;
+          // Create a local URL for the thumbnail
+    localThumbnailUrl.value = URL.createObjectURL(thumbnailBlob.value);
           uploadedFiles.value.push({
             name: file.name,
-            preview: thumbnail,
+            preview: localThumbnailUrl.value,
             type: file.type,
           });
         });
@@ -192,6 +196,11 @@ const submitForm = async () => {
     import.meta.url
   ).toString();
 
+  const uploading = ref(false);
+  const localThumbnailUrl = ref(null);
+  const pdfFile = ref(null);
+  const thumbnailBlob = ref(null);
+
   async function generatePdfThumbnail(file) {
     const pdf = await getDocument(await file.arrayBuffer()).promise;
     const page = await pdf.getPage(1);
@@ -207,6 +216,8 @@ const submitForm = async () => {
       }, 'image/png');
     });
   }
+
+
 
 
 
@@ -266,16 +277,13 @@ const submitForm = async () => {
                         <input type="file" multiple @change="handleFileUpload" id="files" class="border rounded p-2" />
                         <!-- Display uploaded files in a carousel -->
                         <div v-if="uploadedFiles.length > 0" class="mt-6">
-                          <h3 class="text-xl font-semibold mb-4">The Uploaded Files</h3>
+                          <h3 class="text-xl font-semibold mb-4">Attachments</h3>
                           <UCarousel v-slot="{ item }" :items="uploadedFiles" indicators>
-                            <p>{{ item.type }}</p>
                             <video width="300" height="400" draggable="false" v-if="isVideo(item)" controls class="rounded">
                                 <source :src="item.preview" type="video/mp4" />
                                 Your browser does not support the video tag.
-                              </video>
-                              
+                              </video>                             
                               <img width="300" height="400" draggable="false" v-else :src="item.preview" :alt="item.name" class="rounded" />                              
-
                           </UCarousel>
                         </div>
 
