@@ -11,23 +11,23 @@
   
   <script setup>
   import { ref, computed, onMounted } from 'vue'
-  import SHA256 from 'crypto-js/sha256'
+  // import SHA256 from 'crypto-js/sha256'
   import { useFetch } from '#app'
   const user = useCurrentUser()
 
   const gravatarUrl = ref('')
   const imageClass = ref('') // Define your class name
   
-  // Function to generate Gravatar URL
-  const getGravatarUrl = (email) => {
-    const hash = SHA256(email.trim().toLowerCase()).toString()
-    return `https://www.gravatar.com/avatar/${hash}`
-  }
+  // // Function to generate Gravatar URL
+  // const getGravatarUrl = (email) => {
+  //   const hash = SHA256(email.trim().toLowerCase()).toString()
+  //   return `https://www.gravatar.com/avatar/${hash}`
+  // }
   
   // Fetch the Gravatar image using useFetch
   const fetchGravatar = async () => {
     const user = await getCurrentUser()
-    const url = getGravatarUrl(user.email)
+    // const url = getGravatarUrl(user.email)
     imageClass.value = `w-${props.size} h-${props.size} rounded-full object-fill bg-transparent hover:bg-transparent`
     gravatarUrl.value = user.photoURL;
   }
