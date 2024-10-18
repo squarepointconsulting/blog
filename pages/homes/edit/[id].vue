@@ -96,13 +96,22 @@ onMounted(() => {
   getDoc(docRef).then((docSnap) => {
     if (docSnap.exists()) {
       homeSource.value = docSnap.data()
+      if (!homeSource.value.roof) {
+        console.log('No roof found, creating new roof');
+        homeSource.value.roof = {
+          squareFeet: '',
+          materials: '',
+          dateInstalled: '',
+          installer: '',
+          price: '',
+          notes: '',
+          files: [],
+        };
+      }
       form.value = {
         ...homeSource.value.roof
       }
-
-    } else {
-      console.error("No such document!");
-    }
+    } 
   })
 })
 
@@ -132,12 +141,13 @@ const handleFileUpload = async (event) => {
         generatePdfThumbnail(file).then((thumbnail) => {
           thumbnailBlob.value = thumbnail;
           // Create a local URL for the thumbnail
-    localThumbnailUrl.value = URL.createObjectURL(thumbnailBlob.value);
+          localThumbnailUrl.value = URL.createObjectURL(thumbnailBlob.value);
           uploadedFiles.value.push({
             name: file.name,
             preview: localThumbnailUrl.value,
             type: file.type,
             file: file,
+            preview_file: thumbnail,
           });
         });
       } else {
@@ -146,6 +156,7 @@ const handleFileUpload = async (event) => {
           preview: reader.result,
             type: file.type,
             file: file,
+            preview_file: null,
           });
         }
       console.log('Current uploadedFiles:', uploadedFiles.value);
@@ -158,76 +169,67 @@ const isImage = (file) => file.type.startsWith('image/');
 const isVideo = (file) => file.type.startsWith('video/');
 
 const submitForm = async () => {
-  console.log('Form submitted:', form.value);
   try {
 
-
-    uploadedFiles.value.forEach((file) => {
-      // uploadToFirebase(file);
+    // Create an array of promises for file uploads
+    const uploadPromises = uploadedFiles.value.map(async (file) => {
       console.log('File:', file);
       const fileRef = storageRef($storage, `properties/${homeId}/${file.name}`);
       console.log('File ref:', fileRef);
-      uploadBytes(fileRef, file.file).then((snapshot) => {
-        getDownloadURL(fileRef)
-          .then((url) => {
-            console.log('File uploaded:', url);
-            form.value.files.push(url);
-          });
-      }); 
 
+      const snapshot = await uploadBytes(fileRef, file.file);
+      const url = await getDownloadURL(fileRef);
+
+      console.log('File uploaded:', url);
+
+
+      if (file.type.startsWith('application/pdf')) {
+        const thumbnailRef = storageRef($storage, `properties/${homeId}/${file.name}-thumbnail.png`);
+        const thumbnailSnapshot = await uploadBytes(thumbnailRef, file.preview_file);
+        const thumbnailUrl = await getDownloadURL(thumbnailRef);
+        console.log('Thumbnail uploaded:', thumbnailUrl);
+        return {
+          name: file.name,
+          url: url,
+          type: file.type,
+          preview: thumbnailUrl,
+        };
+      }
+      else {
+      return {
+        name: file.name,
+        url: url,
+        type: file.type,
+        preview: url,
+        };
+      }
     });
 
-    // Upload the PDF to Firebase Storage
-    const pdfStorageRef = storageRef($storage, `pdfs/${pdfFile.value.name}`);
-    await uploadBytes(pdfStorageRef, pdfFile.value);
-    const pdfUrl = await getDownloadURL(pdfStorageRef);
+    // Wait for all file uploads to complete
+    const uploadedFileData = await Promise.all(uploadPromises);
 
-    // Upload the thumbnail to Firebase Storage
-    const thumbnailStorageRef = storageRef($storage, `thumbnails/${pdfFile.value.name}.png`);
-    await uploadBytes(thumbnailStorageRef, thumbnailBlob.value);
-    const thumbnailUrl = await getDownloadURL(thumbnailStorageRef);
+    // Add uploaded file data to the form
+    form.value.files = [...form.value.files, ...uploadedFileData];
 
-    // Save the home record with the URLs (adjust the document path as necessary)
-    const homeRecordDoc = doc($db, 'homes', 'homeId'); // Replace 'homeId' with the actual home document ID
-    await updateDoc(homeRecordDoc, {
-      pdfUrl,
-      thumbnailUrl,
-    });
-
-
-
-
-
+    console.log('All files uploaded');
 
     // Update the home document in Firestore
     const docRef = doc($db, "properties", homeId);
     await updateDoc(docRef, {
       roof: {
-        ...form.value,
-        files: uploadedFiles.value
+        ...form.value
       }
-    });
-
-
+    }, { merge: true });
 
     console.log('Home updated successfully');
-
-
-
-    // Optionally, reset the form or show a success message
-    // form.value = {
-    //   squareFeet: '',
-    //   materials: '',
-    //   dateInstalled: '',
-    //   installer: '',
-    //   price: '',
-    //   notes: '',
-    //   files: [],
-    // };
-    // uploadedFiles.value = [];
+    
+    // Optionally, you can reset the form or show a success message here
+    
   } catch (error) {
-    console.error('Error updating home:', error);
-    // Optionally, show an error message to the user
+    console.error('Error in submitForm:', error);
+    // Handle the error (e.g., show an error message to the user)
+  } finally {
+    // wait_for_files_to_upload.value = false;
   }
 };
 
@@ -316,6 +318,11 @@ const submitForm = async () => {
                         <label for="price" class="mb-1">Price Paid:</label>
                         <input type="number" v-model="form.price" id="price" class="border rounded p-2"
                           placeholder="Enter price" />
+                      </div>
+                      <div v-if="homeSource.roof.files.length > 0" class="flex flex-col md:col-span-2">
+                        <UCarousel v-slot="{ item }" :items="homeSource.roof.files" indicators>                   
+                          <img width="300" height="400" draggable="false" :src="item.preview" :alt="item.name" class="rounded" />                              
+                        </UCarousel>  
                       </div>
                       <div class="flex flex-col md:col-span-2">
                         <label for="files" class="mb-1">Upload Files:</label>
@@ -594,3 +601,4 @@ const submitForm = async () => {
   border-radius: 10px;
 }
 </style>
+
