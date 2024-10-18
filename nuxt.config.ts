@@ -62,14 +62,33 @@ export default defineNuxtConfig({
     },
   },
   vite: {
+    optimizeDeps: {
+      include: ['pdfjs-dist']
+    },
     build: {
+      commonjsOptions: {
+        include: [/pdfjs-dist/]
+      },
       rollupOptions: {
         output: {
-          manualChunks: {
-            pdfjs: ['pdfjs-dist'],
-          },
-        },
-      },
-    },
+          manualChunks: (id) => {
+            if (id.includes('node_modules')) {
+              if (id.includes('pdfjs-dist')) {
+                return 'pdfjs'
+              }
+              return 'vendor'
+            }
+          }
+        }
+      }
+    }
   },
+  nitro: {
+    externals: {
+      inline: ['pdfjs-dist']
+    }
+  },
+  build: {
+    transpile: ['pdfjs-dist']
+  }
 })
