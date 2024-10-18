@@ -72,7 +72,7 @@ const sections = [{
   label: 'Roof',
   icon: 'i-heroicons-information-circle',
   defaultOpen: false,
-  slot: 'roof-info'
+  slot: 'roof'
 }, {
   label: 'Gutters',
   icon: 'i-heroicons-arrow-down-tray',
@@ -108,15 +108,92 @@ onMounted(() => {
           files: [],
         };
       }
-      form.value = {
+      roof.value = {
         ...homeSource.value.roof
       }
+      if (!homeSource.value.gutters) {
+        homeSource.value.gutters = {
+          installed: false,
+          length: 0,
+          totalDownspouts: 0,
+          materials: '',
+          dateInstalled: '',
+          installer: '',
+          price: '',
+          notes: '',
+          files: [],  
+        };
+      }
+      gutters.value = {
+        ...homeSource.value.gutters
+      } 
+      if (!homeSource.value.siding) {
+        homeSource.value.siding = {
+          squareFeet: '',
+          materials: '',
+          dateInstalled: '',
+          installer: '',
+          price: '',
+          notes: '',
+          files: [],  
+        };
+      }
+      siding.value = {
+        ...homeSource.value.siding
+      }
+      if (!homeSource.value.paint) {
+        homeSource.value.paint = {
+          squareFeet: '', 
+          materials: '',
+          dateInstalled: '',
+          installer: '',
+          price: '',
+          notes: '',
+          files: [],  
+        };
+      }
+      paint.value = { 
+        ...homeSource.value.paint
+      } 
     } 
   })
 })
 
 
-const form = ref({
+const roof = ref({
+  squareFeet: '',
+  materials: '',
+  dateInstalled: '',
+  installer: '',
+  price: '',
+  notes: '',
+  files: [],
+});
+
+const gutters = ref({
+  installed: false,
+  length: 0,
+  totalDownspouts: 0,
+  materials: '',
+  dateInstalled: '',
+  installer: '',
+  price: '',
+  notes: '',
+  files: [],
+});
+
+const siding = ref({
+  squareFeet: '',
+  materials: '',
+  dateInstalled: '',
+  installer: '',
+  price: '',
+  notes: '',
+  files: [],
+});
+
+
+const paint = ref({
   squareFeet: '',
   materials: '',
   dateInstalled: '',
@@ -208,8 +285,8 @@ const submitForm = async () => {
     // Wait for all file uploads to complete
     const uploadedFileData = await Promise.all(uploadPromises);
 
-    // Add uploaded file data to the form
-    form.value.files = [...form.value.files, ...uploadedFileData];
+    // Add uploaded file data to the roof
+    roof.value.files = [...roof.value.files, ...uploadedFileData];
 
     console.log('All files uploaded');
 
@@ -217,13 +294,22 @@ const submitForm = async () => {
     const docRef = doc($db, "properties", homeId);
     await updateDoc(docRef, {
       roof: {
-        ...form.value
-      }
+        ...roof.value
+      }, 
+      gutters: {
+        ...gutters.value
+      }, 
+      siding: {
+        ...siding.value
+      }, 
+      paint: {
+        ...paint.value
+      },   
     }, { merge: true });
 
     console.log('Home updated successfully');
     
-    // Optionally, you can reset the form or show a success message here
+    // Optionally, you can reset the roof or show a success message here
     
   } catch (error) {
     console.error('Error in submitForm:', error);
@@ -290,38 +376,38 @@ const submitForm = async () => {
                 </p>
               </template>
 
-              <template #roof-info>
+              <template #roof>
 
                 <div v-if="homeSource" class="max-w-4xl mx-auto p-4">
                   <form @submit.prevent="submitForm" class="max-w-4xl mx-auto px-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div class="flex flex-col">
                         <label for="squareFeet" class="mb-1">Square Feet:</label>
-                        <input type="number" v-model="form.squareFeet" id="squareFeet" class="border rounded p-2"
+                        <input type="number" v-model="roof.squareFeet" id="squareFeet" class="border rounded p-2"
                           placeholder="Enter square feet" />
                       </div>
                       <div class="flex flex-col">
                         <label for="materials" class="mb-1">Materials:</label>
-                        <input type="text" v-model="form.materials" id="materials" class="border rounded p-2"
+                        <input type="text" v-model="roof.materials" id="materials" class="border rounded p-2"
                           placeholder="Enter materials" />
                       </div>
                       <div class="flex flex-col">
                         <label for="dateInstalled" class="mb-1">Date Installed:</label>
-                        <input type="date" v-model="form.dateInstalled" id="dateInstalled" class="border rounded p-2" />
+                        <input type="date" v-model="roof.dateInstalled" id="dateInstalled" class="border rounded p-2" />
                       </div>
                       <div class="flex flex-col">
                         <label for="installer" class="mb-1">Installer:</label>
-                        <input type="text" v-model="form.installer" id="installer" class="border rounded p-2"
+                        <input type="text" v-model="roof.installer" id="installer" class="border rounded p-2"
                           placeholder="Enter installer name" />
                       </div>
                       <div class="flex flex-col">
                         <label for="price" class="mb-1">Price Paid:</label>
-                        <input type="number" v-model="form.price" id="price" class="border rounded p-2"
+                        <input type="number" v-model="roof.price" id="price" class="border rounded p-2"
                           placeholder="Enter price" />
                       </div>
                       <div class="flex flex-col md:col-span-2">
                         <label for="notes" class="mb-1">Notes:</label>
-                        <textarea v-model="form.notes" id="notes" class="border rounded p-2" placeholder="Enter notes"
+                        <textarea v-model="roof.notes" id="notes" class="border rounded p-2" placeholder="Enter notes"
                           rows="3"></textarea>
                       </div>
                       <div v-if="homeSource.roof.files.length > 0" class="flex flex-col md:col-span-2">
@@ -357,222 +443,212 @@ const submitForm = async () => {
               </template>
 
               <template #gutters>
-                <article v-if="homeSource" class="p-4 bg-white shadow-md rounded-md relative">
-                  <div class="max-w-4xl mx-auto p-4">
-                    <h2 class="text-2xl font-bold mb-4">Enter Roof Information</h2>
-                    <form @submit.prevent="submitForm">
-                      <div class="mb-4">
-                        <label for="squareFeet" class="block">Square Feet:</label>
-                        <input type="number" v-model="form.squareFeet" class="border rounded w-full p-2"
-                          placeholder="Enter square feet" />
+ 
+                <div v-if="homeSource" class="max-w-4xl mx-auto p-4">
+                  <form @submit.prevent="submitForm" class="max-w-4xl mx-auto px-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div class="flex flex-col">
+                        <label for="installed" class="mb-1">Installed:</label>
+                        <input type="checkbox" v-model="gutters.installed" id="installed" class="border rounded p-2" />
                       </div>
-
-                      <div class="mb-4">
-                        <label for="materials" class="block">Materials:</label>
-                        <input type="text" v-model="form.materials" class="border rounded w-full p-2"
+                      <div class="flex flex-col">
+                        <label for="length" class="mb-1">Length:</label>
+                        <input type="number" v-model="gutters.length" id="length" class="border rounded p-2"
+                          placeholder="Enter length" />
+                      </div>
+                      <div class="flex flex-col">
+                        <label for="totalDownspouts" class="mb-1">Total Downspouts:</label>
+                        <input type="number" v-model="gutters.totalDownspouts" id="totalDownspouts" class="border rounded p-2"
+                          placeholder="Enter total downspouts" />
+                      </div>
+                      <div class="flex flex-col">
+                        <label for="materials" class="mb-1">Materials:</label>
+                        <input type="text" v-model="gutters.materials" id="materials" class="border rounded p-2"
                           placeholder="Enter materials" />
                       </div>
-
-                      <div class="mb-4">
-                        <label for="dateInstalled" class="block">Date Installed:</label>
-                        <input type="date" v-model="form.dateInstalled" class="border rounded w-full p-2" />
+                      <div class="flex flex-col">
+                        <label for="dateInstalled" class="mb-1">Date Installed:</label>
+                        <input type="date" v-model="gutters.dateInstalled" id="dateInstalled" class="border rounded p-2" />
                       </div>
-
-                      <div class="mb-4">
-                        <label for="installer" class="block">Installer:</label>
-                        <input type="text" v-model="form.installer" class="border rounded w-full p-2"
+                      <div class="flex flex-col">
+                        <label for="installer" class="mb-1">Installer:</label>
+                        <input type="text" v-model="gutters.installer" id="installer" class="border rounded p-2"
                           placeholder="Enter installer name" />
                       </div>
-
-                      <div class="mb-4">
-                        <label for="price" class="block">Price Paid:</label>
-                        <input type="number" v-model="form.price" class="border rounded w-full p-2"
+                      <div class="flex flex-col">
+                        <label for="price" class="mb-1">Price Paid:</label>
+                        <input type="number" v-model="gutters.price" id="price" class="border rounded p-2"
                           placeholder="Enter price" />
                       </div>
-
-                      <div class="mb-4">
-                        <label for="notes" class="block">Notes:</label>
-                        <textarea v-model="form.notes" class="border rounded w-full p-2" placeholder="Enter notes"
+                      <div class="flex flex-col md:col-span-2">
+                        <label for="notes" class="mb-1">Notes:</label>
+                        <textarea v-model="gutters.notes" id="notes" class="border rounded p-2" placeholder="Enter notes"
                           rows="3"></textarea>
                       </div>
-
-                      <div class="mb-4">
-                        <label for="files" class="block">Upload Files:</label>
-                        <input type="file" multiple @change="handleFileUpload" class="border rounded w-full p-2" />
+                      <div v-if="homeSource.gutters.files.length > 0" class="flex flex-col md:col-span-2">
+                        <UCarousel v-slot="{ item }" :items="homeSource.gutters.files" indicators>                   
+                          <img width="300" height="400" draggable="false" :src="item.preview" :alt="item.name" class="rounded" />                              
+                        </UCarousel>  
                       </div>
-
-                      <button type="submit" class="bg-blue-500 text-white rounded p-2">
-                        Submit
-                      </button>
-                    </form>
-
-                    <!-- Display uploaded files in a carousel -->
-                    <div v-if="uploadedFiles.length > 0" class="mt-6">
-                      <h3 class="text-xl font-semibold mb-4">The Uploaded Files</h3>
-                      <p>Number of uploaded files: {{ uploadedFiles.length }}</p>
-                      <Carousel :wrapAround="false" :itemsToShow="1">
-                        <Slide v-for="(file, index) in uploadedFiles" :key="index"
-                          class="outline-solid outline-2 outline-blue-500">
-                          <p>File: {{ file.name }} ({{ file.type }})</p>
-                          <img v-if="isImage(file)" :src="file.preview" :alt="file.name" class="w-full rounded" />
-                          <video v-else-if="isVideo(file)" controls class="w-full rounded">
-                            <source :src="file.preview" type="video/mp4" />
-                            Your browser does not support the video tag.
-                          </video>
-                          <a v-else :href="file.preview" target="_blank" class="text-blue-500 underline">
-                            {{ file.name }}
-                          </a>
-                        </Slide>
-                      </Carousel>
+                      <div class="flex flex-col md:col-span-2">
+                        <label for="files" class="mb-1">Upload Files:</label>
+                        <input type="file" multiple @change="handleFileUpload" id="files" class="border rounded p-2" />
+                        <!-- Display uploaded files in a carousel -->
+                        <div v-if="uploadedFiles.length > 0" class="mt-6">
+                          <h3 class="text-xl font-semibold mb-4">Attachments</h3>
+                          <UCarousel v-slot="{ item }" :items="uploadedFiles" indicators>
+                            <video width="300" height="400" draggable="false" v-if="isVideo(item)" controls class="rounded">
+                                <source :src="item.preview" type="video/mp4" />
+                                Your browser does not support the video tag.
+                              </video>                             
+                              <img width="300" height="400" draggable="false" v-else :src="item.preview" :alt="item.name" class="rounded" />                              
+                          </UCarousel>
+                        </div>
+                      </div>
+                      <div class="md:col-span-2 mt-4">
+                        <button type="submit" class="bg-blue-500 text-white rounded p-2 w-full">
+                          Submit
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </article>
+                  </form>
+
+                </div>
+
               </template>
 
               <template #siding>
-                <article v-if="homeSource" class="p-4 bg-white shadow-md rounded-md relative">
-                  <div class="max-w-4xl mx-auto p-4">
-                    <h2 class="text-2xl font-bold mb-4">Enter Roof Information</h2>
-                    <form @submit.prevent="submitForm">
-                      <div class="mb-4">
-                        <label for="squareFeet" class="block">Square Feet:</label>
-                        <input type="number" v-model="form.squareFeet" class="border rounded w-full p-2"
+
+
+                <div v-if="homeSource" class="max-w-4xl mx-auto p-4">
+                  <form @submit.prevent="submitForm" class="max-w-4xl mx-auto px-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div class="flex flex-col">
+                        <label for="squareFeet" class="mb-1">Square Feet:</label>
+                        <input type="number" v-model="siding.squareFeet" id="squareFeet" class="border rounded p-2"
                           placeholder="Enter square feet" />
                       </div>
-
-                      <div class="mb-4">
-                        <label for="materials" class="block">Materials:</label>
-                        <input type="text" v-model="form.materials" class="border rounded w-full p-2"
+                      <div class="flex flex-col">
+                        <label for="materials" class="mb-1">Materials:</label>
+                        <input type="text" v-model="siding.materials" id="materials" class="border rounded p-2"
                           placeholder="Enter materials" />
                       </div>
-
-                      <div class="mb-4">
-                        <label for="dateInstalled" class="block">Date Installed:</label>
-                        <input type="date" v-model="form.dateInstalled" class="border rounded w-full p-2" />
+                      <div class="flex flex-col">
+                        <label for="dateInstalled" class="mb-1">Date Installed:</label>
+                        <input type="date" v-model="siding.dateInstalled" id="dateInstalled" class="border rounded p-2" />
                       </div>
-
-                      <div class="mb-4">
-                        <label for="installer" class="block">Installer:</label>
-                        <input type="text" v-model="form.installer" class="border rounded w-full p-2"
+                      <div class="flex flex-col">
+                        <label for="installer" class="mb-1">Installer:</label>
+                        <input type="text" v-model="siding.installer" id="installer" class="border rounded p-2"
                           placeholder="Enter installer name" />
                       </div>
-
-                      <div class="mb-4">
-                        <label for="price" class="block">Price Paid:</label>
-                        <input type="number" v-model="form.price" class="border rounded w-full p-2"
+                      <div class="flex flex-col">
+                        <label for="price" class="mb-1">Price Paid:</label>
+                        <input type="number" v-model="siding.price" id="price" class="border rounded p-2"
                           placeholder="Enter price" />
                       </div>
-
-                      <div class="mb-4">
-                        <label for="notes" class="block">Notes:</label>
-                        <textarea v-model="form.notes" class="border rounded w-full p-2" placeholder="Enter notes"
+                      <div class="flex flex-col md:col-span-2">
+                        <label for="notes" class="mb-1">Notes:</label>
+                        <textarea v-model="siding.notes" id="notes" class="border rounded p-2" placeholder="Enter notes"
                           rows="3"></textarea>
                       </div>
-
-                      <div class="mb-4">
-                        <label for="files" class="block">Upload Files:</label>
-                        <input type="file" multiple @change="handleFileUpload" class="border rounded w-full p-2" />
+                      <div v-if="homeSource.siding.files.length > 0" class="flex flex-col md:col-span-2">
+                        <UCarousel v-slot="{ item }" :items="homeSource.siding.files" indicators>                   
+                          <img width="300" height="400" draggable="false" :src="item.preview" :alt="item.name" class="rounded" />                              
+                        </UCarousel>  
                       </div>
-
-                      <button type="submit" class="bg-blue-500 text-white rounded p-2">
-                        Submit
-                      </button>
-                    </form>
-
-                    <!-- Display uploaded files in a carousel -->
-                    <div v-if="uploadedFiles.length > 0" class="mt-6">
-                      <h3 class="text-xl font-semibold mb-4">The Uploaded Files</h3>
-                      <p>Number of uploaded files: {{ uploadedFiles.length }}</p>
-                      <Carousel :wrapAround="false" :itemsToShow="1">
-                        <Slide v-for="(file, index) in uploadedFiles" :key="index"
-                          class="outline-solid outline-2 outline-blue-500">
-                          <p>File: {{ file.name }} ({{ file.type }})</p>
-                          <img v-if="isImage(file)" :src="file.preview" :alt="file.name" class="w-full rounded" />
-                          <video v-else-if="isVideo(file)" controls class="w-full rounded">
-                            <source :src="file.preview" type="video/mp4" />
-                            Your browser does not support the video tag.
-                          </video>
-                          <a v-else :href="file.preview" target="_blank" class="text-blue-500 underline">
-                            {{ file.name }}
-                          </a>
-                        </Slide>
-                      </Carousel>
+                      <div class="flex flex-col md:col-span-2">
+                        <label for="files" class="mb-1">Upload Files:</label>
+                        <input type="file" multiple @change="handleFileUpload" id="files" class="border rounded p-2" />
+                        <!-- Display uploaded files in a carousel -->
+                        <div v-if="uploadedFiles.length > 0" class="mt-6">
+                          <h3 class="text-xl font-semibold mb-4">Attachments</h3>
+                          <UCarousel v-slot="{ item }" :items="uploadedFiles" indicators>
+                            <video width="300" height="400" draggable="false" v-if="isVideo(item)" controls class="rounded">
+                                <source :src="item.preview" type="video/mp4" />
+                                Your browser does not support the video tag.
+                              </video>                             
+                              <img width="300" height="400" draggable="false" v-else :src="item.preview" :alt="item.name" class="rounded" />                              
+                          </UCarousel>
+                        </div>
+                      </div>
+                      <div class="md:col-span-2 mt-4">
+                        <button type="submit" class="bg-blue-500 text-white rounded p-2 w-full">
+                          Submit
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </article>
+                  </form>
+
+                </div>
+
               </template>
 
               <template #paint>
-                <article v-if="homeSource" class="p-4 bg-white shadow-md rounded-md relative">
-                  <div class="max-w-4xl mx-auto p-4">
-                    <h2 class="text-2xl font-bold mb-4">Enter Roof Information</h2>
-                    <form @submit.prevent="submitForm">
-                      <div class="mb-4">
-                        <label for="squareFeet" class="block">Square Feet:</label>
-                        <input type="number" v-model="form.squareFeet" class="border rounded w-full p-2"
+
+                <div v-if="homeSource" class="max-w-4xl mx-auto p-4">
+                  <form @submit.prevent="submitForm" class="max-w-4xl mx-auto px-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div class="flex flex-col">
+                        <label for="squareFeet" class="mb-1">Square Feet:</label>
+                        <input type="number" v-model="paint.squareFeet" id="squareFeet" class="border rounded p-2"
                           placeholder="Enter square feet" />
                       </div>
-
-                      <div class="mb-4">
-                        <label for="materials" class="block">Materials:</label>
-                        <input type="text" v-model="form.materials" class="border rounded w-full p-2"
+                      <div class="flex flex-col">
+                        <label for="materials" class="mb-1">Materials:</label>
+                        <input type="text" v-model="paint.materials" id="materials" class="border rounded p-2"
                           placeholder="Enter materials" />
                       </div>
-
-                      <div class="mb-4">
-                        <label for="dateInstalled" class="block">Date Installed:</label>
-                        <input type="date" v-model="form.dateInstalled" class="border rounded w-full p-2" />
+                      <div class="flex flex-col">
+                        <label for="dateInstalled" class="mb-1">Date Installed:</label>
+                        <input type="date" v-model="paint.dateInstalled" id="dateInstalled" class="border rounded p-2" />
                       </div>
-
-                      <div class="mb-4">
-                        <label for="installer" class="block">Installer:</label>
-                        <input type="text" v-model="form.installer" class="border rounded w-full p-2"
+                      <div class="flex flex-col">
+                        <label for="installer" class="mb-1">Installer:</label>
+                        <input type="text" v-model="paint.installer" id="installer" class="border rounded p-2"
                           placeholder="Enter installer name" />
                       </div>
-
-                      <div class="mb-4">
-                        <label for="price" class="block">Price Paid:</label>
-                        <input type="number" v-model="form.price" class="border rounded w-full p-2"
+                      <div class="flex flex-col">
+                        <label for="price" class="mb-1">Price Paid:</label>
+                        <input type="number" v-model="paint.price" id="price" class="border rounded p-2"
                           placeholder="Enter price" />
                       </div>
-
-                      <div class="mb-4">
-                        <label for="notes" class="block">Notes:</label>
-                        <textarea v-model="form.notes" class="border rounded w-full p-2" placeholder="Enter notes"
+                      <div class="flex flex-col md:col-span-2">
+                        <label for="notes" class="mb-1">Notes:</label>
+                        <textarea v-model="paint.notes" id="notes" class="border rounded p-2" placeholder="Enter notes"
                           rows="3"></textarea>
                       </div>
-
-                      <div class="mb-4">
-                        <label for="files" class="block">Upload Files:</label>
-                        <input type="file" multiple @change="handleFileUpload" class="border rounded w-full p-2" />
+                      <div v-if="homeSource.paint.files.length > 0" class="flex flex-col md:col-span-2">
+                        <UCarousel v-slot="{ item }" :items="homeSource.paint.files" indicators>                   
+                          <img width="300" height="400" draggable="false" :src="item.preview" :alt="item.name" class="rounded" />                              
+                        </UCarousel>  
                       </div>
-
-                      <button type="submit" class="bg-blue-500 text-white rounded p-2">
-                        Submit
-                      </button>
-                    </form>
-
-                    <!-- Display uploaded files in a carousel -->
-                    <div v-if="uploadedFiles.length > 0" class="mt-6">
-                      <h3 class="text-xl font-semibold mb-4">The Uploaded Files</h3>
-                      <p>Number of uploaded files: {{ uploadedFiles.length }}</p>
-                      <Carousel :wrapAround="false" :itemsToShow="1">
-                        <Slide v-for="(file, index) in uploadedFiles" :key="index"
-                          class="outline-solid outline-2 outline-blue-500">
-                          <p>File: {{ file.name }} ({{ file.type }})</p>
-                          <img v-if="isImage(file)" :src="file.preview" :alt="file.name" class="w-full rounded" />
-                          <video v-else-if="isVideo(file)" controls class="w-full rounded">
-                            <source :src="file.preview" type="video/mp4" />
-                            Your browser does not support the video tag.
-                          </video>
-                          <a v-else :href="file.preview" target="_blank" class="text-blue-500 underline">
-                            {{ file.name }}
-                          </a>
-                        </Slide>
-                      </Carousel>
+                      <div class="flex flex-col md:col-span-2">
+                        <label for="files" class="mb-1">Upload Files:</label>
+                        <input type="file" multiple @change="handleFileUpload" id="files" class="border rounded p-2" />
+                        <!-- Display uploaded files in a carousel -->
+                        <div v-if="uploadedFiles.length > 0" class="mt-6">
+                          <h3 class="text-xl font-semibold mb-4">Attachments</h3>
+                          <UCarousel v-slot="{ item }" :items="uploadedFiles" indicators>
+                            <video width="300" height="400" draggable="false" v-if="isVideo(item)" controls class="rounded">
+                                <source :src="item.preview" type="video/mp4" />
+                                Your browser does not support the video tag.
+                              </video>                             
+                              <img width="300" height="400" draggable="false" v-else :src="item.preview" :alt="item.name" class="rounded" />                              
+                          </UCarousel>
+                        </div>
+                      </div>
+                      <div class="md:col-span-2 mt-4">
+                        <button type="submit" class="bg-blue-500 text-white rounded p-2 w-full">
+                          Submit
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </article>
+                  </form>
+
+                </div>
+
+
               </template>
 
             </UAccordion>
