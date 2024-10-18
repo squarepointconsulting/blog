@@ -2,11 +2,14 @@
 
 import { useRoute } from 'vue-router';
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+
 import { Carousel, Slide } from 'vue3-carousel';
 
 const route = useRoute();
 const homeId = route.params.id;
-const { $db } = useNuxtApp();
+
+const { $db, $storage } = useNuxtApp();
 const docRef = doc($db, 'properties', homeId);
 const home = useDocument(docRef)
 const homeSource = ref()
@@ -134,13 +137,15 @@ const handleFileUpload = async (event) => {
             name: file.name,
             preview: localThumbnailUrl.value,
             type: file.type,
+            file: file,
           });
         });
       } else {
         uploadedFiles.value.push({
           name: file.name,
           preview: reader.result,
-          type: file.type,
+            type: file.type,
+            file: file,
           });
         }
       console.log('Current uploadedFiles:', uploadedFiles.value);
@@ -155,6 +160,45 @@ const isVideo = (file) => file.type.startsWith('video/');
 const submitForm = async () => {
   console.log('Form submitted:', form.value);
   try {
+
+
+    uploadedFiles.value.forEach((file) => {
+      // uploadToFirebase(file);
+      console.log('File:', file);
+      const fileRef = storageRef($storage, `properties/${homeId}/${file.name}`);
+      console.log('File ref:', fileRef);
+      uploadBytes(fileRef, file.file).then((snapshot) => {
+        getDownloadURL(fileRef)
+          .then((url) => {
+            console.log('File uploaded:', url);
+            form.value.files.push(url);
+          });
+      }); 
+
+    });
+
+    // Upload the PDF to Firebase Storage
+    const pdfStorageRef = storageRef($storage, `pdfs/${pdfFile.value.name}`);
+    await uploadBytes(pdfStorageRef, pdfFile.value);
+    const pdfUrl = await getDownloadURL(pdfStorageRef);
+
+    // Upload the thumbnail to Firebase Storage
+    const thumbnailStorageRef = storageRef($storage, `thumbnails/${pdfFile.value.name}.png`);
+    await uploadBytes(thumbnailStorageRef, thumbnailBlob.value);
+    const thumbnailUrl = await getDownloadURL(thumbnailStorageRef);
+
+    // Save the home record with the URLs (adjust the document path as necessary)
+    const homeRecordDoc = doc($db, 'homes', 'homeId'); // Replace 'homeId' with the actual home document ID
+    await updateDoc(homeRecordDoc, {
+      pdfUrl,
+      thumbnailUrl,
+    });
+
+
+
+
+
+
     // Update the home document in Firestore
     const docRef = doc($db, "properties", homeId);
     await updateDoc(docRef, {
@@ -163,7 +207,13 @@ const submitForm = async () => {
         files: uploadedFiles.value
       }
     });
+
+
+
     console.log('Home updated successfully');
+
+
+
     // Optionally, reset the form or show a success message
     // form.value = {
     //   squareFeet: '',
@@ -248,30 +298,25 @@ const submitForm = async () => {
                         <input type="number" v-model="form.squareFeet" id="squareFeet" class="border rounded p-2"
                           placeholder="Enter square feet" />
                       </div>
-
                       <div class="flex flex-col">
                         <label for="materials" class="mb-1">Materials:</label>
                         <input type="text" v-model="form.materials" id="materials" class="border rounded p-2"
                           placeholder="Enter materials" />
                       </div>
-
                       <div class="flex flex-col">
                         <label for="dateInstalled" class="mb-1">Date Installed:</label>
                         <input type="date" v-model="form.dateInstalled" id="dateInstalled" class="border rounded p-2" />
                       </div>
-
                       <div class="flex flex-col">
                         <label for="installer" class="mb-1">Installer:</label>
                         <input type="text" v-model="form.installer" id="installer" class="border rounded p-2"
                           placeholder="Enter installer name" />
                       </div>
-
                       <div class="flex flex-col">
                         <label for="price" class="mb-1">Price Paid:</label>
                         <input type="number" v-model="form.price" id="price" class="border rounded p-2"
                           placeholder="Enter price" />
                       </div>
-
                       <div class="flex flex-col md:col-span-2">
                         <label for="files" class="mb-1">Upload Files:</label>
                         <input type="file" multiple @change="handleFileUpload" id="files" class="border rounded p-2" />
@@ -286,15 +331,12 @@ const submitForm = async () => {
                               <img width="300" height="400" draggable="false" v-else :src="item.preview" :alt="item.name" class="rounded" />                              
                           </UCarousel>
                         </div>
-
                       </div>
-
                       <div class="flex flex-col md:col-span-2">
                         <label for="notes" class="mb-1">Notes:</label>
                         <textarea v-model="form.notes" id="notes" class="border rounded p-2" placeholder="Enter notes"
                           rows="3"></textarea>
                       </div>
-
                       <div class="md:col-span-2 mt-4">
                         <button type="submit" class="bg-blue-500 text-white rounded p-2 w-full">
                           Submit
