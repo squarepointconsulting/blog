@@ -74,15 +74,17 @@ const sections = [{
   label: 'Gutters',
   icon: 'i-heroicons-arrow-down-tray',
   defaultOpen: false,
-  slot: 'installation'
+  slot: 'gutters'
 }, {
   label: 'Siding',
   icon: 'i-heroicons-eye-dropper',
   defaultOpen: false,
+  slot: 'siding',
   description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
 }, {
   label: 'Paint',
   icon: 'i-heroicons-rectangle-group',
+  slot: 'paint',
   description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
 },]
 
@@ -186,6 +188,83 @@ watch(uploadedFiles, (newFiles) => {
               </template>
 
               <template #roof-info>
+
+                <div v-if="homeSource" class="max-w-4xl mx-auto p-4">
+                  <form @submit.prevent="submitForm" class="max-w-4xl mx-auto px-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div class="flex flex-col">
+                        <label for="squareFeet" class="mb-1">Square Feet:</label>
+                        <input type="number" v-model="form.squareFeet" id="squareFeet" class="border rounded p-2"
+                          placeholder="Enter square feet" />
+                      </div>
+
+                      <div class="flex flex-col">
+                        <label for="materials" class="mb-1">Materials:</label>
+                        <input type="text" v-model="form.materials" id="materials" class="border rounded p-2"
+                          placeholder="Enter materials" />
+                      </div>
+
+                      <div class="flex flex-col">
+                        <label for="dateInstalled" class="mb-1">Date Installed:</label>
+                        <input type="date" v-model="form.dateInstalled" id="dateInstalled" class="border rounded p-2" />
+                      </div>
+
+                      <div class="flex flex-col">
+                        <label for="installer" class="mb-1">Installer:</label>
+                        <input type="text" v-model="form.installer" id="installer" class="border rounded p-2"
+                          placeholder="Enter installer name" />
+                      </div>
+
+                      <div class="flex flex-col">
+                        <label for="price" class="mb-1">Price Paid:</label>
+                        <input type="number" v-model="form.price" id="price" class="border rounded p-2"
+                          placeholder="Enter price" />
+                      </div>
+
+                      <div class="flex flex-col md:col-span-2">
+                        <label for="files" class="mb-1">Upload Files:</label>
+                        <input type="file" multiple @change="handleFileUpload" id="files" class="border rounded p-2" />
+                        <!-- Display uploaded files in a carousel -->
+                        <div v-if="uploadedFiles.length > 0" class="mt-6">
+                          <h3 class="text-xl font-semibold mb-4">The Uploaded Files</h3>
+                          <p>Number of uploaded files: {{ uploadedFiles.length }}</p>
+                          <Carousel :wrapAround="false" :itemsToShow="1">
+                            <Slide v-for="(file, index) in uploadedFiles" :key="index"
+                              class="outline-solid outline-2 outline-blue-500">
+                              <p>File: {{ file.name }} ({{ file.type }})</p>
+                              <img v-if="isImage(file)" :src="file.preview" :alt="file.name" class="w-full rounded" />
+                              <video v-else-if="isVideo(file)" controls class="w-full rounded">
+                                <source :src="file.preview" type="video/mp4" />
+                                Your browser does not support the video tag.
+                              </video>
+                              <a v-else :href="file.preview" target="_blank" class="text-blue-500 underline">
+                                {{ file.name }}
+                              </a>
+                            </Slide>
+                          </Carousel>
+                        </div>
+
+                      </div>
+
+                      <div class="flex flex-col md:col-span-2">
+                        <label for="notes" class="mb-1">Notes:</label>
+                        <textarea v-model="form.notes" id="notes" class="border rounded p-2" placeholder="Enter notes"
+                          rows="3"></textarea>
+                      </div>
+
+                      <div class="md:col-span-2 mt-4">
+                        <button type="submit" class="bg-blue-500 text-white rounded p-2 w-full">
+                          Submit
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+
+                </div>
+
+              </template>
+
+              <template #gutters>
                 <article v-if="homeSource" class="p-4 bg-white shadow-md rounded-md relative">
                   <div class="max-w-4xl mx-auto p-4">
                     <h2 class="text-2xl font-bold mb-4">Enter Roof Information</h2>
@@ -240,7 +319,8 @@ watch(uploadedFiles, (newFiles) => {
                       <h3 class="text-xl font-semibold mb-4">The Uploaded Files</h3>
                       <p>Number of uploaded files: {{ uploadedFiles.length }}</p>
                       <Carousel :wrapAround="false" :itemsToShow="1">
-                        <Slide v-for="(file, index) in uploadedFiles" :key="index" class="outline-solid outline-2 outline-blue-500">
+                        <Slide v-for="(file, index) in uploadedFiles" :key="index"
+                          class="outline-solid outline-2 outline-blue-500">
                           <p>File: {{ file.name }} ({{ file.type }})</p>
                           <img v-if="isImage(file)" :src="file.preview" :alt="file.name" class="w-full rounded" />
                           <video v-else-if="isVideo(file)" controls class="w-full rounded">
@@ -257,23 +337,152 @@ watch(uploadedFiles, (newFiles) => {
                 </article>
               </template>
 
-              <template #installation="{ description }">
-                <div class="flex flex-col justify-center items-center gap-1 mb-4">
-                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-                    Installation
-                  </h3>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Install <code>@nuxt/ui</code> dependency to your project:
-                  </p>
-                  <p>
-                    {{ description }}
-                  </p>
-                </div>
+              <template #siding>
+                <article v-if="homeSource" class="p-4 bg-white shadow-md rounded-md relative">
+                  <div class="max-w-4xl mx-auto p-4">
+                    <h2 class="text-2xl font-bold mb-4">Enter Roof Information</h2>
+                    <form @submit.prevent="submitForm">
+                      <div class="mb-4">
+                        <label for="squareFeet" class="block">Square Feet:</label>
+                        <input type="number" v-model="form.squareFeet" class="border rounded w-full p-2"
+                          placeholder="Enter square feet" />
+                      </div>
 
-                <div class="flex flex-col items-center">
-                  <code>$ npx nuxi@latest module add ui</code>
-                </div>
+                      <div class="mb-4">
+                        <label for="materials" class="block">Materials:</label>
+                        <input type="text" v-model="form.materials" class="border rounded w-full p-2"
+                          placeholder="Enter materials" />
+                      </div>
+
+                      <div class="mb-4">
+                        <label for="dateInstalled" class="block">Date Installed:</label>
+                        <input type="date" v-model="form.dateInstalled" class="border rounded w-full p-2" />
+                      </div>
+
+                      <div class="mb-4">
+                        <label for="installer" class="block">Installer:</label>
+                        <input type="text" v-model="form.installer" class="border rounded w-full p-2"
+                          placeholder="Enter installer name" />
+                      </div>
+
+                      <div class="mb-4">
+                        <label for="price" class="block">Price Paid:</label>
+                        <input type="number" v-model="form.price" class="border rounded w-full p-2"
+                          placeholder="Enter price" />
+                      </div>
+
+                      <div class="mb-4">
+                        <label for="notes" class="block">Notes:</label>
+                        <textarea v-model="form.notes" class="border rounded w-full p-2" placeholder="Enter notes"
+                          rows="3"></textarea>
+                      </div>
+
+                      <div class="mb-4">
+                        <label for="files" class="block">Upload Files:</label>
+                        <input type="file" multiple @change="handleFileUpload" class="border rounded w-full p-2" />
+                      </div>
+
+                      <button type="submit" class="bg-blue-500 text-white rounded p-2">
+                        Submit
+                      </button>
+                    </form>
+
+                    <!-- Display uploaded files in a carousel -->
+                    <div v-if="uploadedFiles.length > 0" class="mt-6">
+                      <h3 class="text-xl font-semibold mb-4">The Uploaded Files</h3>
+                      <p>Number of uploaded files: {{ uploadedFiles.length }}</p>
+                      <Carousel :wrapAround="false" :itemsToShow="1">
+                        <Slide v-for="(file, index) in uploadedFiles" :key="index"
+                          class="outline-solid outline-2 outline-blue-500">
+                          <p>File: {{ file.name }} ({{ file.type }})</p>
+                          <img v-if="isImage(file)" :src="file.preview" :alt="file.name" class="w-full rounded" />
+                          <video v-else-if="isVideo(file)" controls class="w-full rounded">
+                            <source :src="file.preview" type="video/mp4" />
+                            Your browser does not support the video tag.
+                          </video>
+                          <a v-else :href="file.preview" target="_blank" class="text-blue-500 underline">
+                            {{ file.name }}
+                          </a>
+                        </Slide>
+                      </Carousel>
+                    </div>
+                  </div>
+                </article>
               </template>
+
+              <template #paint>
+                <article v-if="homeSource" class="p-4 bg-white shadow-md rounded-md relative">
+                  <div class="max-w-4xl mx-auto p-4">
+                    <h2 class="text-2xl font-bold mb-4">Enter Roof Information</h2>
+                    <form @submit.prevent="submitForm">
+                      <div class="mb-4">
+                        <label for="squareFeet" class="block">Square Feet:</label>
+                        <input type="number" v-model="form.squareFeet" class="border rounded w-full p-2"
+                          placeholder="Enter square feet" />
+                      </div>
+
+                      <div class="mb-4">
+                        <label for="materials" class="block">Materials:</label>
+                        <input type="text" v-model="form.materials" class="border rounded w-full p-2"
+                          placeholder="Enter materials" />
+                      </div>
+
+                      <div class="mb-4">
+                        <label for="dateInstalled" class="block">Date Installed:</label>
+                        <input type="date" v-model="form.dateInstalled" class="border rounded w-full p-2" />
+                      </div>
+
+                      <div class="mb-4">
+                        <label for="installer" class="block">Installer:</label>
+                        <input type="text" v-model="form.installer" class="border rounded w-full p-2"
+                          placeholder="Enter installer name" />
+                      </div>
+
+                      <div class="mb-4">
+                        <label for="price" class="block">Price Paid:</label>
+                        <input type="number" v-model="form.price" class="border rounded w-full p-2"
+                          placeholder="Enter price" />
+                      </div>
+
+                      <div class="mb-4">
+                        <label for="notes" class="block">Notes:</label>
+                        <textarea v-model="form.notes" class="border rounded w-full p-2" placeholder="Enter notes"
+                          rows="3"></textarea>
+                      </div>
+
+                      <div class="mb-4">
+                        <label for="files" class="block">Upload Files:</label>
+                        <input type="file" multiple @change="handleFileUpload" class="border rounded w-full p-2" />
+                      </div>
+
+                      <button type="submit" class="bg-blue-500 text-white rounded p-2">
+                        Submit
+                      </button>
+                    </form>
+
+                    <!-- Display uploaded files in a carousel -->
+                    <div v-if="uploadedFiles.length > 0" class="mt-6">
+                      <h3 class="text-xl font-semibold mb-4">The Uploaded Files</h3>
+                      <p>Number of uploaded files: {{ uploadedFiles.length }}</p>
+                      <Carousel :wrapAround="false" :itemsToShow="1">
+                        <Slide v-for="(file, index) in uploadedFiles" :key="index"
+                          class="outline-solid outline-2 outline-blue-500">
+                          <p>File: {{ file.name }} ({{ file.type }})</p>
+                          <img v-if="isImage(file)" :src="file.preview" :alt="file.name" class="w-full rounded" />
+                          <video v-else-if="isVideo(file)" controls class="w-full rounded">
+                            <source :src="file.preview" type="video/mp4" />
+                            Your browser does not support the video tag.
+                          </video>
+                          <a v-else :href="file.preview" target="_blank" class="text-blue-500 underline">
+                            {{ file.name }}
+                          </a>
+                        </Slide>
+                      </Carousel>
+                    </div>
+                  </div>
+                </article>
+              </template>
+
             </UAccordion>
           </div>
         </template>
@@ -300,4 +509,3 @@ watch(uploadedFiles, (newFiles) => {
   border-radius: 10px;
 }
 </style>
-
