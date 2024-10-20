@@ -3,6 +3,7 @@
 import { useRoute } from 'vue-router';
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref } from 'vue';
 const route = useRoute();
 const homeId = route.params.id;
 const { $db, $storage } = useNuxtApp();
@@ -77,9 +78,11 @@ const handleFileUpload = async (event) => {
 const isImage = (file) => file.type.startsWith('image/');
 const isVideo = (file) => file.type.startsWith('video/');
 
-const submitForm = async () => {
-  try {
+const isUploading = ref(false);
 
+const submitForm = async () => {
+  isUploading.value = true;
+  try {
     // Create an array of promises for file uploads
     const uploadPromises = uploadedFiles.value.map(async (file) => {
       const fileRef = storageRef($storage, `properties/${homeId}/${file.name}`);
@@ -125,7 +128,7 @@ const submitForm = async () => {
   } catch (error) {
     console.error('Error in submitForm:', error);
   } finally {
-
+    isUploading.value = false;
   }
 };
 
@@ -222,6 +225,14 @@ async function generatePdfThumbnail(file) {
         </div>
       </div>
     </form>
+
+    <!-- Upload Modal -->
+    <UModal v-model="isUploading">
+      <div class="p-4 flex flex-col items-center">
+        <USpinner class="mb-4" />
+        <p>Uploading files, please wait...</p>
+      </div>
+    </UModal>
   </div>
 </template>
 
