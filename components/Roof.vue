@@ -2,8 +2,12 @@
 
 import { useRoute } from 'vue-router';
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
-import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { ref } from 'vue';
+
+const showDeleteConfirm = ref(false);
+const fileToDelete = ref(null);
+
 const route = useRoute();
 const homeId = route.params.id;
 const { $db, $storage } = useNuxtApp();
@@ -167,6 +171,51 @@ async function generatePdfThumbnail(file) {
     }, 'image/png');
   });
 }
+
+// Add this function to handle file deletion
+const deleteFile = async (file) => {
+  try {
+    // Delete file from Storage
+    const fileRef = storageRef($storage, `properties/${homeId}/${file.name}`);
+    await deleteObject(fileRef);
+
+    // If it's a PDF, also delete the thumbnail
+    if (file.type.startsWith('application/pdf')) {
+      const thumbnailRef = storageRef($storage, `properties/${homeId}/${file.name}-thumbnail.png`);
+      await deleteObject(thumbnailRef);
+    }
+
+    // Update Firestore by removing the file from the array
+    roof.value.files = roof.value.files.filter(f => f.url !== file.url);
+    
+    // Update the document
+    const docRef = doc($db, "properties", homeId);
+    await updateDoc(docRef, {
+      roof: {
+        ...roof.value
+      },
+    });
+
+  } catch (error) {
+    console.error('Error deleting file:', error);
+  }
+};
+
+// Function to handle delete confirmation
+const confirmDelete = (file) => {
+  fileToDelete.value = file;
+  showDeleteConfirm.value = true;
+};
+
+// Function to execute delete after confirmation
+const handleDeleteConfirm = async () => {
+  if (fileToDelete.value) {
+    await deleteFile(fileToDelete.value);
+    fileToDelete.value = null;
+  }
+  showDeleteConfirm.value = false;
+};
+
 </script>
 
 <template>
@@ -202,18 +251,29 @@ async function generatePdfThumbnail(file) {
             rows="3"></textarea>
         </div>
         <div v-if="roof.files.length > 0" class="flex flex-col md:col-span-2">
-          <UCarousel v-slot="{ item }" :items="roof.files" indicators>
-            <video width="300" height="400" draggable="false" v-if="isVideo(item)" controls class="rounded">
-                <source :src="item.preview" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-              <a :href="item.url" target="_blank" v-else>
-            <img width="300" height="400" draggable="false" :src="item.preview" :alt="item.name"
-              class="rounded" />  
+    <UCarousel v-slot="{ item }" :items="roof.files" indicators>
+      <div class="relative group">
+        <video v-if="isVideo(item)" width="300" height="400" draggable="false" controls class="rounded">
+          <source :src="item.preview" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <img v-else width="300" height="400" draggable="false" :src="item.preview" :alt="item.name"
+          class="rounded" />
+        
+        <!-- Hover Controls -->
+        <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-4">
+          <a :href="item.url" target="_blank" 
+            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+            <UIcon name="i-heroicons-arrow-down-tray" class="w-5 h-5" />
           </a>
-          </UCarousel>
+          <button @click.prevent="confirmDelete(item)"
+            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+            <UIcon name="i-heroicons-trash" class="w-5 h-5" />
+          </button>
         </div>
-        <div class="flex flex-col md:col-span-2">
+      </div>
+    </UCarousel>
+  </div>        <div class="flex flex-col md:col-span-2">
           <label for="files" class="mb-1">Upload Files:</label>
           <input type="file" ref="fileInput" multiple @change="handleFileUpload" id="files" class="border rounded p-2" />
           <!-- Display uploaded files in a carousel -->
@@ -245,6 +305,23 @@ async function generatePdfThumbnail(file) {
       </div>
     </UModal>
   </div>
+
+  <UModal v-model="showDeleteConfirm">
+    <div class="p-4">
+      <h3 class="text-lg font-semibold mb-4">Confirm Delete</h3>
+      <p class="mb-4">Are you sure you want to delete this file?</p>
+      <div class="flex justify-end gap-4">
+        <button @click="showDeleteConfirm = false"
+          class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+          Cancel
+        </button>
+        <button @click="handleDeleteConfirm"
+          class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+          Delete
+        </button>
+      </div>
+    </div>
+  </UModal>
 </template>
 
 <style scoped>
@@ -257,5 +334,16 @@ async function generatePdfThumbnail(file) {
   width: 100%;
   height: auto;
   border-radius: 10px;
+}
+.group {
+  position: relative;
+}
+
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
+}
+
+.transition-opacity {
+  transition: opacity 0.2s ease-in-out;
 }
 </style>
