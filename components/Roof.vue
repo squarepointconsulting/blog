@@ -123,7 +123,7 @@ const submitForm = async () => {
 
     // Add uploaded file data to the roof
     roof.value.files = [...roof.value.files, ...uploadedFileData];
-    
+
     // Update the home document in Firestore
     const docRef = doc($db, "properties", homeId);
     await updateDoc(docRef, {
@@ -187,7 +187,7 @@ const deleteFile = async (file) => {
 
     // Update Firestore by removing the file from the array
     roof.value.files = roof.value.files.filter(f => f.url !== file.url);
-    
+
     // Update the document
     const docRef = doc($db, "properties", homeId);
     await updateDoc(docRef, {
@@ -251,31 +251,33 @@ const handleDeleteConfirm = async () => {
             rows="3"></textarea>
         </div>
         <div v-if="roof.files.length > 0" class="flex flex-col md:col-span-2">
-    <UCarousel v-slot="{ item }" :items="roof.files" indicators>
-      <div class="relative group">
-        <video v-if="isVideo(item)" width="300" height="400" draggable="false" controls class="rounded">
-          <source :src="item.preview" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-        <img v-else width="300" height="400" draggable="false" :src="item.preview" :alt="item.name"
-          class="rounded" />
-        
-        <!-- Hover Controls -->
-        <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-4">
-          <a :href="item.url" target="_blank" 
-            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-            <UIcon name="i-heroicons-arrow-down-tray" class="w-5 h-5" />
-          </a>
-          <button @click.prevent="confirmDelete(item)"
-            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
-            <UIcon name="i-heroicons-trash" class="w-5 h-5" />
-          </button>
+          <UCarousel v-slot="{ item }" :items="roof.files" indicators>
+            <div class="relative group">
+              <video v-if="isVideo(item)" width="300" height="400" draggable="false" controls class="rounded">
+                <source :src="item.preview" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              <img v-else width="300" height="400" draggable="false" :src="item.preview" :alt="item.name"
+                class="rounded" />
+
+              <!-- Hover Controls -->
+              <div
+                class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-4">
+                <a :href="item.url" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                  <UIcon name="i-heroicons-arrow-down-tray" class="w-5 h-5" />
+                </a>
+                <button @click.prevent="confirmDelete(item)"
+                  class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                  <UIcon name="i-heroicons-trash" class="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </UCarousel>
         </div>
-      </div>
-    </UCarousel>
-  </div>        <div class="flex flex-col md:col-span-2">
+        <div class="flex flex-col md:col-span-2">
           <label for="files" class="mb-1">Upload Files:</label>
-          <input type="file" ref="fileInput" multiple @change="handleFileUpload" id="files" class="border rounded p-2" />
+          <input type="file" ref="fileInput" multiple @change="handleFileUpload" id="files"
+            class="border rounded p-2" />
           <!-- Display uploaded files in a carousel -->
           <div v-if="uploadedFiles.length > 0" class="mt-6">
             <h3 class="text-xl font-semibold mb-4">Attachments</h3>
@@ -311,12 +313,10 @@ const handleDeleteConfirm = async () => {
       <h3 class="text-lg font-semibold mb-4">Confirm Delete</h3>
       <p class="mb-4">Are you sure you want to delete this file?</p>
       <div class="flex justify-end gap-4">
-        <button @click="showDeleteConfirm = false"
-          class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+        <button @click="showDeleteConfirm = false" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
           Cancel
         </button>
-        <button @click="handleDeleteConfirm"
-          class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+        <button @click="handleDeleteConfirm" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
           Delete
         </button>
       </div>
@@ -335,6 +335,7 @@ const handleDeleteConfirm = async () => {
   height: auto;
   border-radius: 10px;
 }
+
 .group {
   position: relative;
 }
