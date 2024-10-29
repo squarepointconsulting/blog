@@ -84,7 +84,6 @@ function signInWithGoogle() {
     .then((userCredential) => {
       // Signed in
       logEvent($analytics, `user_logged_in`);
-
       const user = userCredential.user;
       const updated_at_timestamp = serverTimestamp()
       // const ts = Timestamp.fromDate(Date.now())

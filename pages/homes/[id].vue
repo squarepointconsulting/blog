@@ -71,7 +71,7 @@ const columns = [
           </div>
           <!-- Row 2 -->
           <div class="w-full flex justify-center items-center">
-            <p class="font-bold text-center">{{ home.villaFactScore ? home.villaFactScore :
+d            <p class="font-bold text-center">{{ home.villaFactScore ? home.villaFactScore :
               home.villafactScore }}</p>
           </div>
         </div>

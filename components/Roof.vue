@@ -44,6 +44,8 @@ const roof = ref({
 
 
 const uploadedFiles = ref([]);
+const fileInput = ref(null);
+
 const handleFileUpload = async (event) => {
   const files = Array.from(event.target.files);
   files.forEach((file) => {
@@ -79,6 +81,7 @@ const isImage = (file) => file.type.startsWith('image/');
 const isVideo = (file) => file.type.startsWith('video/');
 
 const isUploading = ref(false);
+const router = useRouter();
 
 const submitForm = async () => {
   isUploading.value = true;
@@ -116,7 +119,7 @@ const submitForm = async () => {
 
     // Add uploaded file data to the roof
     roof.value.files = [...roof.value.files, ...uploadedFileData];
-
+    
     // Update the home document in Firestore
     const docRef = doc($db, "properties", homeId);
     await updateDoc(docRef, {
@@ -128,7 +131,15 @@ const submitForm = async () => {
   } catch (error) {
     console.error('Error in submitForm:', error);
   } finally {
+    uploadedFiles.value = [];
+    //homeSource.roof.files = roof.value.files;
     isUploading.value = false;
+
+    // Clear the file input
+    if (fileInput.value) {
+      fileInput.value.value = '';
+    }
+    //router.push('/profile')
   }
 };
 
@@ -190,8 +201,8 @@ async function generatePdfThumbnail(file) {
           <textarea v-model="roof.notes" id="notes" class="border rounded p-2" placeholder="Enter notes"
             rows="3"></textarea>
         </div>
-        <div v-if="homeSource.roof.files.length > 0" class="flex flex-col md:col-span-2">
-          <UCarousel v-slot="{ item }" :items="homeSource.roof.files" indicators>
+        <div v-if="roof.files.length > 0" class="flex flex-col md:col-span-2">
+          <UCarousel v-slot="{ item }" :items="roof.files" indicators>
             <video width="300" height="400" draggable="false" v-if="isVideo(item)" controls class="rounded">
                 <source :src="item.preview" type="video/mp4" />
                 Your browser does not support the video tag.
@@ -204,7 +215,7 @@ async function generatePdfThumbnail(file) {
         </div>
         <div class="flex flex-col md:col-span-2">
           <label for="files" class="mb-1">Upload Files:</label>
-          <input type="file" multiple @change="handleFileUpload" id="files" class="border rounded p-2" />
+          <input type="file" ref="fileInput" multiple @change="handleFileUpload" id="files" class="border rounded p-2" />
           <!-- Display uploaded files in a carousel -->
           <div v-if="uploadedFiles.length > 0" class="mt-6">
             <h3 class="text-xl font-semibold mb-4">Attachments</h3>
@@ -229,7 +240,7 @@ async function generatePdfThumbnail(file) {
     <!-- Upload Modal -->
     <UModal v-model="isUploading">
       <div class="p-4 flex flex-col items-center">
-        <USpinner class="mb-4" />
+        <Spinner />
         <p>Uploading files, please wait...</p>
       </div>
     </UModal>
