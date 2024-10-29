@@ -4,6 +4,12 @@ import { useRoute } from 'vue-router';
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { ref } from 'vue';
+import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf';
+
+GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.mjs',
+  import.meta.url
+).toString();
 
 const showDeleteConfirm = ref(false);
 const fileToDelete = ref(null);
@@ -46,7 +52,6 @@ const roof = ref({
   files: [],
 });
 
-
 const uploadedFiles = ref([]);
 const fileInput = ref(null);
 
@@ -83,9 +88,27 @@ const handleFileUpload = async (event) => {
 
 const isImage = (file) => file.type.startsWith('image/');
 const isVideo = (file) => file.type.startsWith('video/');
-
 const isUploading = ref(false);
-const router = useRouter();
+const localThumbnailUrl = ref(null);
+const thumbnailBlob = ref(null);
+
+async function generatePdfThumbnail(file) {
+  const pdf = await getDocument(await file.arrayBuffer()).promise;
+  const page = await pdf.getPage(1);
+  const viewport = page.getViewport({ scale: 1 });
+  const canvas = document.createElement('canvas');
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+  const context = canvas.getContext('2d');
+  await page.render({ canvasContext: context, viewport }).promise;
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      resolve(blob);
+    }, 'image/png');
+  });
+}
+
+
 
 const submitForm = async () => {
   isUploading.value = true;
@@ -120,11 +143,7 @@ const submitForm = async () => {
 
     // Wait for all file uploads to complete
     const uploadedFileData = await Promise.all(uploadPromises);
-
-    // Add uploaded file data to the roof
     roof.value.files = [...roof.value.files, ...uploadedFileData];
-
-    // Update the home document in Firestore
     const docRef = doc($db, "properties", homeId);
     await updateDoc(docRef, {
       roof: {
@@ -136,7 +155,6 @@ const submitForm = async () => {
     console.error('Error in submitForm:', error);
   } finally {
     uploadedFiles.value = [];
-    //homeSource.roof.files = roof.value.files;
     isUploading.value = false;
 
     // Clear the file input
@@ -147,30 +165,6 @@ const submitForm = async () => {
   }
 };
 
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf';
-GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.mjs',
-  import.meta.url
-).toString();
-
-const localThumbnailUrl = ref(null);
-const thumbnailBlob = ref(null);
-
-async function generatePdfThumbnail(file) {
-  const pdf = await getDocument(await file.arrayBuffer()).promise;
-  const page = await pdf.getPage(1);
-  const viewport = page.getViewport({ scale: 1 });
-  const canvas = document.createElement('canvas');
-  canvas.width = viewport.width;
-  canvas.height = viewport.height;
-  const context = canvas.getContext('2d');
-  await page.render({ canvasContext: context, viewport }).promise;
-  return new Promise((resolve) => {
-    canvas.toBlob((blob) => {
-      resolve(blob);
-    }, 'image/png');
-  });
-}
 
 // Add this function to handle file deletion
 const deleteFile = async (file) => {
@@ -185,10 +179,7 @@ const deleteFile = async (file) => {
       await deleteObject(thumbnailRef);
     }
 
-    // Update Firestore by removing the file from the array
     roof.value.files = roof.value.files.filter(f => f.url !== file.url);
-
-    // Update the document
     const docRef = doc($db, "properties", homeId);
     await updateDoc(docRef, {
       roof: {
