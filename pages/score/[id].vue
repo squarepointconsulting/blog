@@ -33,7 +33,7 @@
                     <!-- Right column with image placeholder -->
                     <div class="flex items-center justify-center">
                         <NuxtLink :to="`/quests/${featuredQuestId}`" class="relative block cursor-pointer group">
-                            <img src="https://placehold.co/200x300?text=Quest+1+Avatar" alt="Score visualization"
+                            <img src="/images/gutter-maintenance-banner.jpg" alt="Score visualization"
                                 class="rounded-lg shadow-sm transition-opacity group-hover:opacity-90" />
                             <!-- Overlay -->
                             <div class="absolute inset-0 flex items-center justify-center">
@@ -90,7 +90,7 @@ const { $db } = useNuxtApp();
 const docRef = doc($db, 'properties', homeId);
 const home = useDocument(docRef)
 
-const featuredQuestId = ref('featured-quest') // You can set this from your data
+const featuredQuestId = ref('gutter-cleaning') // You can set this from your data
 
 
 </script>

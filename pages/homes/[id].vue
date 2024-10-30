@@ -5,7 +5,7 @@ import { useAsyncData } from 'nuxt/app';
 import { doc, getDoc } from 'firebase/firestore';
 
 import { useCollection } from 'vuefire'
-import { collection, query, where } from 'firebase/firestore'
+import { collection, query, orderBy, where } from 'firebase/firestore'
 
 const route = useRoute();
 const homeId = route.params.id;
@@ -13,7 +13,8 @@ const { $db } = useNuxtApp();
 const docRef = doc($db, 'properties', homeId);
 const home = useDocument(docRef)
 const tasksRef = collection($db, 'properties', homeId, 'project_records');
-const tasks = useCollection(tasksRef);
+const tasksQuery = query(tasksRef, orderBy('timestamp', 'desc'));
+const tasks = useCollection(tasksQuery);
 
 
 const items = [{
@@ -71,13 +72,15 @@ const columns = [
           </div>
           <!-- Row 2 -->
           <div class="w-full flex justify-center items-center">
-            <p class="font-bold text-center">{{ Math.round(home.villaFactScore ) }}</p>
+            <p class="font-bold text-center">{{ Math.round(home.villaFactScore) }}</p>
           </div>
         </div>
         <!-- Edit Button -->
         <div class="relative top-2 right-2">
           <NuxtLink :to="{ name: 'homes-edit-id', params: { id: homeId } }">
-            <p><UIcon name="i-heroicons-pencil-square" />&nbsp;Edit</p>
+            <p>
+              <UIcon name="i-heroicons-pencil-square" />&nbsp;Edit
+            </p>
           </NuxtLink>
         </div>
 
@@ -113,6 +116,30 @@ const columns = [
           the costs of your home.</p>
       </NuxtLink>
     </article>
+
+    <article class="p-4 bg-white shadow-md rounded-md">
+
+      <UTabs :items="items" class="w-full">
+        <template #item="{ item }">
+          <div v-if="item.key === 'projects'" class="space-y-3">
+            <UTable :rows="tasks" :columns="columns">
+              <template #timestamp-data="{ row }">
+                {{ row.timestamp.toDate().toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'numeric',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                hour12: true,
+                }) }}
+              </template>
+            </UTable>
+          </div>
+        </template>
+      </UTabs>
+
+    </article>
+
 
 
   </div>
