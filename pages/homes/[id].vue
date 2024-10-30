@@ -71,8 +71,7 @@ const columns = [
           </div>
           <!-- Row 2 -->
           <div class="w-full flex justify-center items-center">
-d            <p class="font-bold text-center">{{ home.villaFactScore ? home.villaFactScore :
-              home.villafactScore }}</p>
+            <p class="font-bold text-center">{{ Math.round(home.villaFactScore ) }}</p>
           </div>
         </div>
         <!-- Edit Button -->
@@ -86,25 +85,36 @@ d            <p class="font-bold text-center">{{ home.villaFactScore ? home.vill
     </article>
 
     <HomeValue :homeId="homeId" />
+
     <article class="p-4 bg-white shadow-md rounded-md">
-
-      <UTabs :items="items" class="w-full">
-        <template #item="{ item }">
-          <div v-if="item.key === 'projects'" class="space-y-3">
-            <UTable :rows="tasks" :columns="columns">
-              <template #timestamp-data="{ row }">
-                {{ row.timestamp.toDate().toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'numeric',
-                day: 'numeric'
-                }) }}
-              </template>
-            </UTable>
-          </div>
-        </template>
-      </UTabs>
-
+      <NuxtLink :to="{ name: 'score-id', params: { id: homeId } }">
+        <h2 class="text-lg font-bold">Level Up
+          <UIcon name="i-heroicons-chevron-double-right" class="w-4 h-4" />
+        </h2>
+        <p class="text-gray-700">Increase your home's VillaFact Score to increase your net asset value. Complete these
+          simple
+          activities to build your profile.</p>
+      </NuxtLink>
     </article>
+    <article class="p-4 bg-white shadow-md rounded-md">
+      <NuxtLink to="/invest">
+        <h2 class="text-lg font-bold">Invest
+          <UIcon name="i-heroicons-chevron-double-right" class="w-4 h-4" />
+        </h2>
+        <p class="text-gray-700">Plan and track home improvement projects to maximize your costs basis.</p>
+      </NuxtLink>
+    </article>
+    <article class="p-4 bg-white shadow-md rounded-md">
+      <NuxtLink to="/advice">
+        <h2 class="text-lg font-bold">Advice
+          <UIcon name="i-heroicons-chevron-double-right" class="w-4 h-4" />
+        </h2>
+        <p class="text-gray-700">GenAI Powered advice for homeowners about the best way to increase the value and lower
+          the costs of your home.</p>
+      </NuxtLink>
+    </article>
+
+
   </div>
   <div v-else class="space-y-4">
     <article class="p-4 bg-white shadow-md rounded-md">
