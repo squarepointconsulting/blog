@@ -265,6 +265,11 @@ async function generatePdfThumbnail(file) {
 }
 
 const submitForm = async () => {
+    if (!isAccepted.value)
+{   
+isOpen.value = false;
+return;
+}
     isUploading.value = true;
     const user = await useCurrentUser()
     console.log(user.value)
