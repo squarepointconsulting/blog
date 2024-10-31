@@ -5,7 +5,7 @@ import { useAsyncData } from 'nuxt/app';
 import { doc, getDoc } from 'firebase/firestore';
 
 import { useCollection } from 'vuefire'
-import { collection, query, where } from 'firebase/firestore'
+import { collection, query, orderBy, where } from 'firebase/firestore'
 
 const route = useRoute();
 const homeId = route.params.id;
@@ -13,7 +13,8 @@ const { $db } = useNuxtApp();
 const docRef = doc($db, 'properties', homeId);
 const home = useDocument(docRef)
 const tasksRef = collection($db, 'properties', homeId, 'project_records');
-const tasks = useCollection(tasksRef);
+const tasksQuery = query(tasksRef, orderBy('timestamp', 'desc'));
+const tasks = useCollection(tasksQuery);
 
 
 const items = [{
@@ -71,14 +72,15 @@ const columns = [
           </div>
           <!-- Row 2 -->
           <div class="w-full flex justify-center items-center">
-d            <p class="font-bold text-center">{{ home.villaFactScore ? home.villaFactScore :
-              home.villafactScore }}</p>
+            <p class="font-bold text-center">{{ Math.round(home.villaFactScore) }}</p>
           </div>
         </div>
         <!-- Edit Button -->
         <div class="relative top-2 right-2">
           <NuxtLink :to="{ name: 'homes-edit-id', params: { id: homeId } }">
-            <p><UIcon name="i-heroicons-pencil-square" />&nbsp;Edit</p>
+            <p>
+              <UIcon name="i-heroicons-pencil-square" />&nbsp;Edit
+            </p>
           </NuxtLink>
         </div>
 
@@ -86,6 +88,35 @@ d            <p class="font-bold text-center">{{ home.villaFactScore ? home.vill
     </article>
 
     <HomeValue :homeId="homeId" />
+
+    <article class="p-4 bg-white shadow-md rounded-md">
+      <NuxtLink :to="{ name: 'score-id', params: { id: homeId } }">
+        <h2 class="text-lg font-bold">Level Up
+          <UIcon name="i-heroicons-chevron-double-right" class="w-4 h-4" />
+        </h2>
+        <p class="text-gray-700">Increase your home's VillaFact Score to increase your net asset value. Complete these
+          simple
+          activities to build your profile.</p>
+      </NuxtLink>
+    </article>
+    <article class="p-4 bg-white shadow-md rounded-md">
+      <NuxtLink to="/invest">
+        <h2 class="text-lg font-bold">Invest
+          <UIcon name="i-heroicons-chevron-double-right" class="w-4 h-4" />
+        </h2>
+        <p class="text-gray-700">Plan and track home improvement projects to maximize your costs basis.</p>
+      </NuxtLink>
+    </article>
+    <article class="p-4 bg-white shadow-md rounded-md">
+      <NuxtLink to="/advice">
+        <h2 class="text-lg font-bold">Advice
+          <UIcon name="i-heroicons-chevron-double-right" class="w-4 h-4" />
+        </h2>
+        <p class="text-gray-700">GenAI Powered advice for homeowners about the best way to increase the value and lower
+          the costs of your home.</p>
+      </NuxtLink>
+    </article>
+
     <article class="p-4 bg-white shadow-md rounded-md">
 
       <UTabs :items="items" class="w-full">
@@ -96,7 +127,10 @@ d            <p class="font-bold text-center">{{ home.villaFactScore ? home.vill
                 {{ row.timestamp.toDate().toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'numeric',
-                day: 'numeric'
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                hour12: true,
                 }) }}
               </template>
             </UTable>
@@ -105,6 +139,9 @@ d            <p class="font-bold text-center">{{ home.villaFactScore ? home.vill
       </UTabs>
 
     </article>
+
+
+
   </div>
   <div v-else class="space-y-4">
     <article class="p-4 bg-white shadow-md rounded-md">

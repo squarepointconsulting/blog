@@ -2,7 +2,7 @@
 <article class="p-4 bg-white shadow-md rounded-md" v-for="home in homes" :key="home.id">
     <NuxtLink :to="{ name: 'homes-id', params: {id: home.id }}">
         <h2 class="text-lg font-bold">{{ home.address.street1 }}</h2>
-        <p class="text-gray-700">{{ home.villaFactScore }} </p>
+        <p class="text-gray-700">{{ Math.round(home.villaFactScore) }} </p>
     </NuxtLink>
 </article>
 </template>
