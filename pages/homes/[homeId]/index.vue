@@ -3,12 +3,15 @@
 import { useRoute } from 'vue-router';
 import { useAsyncData } from 'nuxt/app';
 import { doc, getDoc } from 'firebase/firestore';
-
+import { inject } from 'vue'
 import { useCollection } from 'vuefire'
 import { collection, query, orderBy, where } from 'firebase/firestore'
 
 const route = useRoute();
+const homeIdRef = useState('homeId') 
 const homeId = route.params.homeId;
+homeIdRef.value = homeId;
+
 const { $db } = useNuxtApp();
 const docRef = doc($db, 'properties', homeId);
 const home = useDocument(docRef)

@@ -1,4 +1,5 @@
 <script setup>
+
 useHead({
   title: 'VillaFact',
   link: [
@@ -39,12 +40,14 @@ import { computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 
 const route = useRoute();
+const homeIdRef = useState('homeId', route.params.homeId)
+
 
 // Conditionally apply padding based on the current route
 const mainClass = computed(() => {
   const baseClass = "flex-1 overflow-y-auto bg-gray-100"
   const paddedBaseClass = "flex-1 overflow-y-auto bg-gray-100 p-4"
-  
+
   if (route.name === 'camera') {
     return baseClass
   }
@@ -52,6 +55,18 @@ const mainClass = computed(() => {
     return paddedBaseClass
   }
 });
+
+function navigateToHome() {
+  
+  if (homeIdRef) { 
+    console.log(homeIdRef.value)
+    router.push({ name: 'homes-homeId', params: { homeId: homeIdRef.value } })
+  }
+  else {
+    router.push('/profile');
+  }
+}
+
 
 </script>
 
@@ -62,66 +77,79 @@ const mainClass = computed(() => {
       <div class="flex items-center space-x-4">
         <!-- Left slot for icons -->
         <slot name="left-icons">
-          <span v-if="false"> <NuxtLink to="/profile"><Gravatar :size=10 /></NuxtLink></span>
-          <span><p>VillaFact</p></span>
+          <span v-if="false">
+            <NuxtLink to="/profile">
+              <Gravatar :size=10 />
+            </NuxtLink>
+          </span>
+          <span>
+            <p>VillaFact</p>
+          </span>
         </slot>
       </div>
       <div class="flex items-center space-x-4">
         <!-- Right slot for icons -->
         <slot name="right-icons">
-          <span><UButton icon="i-heroicons-bell" label="" @click="isOpen = true" class="bg-transparent hover:bg-transparent" /></span>
-          <span v-if="user"> <NuxtLink to="/profile"><Gravatar :size=8 /></NuxtLink></span>
+          <span>
+            <UButton icon="i-heroicons-bell" label="" @click="isOpen = true"
+              class="bg-transparent hover:bg-transparent" />
+          </span>
+          <span v-if="user">
+            <NuxtLink to="/profile">
+              <Gravatar :size=8 />
+            </NuxtLink>
+          </span>
         </slot>
       </div>
       <USlideover v-model="isOpen">
-      <div class="p-4 flex-1">
-        <UButton
-          color="gray"
-          variant="ghost"
-          size="sm"
-          icon="i-heroicons-x-mark-20-solid"
-          class="flex sm:hidden absolute end-5 top-5 z-10"
-          square
-          padded
-          @click="isOpen = false"
-        />
-        <p class="h-full">You don't have any notifications.</p>
-      </div>
-    </USlideover>
+        <div class="p-4 flex-1">
+          <UButton color="gray" variant="ghost" size="sm" icon="i-heroicons-x-mark-20-solid"
+            class="flex sm:hidden absolute end-5 top-5 z-10" square padded @click="isOpen = false" />
+          <p class="h-full">You don't have any notifications.</p>
+        </div>
+      </USlideover>
     </header>
-  
+
     <!-- Main Content  CKE TODO remove 'p-4' below when on page is "camera"-->
     <main :class="mainClass">
       <NuxtPage />
     </main>
-  
+
     <!-- Footer -->
     <footer class="flex justify-between items-center bg-gray-800 text-white p-4">
       <div class="flex items-center space-x-4">
         <!-- Left slot for icons -->
         <slot name="footer-left-icons">
           <span>
-            <NuxtLink to="/">
-            <UIcon name="i-heroicons-home" class="w-8 h-8" /></NuxtLink></span>
+            <NuxtLink @click.prevent="navigateToHome" class="hover:opacity-75">
+              <UIcon name="i-heroicons-home" class="w-8 h-8" />
+            </NuxtLink>
+          </span>
         </slot>
       </div>
       <div class="flex items-center space-x-4">
         <!-- Center slot for icons -->
         <slot name="footer-center-icons">
-          <span v-if="false"><NuxtLink to="/camera">
-            <UIcon name="i-heroicons-camera" class="w-8 h-8" /></NuxtLink></span>
+          <span v-if="false">
+            <NuxtLink to="/camera">
+              <UIcon name="i-heroicons-camera" class="w-8 h-8" />
+            </NuxtLink>
+          </span>
         </slot>
       </div>
       <div class="flex items-center space-x-4">
         <!-- Right slot for icons -->
         <slot name="footer-right-icons">
-          <span><NuxtLink to="/">
-            <UIcon name="i-heroicons-calendar-days" class="w-8 h-8" /></NuxtLink></span>
+          <span>
+            <NuxtLink to="/">
+              <UIcon name="i-heroicons-calendar-days" class="w-8 h-8" />
+            </NuxtLink>
+          </span>
         </slot>
       </div>
     </footer>
   </div>
-  </template>
+</template>
 
 <style>
 html,
@@ -144,18 +172,22 @@ a:hover {
 .navbar.is-white {
   background: #f0f2f4;
 }
+
 .navbar-brand .brand-text {
   font-size: 1.11rem;
   font-weight: bold;
 }
+
 .articles {
   margin: 5rem 0;
   margin-top: -200px;
 }
+
 .articles .content p {
   line-height: 1.9;
   margin: 15px 0;
 }
+
 .author-image {
   position: absolute;
   top: -30px;
@@ -171,23 +203,28 @@ a:hover {
 .promo-block {
   margin-top: 6rem;
 }
+
 div.column.is-8:first-child {
   padding-top: 0;
   margin-top: 0;
 }
+
 .article-title {
   font-size: 2rem;
   font-weight: lighter;
   line-height: 2;
 }
+
 .article-subtitle {
   color: #909aa0;
   margin-bottom: 3rem;
 }
+
 .article-body {
   line-height: 1.4;
   margin: 0 6rem;
 }
+
 .promo-block .container {
   margin: 1rem 5rem;
 }
