@@ -32,7 +32,7 @@
 
                     <!-- Right column with image placeholder -->
                     <div class="flex items-center justify-center">
-                        <NuxtLink :to="`/quests/${featuredQuestId}`" class="relative block cursor-pointer group">
+                        <NuxtLink :to="`./projects/${featuredQuestId}`" class="relative block cursor-pointer group">
                             <img src="/images/gutter-maintenance-banner.jpg" alt="Score visualization"
                                 class="rounded-lg shadow-sm transition-opacity group-hover:opacity-90" />
                             <!-- Overlay -->

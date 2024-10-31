@@ -196,6 +196,8 @@ import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf';
 import { collection, addDoc, getDoc, doc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 const { $db, $storage } = useNuxtApp();
+const route = useRoute();
+const homeId = route.params.homeId;
 
 GlobalWorkerOptions.workerSrc = new URL(
     'pdfjs-dist/build/pdf.worker.mjs',
@@ -273,10 +275,7 @@ const submitForm = async () => {
         completedByUserDisplayName: user.value.displayName,
         attachments: [],
     }
-    // Get a reference to the home document. Or do we have that already?
 
-    console.log(projectRecord)
-    const homeId = "kOaIax2MJ8KbUujmhLkr"
     const docRef = await addDoc(collection($db, "properties", homeId, "project_records"), projectRecord);
     console.log("Document written with ID: ", docRef.id);
 
