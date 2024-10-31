@@ -85,7 +85,7 @@
 import { useRoute } from 'vue-router';
 import { doc } from 'firebase/firestore'
 const route = useRoute();
-const homeId = route.params.id;
+const homeId = route.params.homeId;
 const { $db } = useNuxtApp();
 const docRef = doc($db, 'properties', homeId);
 const home = useDocument(docRef)
