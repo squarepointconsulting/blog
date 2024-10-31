@@ -290,8 +290,6 @@ const deleteProject = async () => {
       </div>
     </div>
 
-
-
     <div class="flex flex-col md:col-span-2">
       <label for="files" class="mb-1">Upload Files:</label>
       <input type="file" ref="fileInput" multiple @change="handleFileUpload" id="files" class="border rounded p-2" />
@@ -307,14 +305,20 @@ const deleteProject = async () => {
         </UCarousel>
       </div>
     </div>
-    <div class="md:col-span-2 mt-4">
-      <button type="submit" class="bg-blue-500 text-white rounded p-2 w-full">
-        Submit
-      </button>
-      <button @click="confirmDeleteProject" class="bg-red-500 text-white rounded p-2 w-full ml-4">
-        Delete Project
-      </button>
-    </div>
+    <div class="md:col-span-2 mt-4 flex justify-between">
+  <button 
+    type="submit" 
+    class="bg-blue-500 text-white rounded p-3 w-1/2 hover:bg-blue-600 transition duration-200"
+  >
+    Submit
+  </button>
+  <button 
+    @click="confirmDeleteProject" 
+    class="bg-red-500 text-white rounded p-3 w-1/2 ml-4 hover:bg-red-600 transition duration-200"
+  >
+    Delete Project
+  </button>
+</div>
 
 
     <!-- Upload Modal -->

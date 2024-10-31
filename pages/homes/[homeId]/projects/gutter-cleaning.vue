@@ -281,14 +281,16 @@ const submitForm = async () => {
     console.log("Document written with ID: ", docRef.id);
 
     try {
+        isAccepted.value = false;
         // Create an array of promises for file uploads
         const uploadPromises = uploadedFiles.value.map(async (file) => {
             const fileRef = storageRef($storage, `properties/${homeId}/project_records/${docRef.id}/${file.name}`);
+            console.log(`Filename: ${file.name}`);
             const snapshot = await uploadBytes(fileRef, file.file);
             const url = await getDownloadURL(fileRef);
-
+            console.log(`File type: ${file.type}`)
             if (file.type.startsWith('application/pdf')) {
-                const thumbnailRef = storageRef($storage, `properties/${homeId}/${file.name}-thumbnail.png`);
+                const thumbnailRef = storageRef($storage, `properties/${homeId}/project_records/${docRef.id}/${file.name}-thumbnail.png`);
                 const thumbnailSnapshot = await uploadBytes(thumbnailRef, file.preview_file);
                 const thumbnailUrl = await getDownloadURL(thumbnailRef);
                 console.log('Thumbnail uploaded:', thumbnailUrl);
