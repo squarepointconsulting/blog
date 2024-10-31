@@ -197,6 +197,7 @@ import { collection, addDoc, getDoc, doc, updateDoc, deleteDoc, serverTimestamp 
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 const { $db, $storage } = useNuxtApp();
 const route = useRoute();
+const router = useRouter();
 const homeId = route.params.homeId;
 
 GlobalWorkerOptions.workerSrc = new URL(
@@ -328,7 +329,7 @@ const submitForm = async () => {
         if (fileInput.value) {
             fileInput.value.value = '';
         }
-        router.push('/profile')
+        router.push({ name: 'homes-homeId', params: { homeId: homeId } })
     }
 };
 
