@@ -167,9 +167,6 @@
                         </UCarousel>
                     </div>
                 </div>
-                <div class="md:col-span-2 mt-4">
-
-                </div>
                 <template #footer>
 
                     <div class="flex justify-center gap-4 w-full px-4">
@@ -193,7 +190,7 @@
 import { useRoute } from 'vue-router';
 import { ref } from 'vue';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf';
-import { collection, addDoc, getDoc, doc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
+import { collection, addDoc, getDoc, doc, updateDoc, deleteDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 const { $db, $storage } = useNuxtApp();
 const route = useRoute();
@@ -204,6 +201,16 @@ GlobalWorkerOptions.workerSrc = new URL(
     'pdfjs-dist/build/pdf.worker.mjs',
     import.meta.url
 ).toString();
+
+const user = await useCurrentUser()
+const updated_at_timestamp = serverTimestamp()
+const projectRecord = ref({
+        type: "gutter_cleaning",
+        timestamp: updated_at_timestamp,
+        completedByUserUid: user.value.uid,
+        completedByUserDisplayName: user.value.displayName,
+        attachments: [],
+    });
 
 const isOpen = ref(false)
 const uploadedFiles = ref([]);
@@ -265,24 +272,12 @@ async function generatePdfThumbnail(file) {
 }
 
 const submitForm = async () => {
-    if (!isAccepted.value)
-{   
-isOpen.value = false;
-return;
-}
-    isUploading.value = true;
-    const user = await useCurrentUser()
-    console.log(user.value)
-    const updated_at_timestamp = serverTimestamp()
-    const projectRecord = {
-        type: "gutter_cleaning",
-        timestamp: updated_at_timestamp,
-        completedByUserUid: user.value.uid,
-        completedByUserDisplayName: user.value.displayName,
-        attachments: [],
+    if (!isAccepted.value) {
+        isOpen.value = false;
+        return;
     }
-
-    const docRef = await addDoc(collection($db, "properties", homeId, "project_records"), projectRecord);
+    isUploading.value = true;
+    const docRef = await addDoc(collection($db, "properties", homeId, "project_records"), projectRecord.value);
     console.log("Document written with ID: ", docRef.id);
 
     try {
@@ -316,13 +311,9 @@ return;
 
         // Wait for all file uploads to complete
         const uploadedFileData = await Promise.all(uploadPromises);
-        projectRecord.attachments = [...projectRecord.attachments, ...uploadedFileData];
+        projectRecord.value.attachments = [...projectRecord.value.attachments, ...uploadedFileData];
         // const docRef = doc($db, "properties", homeId);
-        await updateDoc(docRef, {
-            attachments: {
-                ...projectRecord.attachments
-            },
-        }, { merge: true });
+        await setDoc(docRef, {...projectRecord.value}, { merge: true });
 
     } catch (error) {
         console.error('Error in submitForm:', error);
