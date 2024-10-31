@@ -45,11 +45,33 @@
                     </div>
                 </div>
             </div>
+
             <article class="p-4 bg-white shadow-md rounded-md">
+
+<UTabs :items="items" class="w-full">
+  <template #item="{ item }">
+    <div v-if="item.key === 'projects'" class="space-y-3">
+      <UTable :rows="tasks" :columns="columns">
+        <template #timestamp-data="{ row }">
+          {{ row.timestamp.toDate().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+          hour12: true,
+          }) }}
+        </template>
+      </UTable>
+    </div>
+    <div v-if="item.key === 'quests'" class="space-y-3">
+        <article class="p-4 bg-white shadow-md rounded-md">
                 <h2 class="text-lg font-bold">Avatar Quest</h2>
                 <p class="text-gray-700 mb-3">Upload a photo of your home's exterior to begin your home maintenance
                     journey. This helps us personalize your experience and track improvements over time.</p>
                 <div class="text-sm text-blue-600">✓ Completed on March 15, 2024</div>
+                <div class="text-sm text-green-600">+25 pts</div>
+
             </article>
             <article class="p-4 bg-white shadow-md rounded-md">
                 <h2 class="text-lg font-bold">Sink or Swim Quest</h2>
@@ -63,6 +85,16 @@
                 <Progress color="success" aria-label="Loading..." value={33} />
                 <p class="text-sm text-gray-500 mt-2">1 of 3 tasks completed</p>
             </article>
+
+
+    </div>
+
+  </template>
+</UTabs>
+
+</article>
+
+
         </div>
 
 
@@ -83,14 +115,46 @@
 <script setup>
 
 import { useRoute } from 'vue-router';
-import { doc } from 'firebase/firestore'
+import { useCollection } from 'vuefire'
+import { collection, query, orderBy, doc, where } from 'firebase/firestore'
+
 const route = useRoute();
 const homeId = route.params.homeId;
 const { $db } = useNuxtApp();
 const docRef = doc($db, 'properties', homeId);
 const home = useDocument(docRef)
+const tasksRef = collection($db, 'properties', homeId, 'project_records');
+const tasksQuery = query(tasksRef, orderBy('timestamp', 'desc'));
+const tasks = useCollection(tasksQuery);
 
 const featuredQuestId = ref('gutter-cleaning') // You can set this from your data
+
+
+const items = [{
+  label: 'Projects',
+  key: 'projects',
+  icon: 'i-pajamas-issue-type-feature',
+  content: 'This is the content shown for Tab1'
+}, {
+  label: 'Quests',
+  key: 'quests',
+  icon: 'i-pajamas-issue-type-objective',
+  content: 'Check back soon for more quests!'
+}]
+
+const columns = [
+  { label: 'Date', key: 'timestamp' },
+  {
+    key: 'type',
+    label: 'Type',
+  }, {
+    key: 'completedByUserDisplayName',
+    label: 'User',
+  },
+]
+
+
+
 
 
 </script>
