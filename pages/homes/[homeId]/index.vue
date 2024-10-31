@@ -3,12 +3,15 @@
 import { useRoute } from 'vue-router';
 import { useAsyncData } from 'nuxt/app';
 import { doc, getDoc } from 'firebase/firestore';
-
+import { inject } from 'vue'
 import { useCollection } from 'vuefire'
 import { collection, query, orderBy, where } from 'firebase/firestore'
 
 const route = useRoute();
-const homeId = route.params.id;
+const homeIdRef = useState('homeId') 
+const homeId = route.params.homeId;
+homeIdRef.value = homeId;
+
 const { $db } = useNuxtApp();
 const docRef = doc($db, 'properties', homeId);
 const home = useDocument(docRef)
@@ -77,7 +80,7 @@ const columns = [
         </div>
         <!-- Edit Button -->
         <div class="relative top-2 right-2">
-          <NuxtLink :to="{ name: 'homes-edit-id', params: { id: homeId } }">
+          <NuxtLink :to="{ name: 'homes-homeId-edit', params: { homeId: homeId } }">
             <p>
               <UIcon name="i-heroicons-pencil-square" />&nbsp;Edit
             </p>
@@ -90,7 +93,7 @@ const columns = [
     <HomeValue :homeId="homeId" />
 
     <article class="p-4 bg-white shadow-md rounded-md">
-      <NuxtLink :to="{ name: 'score-id', params: { id: homeId } }">
+      <NuxtLink :to="{ name: 'homes-homeId-score', params: { homeId: homeId } }">
         <h2 class="text-lg font-bold">Level Up
           <UIcon name="i-heroicons-chevron-double-right" class="w-4 h-4" />
         </h2>

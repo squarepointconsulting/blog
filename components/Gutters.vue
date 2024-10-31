@@ -15,7 +15,7 @@ const showDeleteConfirm = ref(false);
 const fileToDelete = ref(null);
 
 const route = useRoute();
-const homeId = route.params.id;
+const homeId = route.params.homeId;
 const { $db, $storage } = useNuxtApp();
 const homeSource = ref()
 
