@@ -15,33 +15,7 @@ homeIdRef.value = homeId;
 const { $db } = useNuxtApp();
 const docRef = doc($db, 'properties', homeId);
 const home = useDocument(docRef)
-const tasksRef = collection($db, 'properties', homeId, 'project_records');
-const tasksQuery = query(tasksRef, orderBy('timestamp', 'desc'));
-const tasks = useCollection(tasksQuery);
 
-
-const items = [{
-  label: 'Projects',
-  key: 'projects',
-  icon: 'i-pajamas-issue-type-feature',
-  content: 'This is the content shown for Tab1'
-}, {
-  label: 'Quests',
-  key: 'quests',
-  icon: 'i-pajamas-issue-type-objective',
-  content: 'Check back soon for more quests!'
-}]
-
-const columns = [
-  { label: 'Date', key: 'timestamp' },
-  {
-    key: 'type',
-    label: 'Type',
-  }, {
-    key: 'completedByUserDisplayName',
-    label: 'User',
-  },
-]
 
 </script>
 
@@ -119,32 +93,6 @@ const columns = [
           the costs of your home.</p>
       </NuxtLink>
     </article>
-
-    <article class="p-4 bg-white shadow-md rounded-md">
-
-      <UTabs :items="items" class="w-full">
-        <template #item="{ item }">
-          <div v-if="item.key === 'projects'" class="space-y-3">
-            <UTable :rows="tasks" :columns="columns">
-              <template #timestamp-data="{ row }">
-                {{ row.timestamp.toDate().toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'numeric',
-                  day: 'numeric',
-                  hour: 'numeric',
-                  minute: 'numeric',
-                hour12: true,
-                }) }}
-              </template>
-            </UTable>
-          </div>
-        </template>
-      </UTabs>
-
-    </article>
-
-
-
   </div>
   <div v-else class="space-y-4">
     <article class="p-4 bg-white shadow-md rounded-md">

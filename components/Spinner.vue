@@ -1,57 +1,69 @@
 <template>
-    <div class="splash-screen">
-      <div class="spinner-wrapper">
-        <div class="spinner"></div>
-      </div>
+  <div class="splash-screen">
+    <div class="spinner-wrapper">
+      <svg 
+        class="spinner" 
+        viewBox="0 0 50 50"
+        width="50"
+        height="50"
+      >
+        <circle
+          class="path"
+          cx="25"
+          cy="25"
+          r="20"
+          fill="none"
+          stroke-width="4"
+        />
+      </svg>
     </div>
-  </template>
-  
-  <style scoped>
-  .splash-screen {
-     background: #f2f0ee;
-      width: 100vw;
-      height: 100vh;
-    position: fixed;
-    z-index: 50;    
+  </div>
+</template>
+
+<style scoped>
+.splash-screen {
+  background: #f2f0ee;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  z-index: 50;
+}
+
+.spinner-wrapper {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.spinner {
+  animation: rotate 2s linear infinite;
+}
+
+.path {
+  stroke: #e45447;
+  stroke-linecap: round;
+  animation: dash 1.5s ease-in-out infinite;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
   }
-  
-  .spinner-wrapper {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-  
-    transform: translate(-50%, -50%);
+}
+
+@keyframes dash {
+  0% {
+    stroke-dasharray: 1, 150;
+    stroke-dashoffset: 0;
   }
-  .spinner {
-    width: 80px;
-    height: 80px;
-    margin: 100px auto;
-    background-color: #e45447;
-  
-    border-radius: 100%;
-    -webkit-animation: sk-scaleout 1s infinite ease-in-out;
-    animation: sk-scaleout 1s infinite ease-in-out;
+  50% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -35;
   }
-  
-  @-webkit-keyframes sk-scaleout {
-    0% {
-      -webkit-transform: scale(0);
-    }
-    100% {
-      -webkit-transform: scale(1);
-      opacity: 0;
-    }
+  100% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -124;
   }
-  
-  @keyframes sk-scaleout {
-    0% {
-      -webkit-transform: scale(0);
-      transform: scale(0);
-    }
-    100% {
-      -webkit-transform: scale(1);
-      transform: scale(1);
-      opacity: 0;
-    }
 }
 </style>
