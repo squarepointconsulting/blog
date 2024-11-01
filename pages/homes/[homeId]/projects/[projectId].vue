@@ -53,6 +53,7 @@ const isVideo = (file) => file.type.startsWith('video/');
 const isUploading = ref(false);
 const localThumbnailUrl = ref(null);
 const thumbnailBlob = ref(null);
+const showDeleteConfirm = ref(false);
 
 async function generatePdfThumbnail(file) {
   const pdf = await getDocument(await file.arrayBuffer()).promise;

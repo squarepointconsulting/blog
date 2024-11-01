@@ -1,3 +1,12 @@
+<script setup>
+
+import { useRoute } from 'vue-router';
+const route = useRoute();
+const homeId = route.params.homeId;
+const property_avatar = ref("property_avatar")
+
+</script>
+
 <template>
     <article class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Header Section -->
@@ -7,7 +16,9 @@
                     Getting Started with a Property Avatar
                 </h1>
                 <p class="text-xl text-gray-600 leading-relaxed">
-                    Taking a photo of your home to create a personalized property profile helps document its unique features, track improvements over time, and enhances insurance, appraisal, or resale processes by providing a visual record of your property’s condition and characteristics.
+                    Taking a photo of your home to create a personalized property profile helps document its unique
+                    features, track improvements over time, and enhances insurance, appraisal, or resale processes by
+                    providing a visual record of your property's condition and characteristics.
                 </p>
             </div>
             <div class="lg:col-span-1">
@@ -85,7 +96,8 @@
                         </li>
                         <li class="flex items-start">
                             <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" />
-                            <span>Some points decrease over time. Others remain as long as the project is completed.</span>
+                            <span>Some points decrease over time. Others remain as long as the project is
+                                completed.</span>
                         </li>
                     </ul>
                 </div>
@@ -127,13 +139,3 @@
 
 
 </template>
-
-<script setup>
-
-import { useRoute } from 'vue-router';
-const route = useRoute();
-const homeId = route.params.homeId;
-const property_avatar = ref("property_avatar")
-
-
-</script>
