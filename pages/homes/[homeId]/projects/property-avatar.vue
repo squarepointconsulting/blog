@@ -51,7 +51,7 @@ const project_type = ref("property_avatar")
                     </ul>
                 </div>
                 <div>
-                    <img src="/images/ladder-safety.webp" alt="Ladder Safety"
+                    <img src="/images/avatar-steps.jpg" alt="Ladder Safety"
                         class="rounded-lg shadow-lg w-full h-64 object-cover" />
                 </div>
             </div>
@@ -74,7 +74,7 @@ const project_type = ref("property_avatar")
                     </ul>
                 </div>
                 <div class="md:order-1">
-                    <img src="/images/man-cleaning-gutters-16260041.webp" alt="Gutter Inspection"
+                    <img src="/images/avatar-verify.jpg" alt="Gutter Inspection"
                         class="rounded-lg shadow-lg w-full h-64 object-cover" />
                 </div>
             </div>
@@ -102,8 +102,7 @@ const project_type = ref("property_avatar")
                     </ul>
                 </div>
                 <div>
-                    <img src="/images/gutter-maintenance.jpg" alt="Gutter Cleaning"
-                        class="rounded-lg shadow-lg w-full h-64 object-cover" />
+                   
                 </div>
             </div>
 
@@ -129,8 +128,7 @@ const project_type = ref("property_avatar")
                     </ul>
                 </div>
                 <div class="md:order-1 text-center">
-                    <img src="/images/hands-worker-fixing-drain-scaffold-260nw-415177999.webp" alt="Gutter Inspection"
-                        class="rounded-lg shadow-lg w-full h-64 object-cover" />
+                    
                 </div>
             </div>
         </section>
