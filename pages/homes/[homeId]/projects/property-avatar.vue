@@ -1,19 +1,28 @@
+<script setup>
+
+import { useRoute } from 'vue-router';
+const route = useRoute();
+const homeId = route.params.homeId;
+const project_type = ref("property_avatar")
+
+</script>
+
 <template>
     <article class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Header Section -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
             <div class="lg:col-span-2">
                 <h1 class="text-4xl font-bold text-gray-900 mb-4">
-                    Complete Guide to Gutter Maintenance
+                    Getting Started with a Property Avatar
                 </h1>
                 <p class="text-xl text-gray-600 leading-relaxed">
-                    Regular gutter maintenance is crucial for protecting your home from water damage.
-                    This guide will walk you through the essential steps to properly inspect, clean,
-                    and maintain your home's gutter system.
+                    Taking a photo of your home to create a personalized property profile helps document its unique
+                    features, track improvements over time, and enhances insurance, appraisal, or resale processes by
+                    providing a visual record of your property's condition and characteristics.
                 </p>
             </div>
             <div class="lg:col-span-1">
-                <img src="/images/autumn-leaves-clogging-rain-gutter-260nw-1510057928.webp" alt="Gutter Maintenance"
+                <img src="/images/property-avatar-example.jpg" alt="Gutter Maintenance"
                     class="rounded-lg shadow-lg w-full h-64 object-cover" />
             </div>
         </div>
@@ -24,20 +33,20 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                     <h2 class="text-2xl font-semibold text-gray-900 mb-4">
-                        1. Safety and Preparation
+                        1. Go to your Property Profile
                     </h2>
                     <ul class="space-y-3 text-gray-600">
                         <li class="flex items-start">
                             <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" />
-                            <span>Locate all gutters and identify safe ladder access points</span>
+                            <span>Open the VillaFact app</span>
                         </li>
                         <li class="flex items-start">
                             <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" />
-                            <span>Ensure ladder is on stable, level ground</span>
+                            <span>Choose your property from the profile page.</span>
                         </li>
                         <li class="flex items-start">
                             <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" />
-                            <span>Gather necessary tools: gutter scoop, leaf blower, bucket, gloves</span>
+                            <span>Click the placeholder image to take a new photo or upload one on your computer.</span>
                         </li>
                     </ul>
                 </div>
@@ -51,20 +60,16 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="md:order-2">
                     <h2 class="text-2xl font-semibold text-gray-900 mb-4">
-                        2. Initial Inspection
+                        2. Confirm your new Avatar
                     </h2>
                     <ul class="space-y-3 text-gray-600">
                         <li class="flex items-start">
                             <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" />
-                            <span>Check for signs of leaks and overflow</span>
+                            <span>You should see this in the application.</span>
                         </li>
                         <li class="flex items-start">
                             <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" />
-                            <span>Verify proper gutter slope for drainage</span>
-                        </li>
-                        <li class="flex items-start">
-                            <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" />
-                            <span>Inspect roof valleys for debris accumulation</span>
+                            <span>Check here and here for more places to see it.</span>
                         </li>
                     </ul>
                 </div>
@@ -78,20 +83,21 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                     <h2 class="text-2xl font-semibold text-gray-900 mb-4">
-                        3. Cleaning Process
+                        3. Watch your ViiaFact score grow.
                     </h2>
                     <ul class="space-y-3 text-gray-600">
                         <li class="flex items-start">
                             <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" />
-                            <span>Start with second story gutters if applicable</span>
+                            <span>See how this score is displayed.</span>
                         </li>
                         <li class="flex items-start">
                             <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" />
-                            <span>Remove debris using gutter scoop or leaf blower</span>
+                            <span>More quests can get your a higher score.</span>
                         </li>
                         <li class="flex items-start">
                             <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" />
-                            <span>Clear roof valleys of organic debris</span>
+                            <span>Some points decrease over time. Others remain as long as the project is
+                                completed.</span>
                         </li>
                     </ul>
                 </div>
@@ -105,20 +111,20 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="md:order-2">
                     <h2 class="text-2xl font-semibold text-gray-900 mb-4">
-                        4. Final Inspection
+                        4. See home this changes your home value
                     </h2>
                     <ul class="space-y-3 text-gray-600">
                         <li class="flex items-start">
                             <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" />
-                            <span>Check joints and corners for proper sealing</span>
+                            <span>Improving your VillaFact score means you are improving the value of your home.</span>
                         </li>
                         <li class="flex items-start">
                             <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" />
-                            <span>Verify gutter hangers are secure</span>
+                            <span>Save money when listing and selling your home.</span>
                         </li>
                         <li class="flex items-start">
                             <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" />
-                            <span>Ensure downspouts are clear and properly diverting water</span>
+                            <span>Ensure future home insurability</span>
                         </li>
                     </ul>
                 </div>
@@ -130,13 +136,6 @@
         </section>
     </article>
     <ProjectRecord :homeId="homeId" :projectType="project_type" />
+
+
 </template>
-
-<script setup>
-
-import { useRoute } from 'vue-router';
-const route = useRoute();
-const homeId = route.params.homeId;
-const project_type = ref("gutter_cleaning")
-
-</script>
