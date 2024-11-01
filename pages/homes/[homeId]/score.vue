@@ -10,7 +10,8 @@
                         </h3>
                         <p class="text-gray-600">
                             The VillaFact score shows how you rank with your neighbors and nationally for completing and
-                            logging routine home maintenance items. Complete the projects, capture the proof, and use this 
+                            logging routine home maintenance items. Complete the projects, capture the proof, and use
+                            this
                             to maximize the value of your home.
                         </p>
                         <div class="flex-1 flex flex-col justify-center items-center">
@@ -50,19 +51,17 @@
                                         year: 'numeric',
                                         month: 'numeric',
                                         day: 'numeric',
-                                    hour: 'numeric',
-                                    minute: 'numeric',
-                                    hour12: true,
+                                        hour: 'numeric',
+                                        minute: 'numeric',
+                                        hour12: true,
                                     }) }}
                                 </template>
                                 <template #type-data="{ row }">
-        <NuxtLink 
-            :to="`./projects/${row.id}`"
-            class="text-blue-600 hover:text-blue-800 hover:underline"
-        >
-            {{ row.type }}
-        </NuxtLink>
-    </template>
+                                    <NuxtLink :to="`./projects/${row.id}`"
+                                        class="text-blue-600 hover:text-blue-800 hover:underline">
+                                        {{ snakeToNormalText(row.type) }}
+                                    </NuxtLink>
+                                </template>
                             </UTable>
                         </div>
                         <div v-if="item.key === 'quests'" class="space-y-3">
@@ -86,7 +85,7 @@
                                     <li>Inspect water heater connections</li>
                                     <li>Test sump pump functionality</li>
                                 </ul>
-                                <Progress color="success" aria-label="Loading..." value={33} />
+                                <UProgress color="success" aria-label="Loading..." value={33} />
                                 <p class="text-sm text-gray-500 mt-2">1 of 3 tasks completed</p>
                             </article>
 
@@ -146,13 +145,22 @@ const items = [{
     content: 'Check back soon for more quests!'
 }]
 
+function snakeToNormalText(snakeStr) {
+    return snakeStr
+        .split('_')                // Split the string by underscores
+        .map(word =>
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()  // Capitalize the first letter of each word
+        )
+        .join(' ');                // Join the words back with spaces
+}
+
 const columns = [
-    { label: 'Id', key: 'id' },
-    { label: 'Date', key: 'timestamp' },
     {
         key: 'type',
         label: 'Type',
-    }, {
+    },
+    { label: 'Date', key: 'timestamp' },
+    {
         key: 'completedByUserDisplayName',
         label: 'User',
     },

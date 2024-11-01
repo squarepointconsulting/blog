@@ -136,6 +136,31 @@
             </div>
         </section>
     </article>
+    <article class="p-4 bg-white shadow-md rounded-md">
+
+        <div v-if="tasks" class="space-y-3">
+            <UTable :rows="tasks" :columns="columns">
+                <template #timestamp-data="{ row }">
+                    {{ row.timestamp.toDate().toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'numeric',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true,
+                    }) }}
+                </template>
+                <template #type-data="{ row }">
+                    <NuxtLink :to="`./${row.id}`"
+                        class="text-blue-600 hover:text-blue-800 hover:underline">
+                        {{ snakeToNormalText(row.type) }}
+                    </NuxtLink>
+                </template>
+            </UTable>
+        </div>
+
+        
+    </article>
     <UModal v-model="isOpen">
         <form @submit.prevent="submitForm" class="max-w-4xl mx-auto px-4">
             <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
@@ -190,7 +215,7 @@
 import { useRoute } from 'vue-router';
 import { ref } from 'vue';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf';
-import { collection, addDoc, getDoc, doc, updateDoc, deleteDoc, serverTimestamp, setDoc } from 'firebase/firestore'
+import { collection, addDoc, query, orderBy, where, getDoc, doc, updateDoc, deleteDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 const { $db, $storage } = useNuxtApp();
 const route = useRoute();
@@ -211,6 +236,14 @@ const projectRecord = ref({
         completedByUserDisplayName: user.value.displayName,
         attachments: [],
     });
+
+const tasksRef = collection($db, 'properties', homeId, 'project_records');
+const tasksQuery = query(
+  tasksRef,
+  where('type', '==', 'gutter_cleaning'), // Filter for gutter_cleaning type
+  orderBy('timestamp', 'desc') // Order by timestamp in descending order
+);
+const tasks = useCollection(tasksQuery);
 
 const isOpen = ref(false)
 const uploadedFiles = ref([]);
@@ -330,6 +363,27 @@ const submitForm = async () => {
         router.push({ name: 'homes-homeId', params: { homeId: homeId } })
     }
 };
+
+const columns = [
+    {
+        key: 'type',
+        label: 'Type',
+    },
+    { label: 'Date', key: 'timestamp' },
+    {
+        key: 'completedByUserDisplayName',
+        label: 'User',
+    },
+]
+
+function snakeToNormalText(snakeStr) {
+    return snakeStr
+        .split('_')                // Split the string by underscores
+        .map(word =>
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()  // Capitalize the first letter of each word
+        )
+        .join(' ');                // Join the words back with spaces
+}
 
 
 
