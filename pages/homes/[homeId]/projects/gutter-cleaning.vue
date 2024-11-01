@@ -128,6 +128,8 @@
                 </div>
             </div>
         </section>
+    </article>
+    <article class="p-4 bg-white shadow-md rounded-md">
         <section>
             <div class="md:col-span-2 mt-4">
                 <button @click="isOpen = true" type="submit" class="bg-blue-500 text-white rounded p-2 w-full">
@@ -135,10 +137,7 @@
                 </button>
             </div>
         </section>
-    </article>
-    <article class="p-4 bg-white shadow-md rounded-md">
-
-        <div v-if="tasks" class="space-y-3">
+        <div v-if="tasks.length > 0" class="space-y-3">
             <UTable :rows="tasks" :columns="columns">
                 <template #timestamp-data="{ row }">
                     {{ row.timestamp.toDate().toLocaleDateString('en-US', {
@@ -158,8 +157,6 @@
                 </template>
             </UTable>
         </div>
-
-        
     </article>
     <UModal v-model="isOpen">
         <form @submit.prevent="submitForm" class="max-w-4xl mx-auto px-4">
@@ -193,13 +190,11 @@
                     </div>
                 </div>
                 <template #footer>
-
                     <div class="flex justify-center gap-4 w-full px-4">
                         <button type="submit" :disabled="!isAccepted"
                             class="flex-1 bg-blue-500 text-white rounded p-2 max-w-[200px] disabled:opacity-50 disabled:cursor-not-allowed">
                             Submit
                         </button>
-
                         <button @click="isOpen = false" class="flex-1 bg-red-500 text-white rounded p-2 max-w-[200px]">
                             Cancel
                         </button>
