@@ -1,3 +1,12 @@
+<script setup>
+
+import { useRoute } from 'vue-router';
+const route = useRoute();
+const homeId = route.params.homeId;
+const project_type = ref("roof_inspection")
+
+</script>
+
 <template>
     <article class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Header Section -->
@@ -87,4 +96,5 @@
             </div>
         </section>
     </article>
+    <ProjectRecord :homeId="homeId" :projectType="project_type" />
 </template>

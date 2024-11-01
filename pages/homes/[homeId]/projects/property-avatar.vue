@@ -3,7 +3,7 @@
 import { useRoute } from 'vue-router';
 const route = useRoute();
 const homeId = route.params.homeId;
-const property_avatar = ref("property_avatar")
+const project_type = ref("property_avatar")
 
 </script>
 
@@ -135,7 +135,7 @@ const property_avatar = ref("property_avatar")
             </div>
         </section>
     </article>
-    <ProjectRecord :homeId="homeId" :projectType="property_avatar" />
+    <ProjectRecord :homeId="homeId" :projectType="project_type" />
 
 
 </template>
