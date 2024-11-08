@@ -7,13 +7,17 @@ const user = await getCurrentUser()
 const { $db } = useNuxtApp();
 const q = query(collection($db, "properties"), where("ownerId", "==", user.uid));
 const querySnapshot = await getDocs(q);
+const router = useRouter();
 
+function navigateToSettingsPage() {
+  
+}
 onMounted(() => {
   // TODO: This is dumb. Allow user to choose "default" home.   
   querySnapshot.forEach((doc) => {
-    homeId.value = doc.id;
+    router.push({ name: 'homes-homeId', params: {homeId: doc.id }});
+    //homeId.value = doc.id;
   })
-    
 })
 
 </script>

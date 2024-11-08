@@ -72,12 +72,10 @@
                         <div v-if="item.key === 'quests'" class="space-y-3">
                             <article class="p-4 bg-white shadow-md rounded-md">
                                 <h2 class="text-lg font-bold">Avatar Quest</h2>
-                                <p class="text-gray-700 mb-3">Upload a photo of your home's exterior to begin your home
-                                    maintenance
-                                    journey. This helps us personalize your experience and track improvements over time.
+                                <p class="text-gray-700 mb-3">You have taken the first step towards maximizing your investment. Well done!
                                 </p>
                                 <div class="text-sm text-blue-600">✓ Completed on March 15, 2024</div>
-                                <div class="text-sm text-green-600">+25 pts</div>
+                                <div class="text-sm text-green-600">+50 pts</div>
 
                             </article>
                             <article class="p-4 bg-white shadow-md rounded-md">
