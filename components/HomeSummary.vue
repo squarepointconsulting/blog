@@ -150,7 +150,7 @@ const handleFileUpload = (event) => {
                 <!-- Row 1 -->
                 <div class="w-full flex justify-center items-center">
                     <div class="chart-container">
-                        <GaugeChart />
+                        <GaugeChart :villaFactScore="Math.round(home.villaFactScore)" />
                     </div>
                 </div>
                 <!-- Row 2 -->

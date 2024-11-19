@@ -17,7 +17,7 @@
                         <div class="flex-1 flex flex-col justify-center items-center">
                             <div class="w-full flex justify-center items-center">
                                 <div class="chart-container">
-                                    <GaugeChart />
+                                    <GaugeChart Math.round(home.villaFactScore) />
                                 </div>
                             </div>
                             <div class="w-full flex justify-center items-center">
