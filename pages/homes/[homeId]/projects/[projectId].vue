@@ -123,7 +123,6 @@ const submitForm = async () => {
   }
 };
 
-
 // Add this function to handle file deletion
 const deleteFile = async (file) => {
   try {
