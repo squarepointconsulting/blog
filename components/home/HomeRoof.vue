@@ -1,5 +1,5 @@
-<<script setup>
-
+<script setup>
+import { useDeleteConfirmation } from '@/composables/useDeleteConfirmation';
 import { useRoute } from 'vue-router';
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
@@ -24,11 +24,9 @@ onMounted(() => {
   getDoc(docRef).then((docSnap) => {
     if (docSnap.exists()) {
       homeSource.value = docSnap.data()
-      if (!homeSource.value.gutters) {
-        homeSource.value.gutters = {
-          installed: false,
-          length: 0,
-          totalDownspouts: 0,
+      if (!homeSource.value.roof) {
+        homeSource.value.roof = {
+          squareFeet: '',
           materials: '',
           dateInstalled: '',
           installer: '',
@@ -37,17 +35,15 @@ onMounted(() => {
           files: [],
         };
       }
-      gutters.value = {
-        ...homeSource.value.gutters
+      roof.value = {
+        ...homeSource.value.roof
       }
     }
   })
 })
 
-const gutters = ref({
-  installed: false,
-  length: 0,
-  totalDownspouts: 0,
+const roof = ref({
+  squareFeet: '',
   materials: '',
   dateInstalled: '',
   installer: '',
@@ -147,11 +143,11 @@ const submitForm = async () => {
 
     // Wait for all file uploads to complete
     const uploadedFileData = await Promise.all(uploadPromises);
-    gutters.value.files = [...gutters.value.files, ...uploadedFileData];
+    roof.value.files = [...roof.value.files, ...uploadedFileData];
     const docRef = doc($db, "properties", homeId);
     await updateDoc(docRef, {
-      gutters: {
-        ...gutters.value
+      roof: {
+        ...roof.value
       },
     }, { merge: true });
 
@@ -183,11 +179,11 @@ const deleteFile = async (file) => {
       await deleteObject(thumbnailRef);
     }
 
-    gutters.value.files = gutters.value.files.filter(f => f.url !== file.url);
+    roof.value.files = roof.value.files.filter(f => f.url !== file.url);
     const docRef = doc($db, "properties", homeId);
     await updateDoc(docRef, {
-      gutters: {
-        ...gutters.value
+      roof: {
+        ...roof.value
       },
     });
 
@@ -214,50 +210,39 @@ const handleDeleteConfirm = async () => {
 </script>
 
 <template>
-
   <div v-if="homeSource" class="max-w-4xl mx-auto p-4">
     <form @submit.prevent="submitForm" class="max-w-4xl mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="flex flex-col">
-          <label for="installed" class="mb-1">Installed:</label>
-          <input type="checkbox" v-model="gutters.installed" id="installed" class="border rounded p-2" />
-        </div>
-        <div class="flex flex-col">
-          <label for="length" class="mb-1">Length:</label>
-          <input type="number" v-model="gutters.length" id="length" class="border rounded p-2"
-            placeholder="Enter length" />
-        </div>
-        <div class="flex flex-col">
-          <label for="totalDownspouts" class="mb-1">Total Downspouts:</label>
-          <input type="number" v-model="gutters.totalDownspouts" id="totalDownspouts" class="border rounded p-2"
-            placeholder="Enter total downspouts" />
+          <label for="squareFeet" class="mb-1">Square Feet:</label>
+          <input type="number" v-model="roof.squareFeet" id="squareFeet" class="border rounded p-2"
+            placeholder="Enter square feet" />
         </div>
         <div class="flex flex-col">
           <label for="materials" class="mb-1">Materials:</label>
-          <input type="text" v-model="gutters.materials" id="materials" class="border rounded p-2"
+          <input type="text" v-model="roof.materials" id="materials" class="border rounded p-2"
             placeholder="Enter materials" />
         </div>
         <div class="flex flex-col">
           <label for="dateInstalled" class="mb-1">Date Installed:</label>
-          <input type="date" v-model="gutters.dateInstalled" id="dateInstalled" class="border rounded p-2" />
+          <input type="date" v-model="roof.dateInstalled" id="dateInstalled" class="border rounded p-2" />
         </div>
         <div class="flex flex-col">
           <label for="installer" class="mb-1">Installer:</label>
-          <input type="text" v-model="gutters.installer" id="installer" class="border rounded p-2"
+          <input type="text" v-model="roof.installer" id="installer" class="border rounded p-2"
             placeholder="Enter installer name" />
         </div>
         <div class="flex flex-col">
           <label for="price" class="mb-1">Price Paid:</label>
-          <input type="number" v-model="gutters.price" id="price" class="border rounded p-2"
-            placeholder="Enter price" />
+          <input type="number" v-model="roof.price" id="price" class="border rounded p-2" placeholder="Enter price" />
         </div>
         <div class="flex flex-col md:col-span-2">
           <label for="notes" class="mb-1">Notes:</label>
-          <textarea v-model="gutters.notes" id="notes" class="border rounded p-2" placeholder="Enter notes"
+          <textarea v-model="roof.notes" id="notes" class="border rounded p-2" placeholder="Enter notes"
             rows="3"></textarea>
         </div>
-        <div v-if="gutters.files.length > 0" class="flex flex-col md:col-span-2">
-          <UCarousel v-slot="{ item }" :items="gutters.files" indicators>
+        <div v-if="roof.files.length > 0" class="flex flex-col md:col-span-2">
+          <UCarousel v-slot="{ item }" :items="roof.files" indicators>
             <div class="relative group">
               <video v-if="isVideo(item)" width="300" height="400" draggable="false" controls class="rounded">
                 <source :src="item.preview" type="video/mp4" />
@@ -280,10 +265,16 @@ const handleDeleteConfirm = async () => {
             </div>
           </UCarousel>
         </div>
-        <div class="flex flex-col md:col-span-2">
+        <div class="flex flex-col md:col-span-1">
           <label for="files" class="mb-1">Upload Files:</label>
-          <input type="file" ref="fileInput" multiple @change="handleFileUpload" id="files"
-            class="border rounded p-2" />
+          <input type="file" ref="fileInput" multiple @change="handleFileUpload" id="files" class="hidden" />
+          <button 
+            @click="$refs.fileInput.click()" 
+            class="bg-blue-500 text-white rounded-full p-2 hover:bg-blue-600 transition duration-200 flex items-center justify-center"
+            aria-label="Choose Files"
+          >
+            <UIcon name="i-heroicons-plus" class="w-5 h-5" aria-hidden="true" />
+          </button>
           <!-- Display uploaded files in a carousel -->
           <div v-if="uploadedFiles.length > 0" class="mt-6">
             <h3 class="text-xl font-semibold mb-4">Attachments</h3>
@@ -299,7 +290,7 @@ const handleDeleteConfirm = async () => {
         </div>
         <div class="md:col-span-2 mt-4">
           <button type="submit" class="bg-blue-500 text-white rounded p-2 w-full">
-            Submit
+            Save Changes
           </button>
         </div>
       </div>

@@ -24,9 +24,11 @@ onMounted(() => {
   getDoc(docRef).then((docSnap) => {
     if (docSnap.exists()) {
       homeSource.value = docSnap.data()
-      if (!homeSource.value.roof) {
-        homeSource.value.roof = {
-          squareFeet: '',
+      if (!homeSource.value.gutters) {
+        homeSource.value.gutters = {
+          installed: false,
+          length: 0,
+          totalDownspouts: 0,
           materials: '',
           dateInstalled: '',
           installer: '',
@@ -35,15 +37,17 @@ onMounted(() => {
           files: [],
         };
       }
-      roof.value = {
-        ...homeSource.value.roof
+      gutters.value = {
+        ...homeSource.value.gutters
       }
     }
   })
 })
 
-const roof = ref({
-  squareFeet: '',
+const gutters = ref({
+  installed: false,
+  length: 0,
+  totalDownspouts: 0,
   materials: '',
   dateInstalled: '',
   installer: '',
@@ -143,11 +147,11 @@ const submitForm = async () => {
 
     // Wait for all file uploads to complete
     const uploadedFileData = await Promise.all(uploadPromises);
-    roof.value.files = [...roof.value.files, ...uploadedFileData];
+    gutters.value.files = [...gutters.value.files, ...uploadedFileData];
     const docRef = doc($db, "properties", homeId);
     await updateDoc(docRef, {
-      roof: {
-        ...roof.value
+      gutters: {
+        ...gutters.value
       },
     }, { merge: true });
 
@@ -179,11 +183,11 @@ const deleteFile = async (file) => {
       await deleteObject(thumbnailRef);
     }
 
-    roof.value.files = roof.value.files.filter(f => f.url !== file.url);
+    gutters.value.files = gutters.value.files.filter(f => f.url !== file.url);
     const docRef = doc($db, "properties", homeId);
     await updateDoc(docRef, {
-      roof: {
-        ...roof.value
+      gutters: {
+        ...gutters.value
       },
     });
 
@@ -210,39 +214,50 @@ const handleDeleteConfirm = async () => {
 </script>
 
 <template>
+
   <div v-if="homeSource" class="max-w-4xl mx-auto p-4">
     <form @submit.prevent="submitForm" class="max-w-4xl mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="flex flex-col">
-          <label for="squareFeet" class="mb-1">Square Feet:</label>
-          <input type="number" v-model="roof.squareFeet" id="squareFeet" class="border rounded p-2"
-            placeholder="Enter square feet" />
+          <label for="installed" class="mb-1">Installed:</label>
+          <input type="checkbox" v-model="gutters.installed" id="installed" class="border rounded p-2" />
+        </div>
+        <div class="flex flex-col">
+          <label for="length" class="mb-1">Length:</label>
+          <input type="number" v-model="gutters.length" id="length" class="border rounded p-2"
+            placeholder="Enter length" />
+        </div>
+        <div class="flex flex-col">
+          <label for="totalDownspouts" class="mb-1">Total Downspouts:</label>
+          <input type="number" v-model="gutters.totalDownspouts" id="totalDownspouts" class="border rounded p-2"
+            placeholder="Enter total downspouts" />
         </div>
         <div class="flex flex-col">
           <label for="materials" class="mb-1">Materials:</label>
-          <input type="text" v-model="roof.materials" id="materials" class="border rounded p-2"
+          <input type="text" v-model="gutters.materials" id="materials" class="border rounded p-2"
             placeholder="Enter materials" />
         </div>
         <div class="flex flex-col">
           <label for="dateInstalled" class="mb-1">Date Installed:</label>
-          <input type="date" v-model="roof.dateInstalled" id="dateInstalled" class="border rounded p-2" />
+          <input type="date" v-model="gutters.dateInstalled" id="dateInstalled" class="border rounded p-2" />
         </div>
         <div class="flex flex-col">
           <label for="installer" class="mb-1">Installer:</label>
-          <input type="text" v-model="roof.installer" id="installer" class="border rounded p-2"
+          <input type="text" v-model="gutters.installer" id="installer" class="border rounded p-2"
             placeholder="Enter installer name" />
         </div>
         <div class="flex flex-col">
           <label for="price" class="mb-1">Price Paid:</label>
-          <input type="number" v-model="roof.price" id="price" class="border rounded p-2" placeholder="Enter price" />
+          <input type="number" v-model="gutters.price" id="price" class="border rounded p-2"
+            placeholder="Enter price" />
         </div>
         <div class="flex flex-col md:col-span-2">
           <label for="notes" class="mb-1">Notes:</label>
-          <textarea v-model="roof.notes" id="notes" class="border rounded p-2" placeholder="Enter notes"
+          <textarea v-model="gutters.notes" id="notes" class="border rounded p-2" placeholder="Enter notes"
             rows="3"></textarea>
         </div>
-        <div v-if="roof.files.length > 0" class="flex flex-col md:col-span-2">
-          <UCarousel v-slot="{ item }" :items="roof.files" indicators>
+        <div v-if="gutters.files.length > 0" class="flex flex-col md:col-span-2">
+          <UCarousel v-slot="{ item }" :items="gutters.files" indicators>
             <div class="relative group">
               <video v-if="isVideo(item)" width="300" height="400" draggable="false" controls class="rounded">
                 <source :src="item.preview" type="video/mp4" />

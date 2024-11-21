@@ -24,7 +24,7 @@ const items = [{
   key: 'appliances',
   icon: 'i-mdi-fridge',
   content: 'Dishwashers and refrigerators and stuff',
-  disabled: true,
+  disabled: false,
 },]
 
 const sections = [{
@@ -48,6 +48,9 @@ const sections = [{
   slot: 'paint',
 },]
 
+const appliances = ref([])
+
+appliances.value = [ {description: 'Dishwasher', key: "hjgdsfa82"}]
 
 
 </script>
@@ -67,24 +70,29 @@ const sections = [{
               </template>
 
               <template #roof>
-                <Roof />
+                <HomeRoof />
 
               </template>
 
               <template #gutters>
-                <Gutters />
+                <HomeGutters />
               </template>
 
               <template #siding>
-                <Siding />
+                <HomeSiding />
               </template>
 
               <template #paint>
-                <Paint /> 
+                <HomePaint /> 
               </template>
 
             </UAccordion>
           </div>
+          <div v-if="item.key === 'appliances'" class="space-y-3">
+            <Appliance />
+
+          </div>
+
         </template>
       </UTabs>
 
