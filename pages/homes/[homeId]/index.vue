@@ -1,9 +1,7 @@
 <script setup>
 import { useRoute } from 'vue-router';
-import { doc, getDoc, updateDoc } from 'firebase/firestore'
-import Attachments from '@/components/common/Attachments.vue';
+import { doc, updateDoc } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-
 
 const route = useRoute();
 const homeIdRef = useState('homeId') 
@@ -17,11 +15,7 @@ const home = useDocument(docRef)
 
 const attachmentsRef = ref(null);
 
-const logUploadedFiles = async () => {
-    if (attachmentsRef.value) {
-        console.log(attachmentsRef.value.uploadedFiles); // Access the uploadedFiles ref
-    }
-
+const saveFiles = async () => {
     try {
     // Create an array of promises for file uploads
     const uploadPromises = attachmentsRef.value.uploadedFiles.map(async (file) => {
@@ -68,10 +62,6 @@ const logUploadedFiles = async () => {
     //isUploading.value = false;
 
   }
-
-
-
-    
 };
 
 
@@ -158,14 +148,7 @@ const deleteFile = async (file) => {
 
     <HomeValue :homeId="homeId" />
 
-    <article class="p-4 bg-white shadow-md rounded-md">
-      
-        <h2 class="text-lg font-bold"><UIcon name="i-heroicons-chevron-double-right" class="w-4 h-4" />
-          Attachments          
-        </h2>
-        <CommonAttachments ref="attachmentsRef" :attachments="home.roof.files" @fileDeleted="deleteFile" />
-        <button @click="logUploadedFiles">Save Files</button>
-    </article>
+
 
     <article class="p-4 bg-white shadow-md rounded-md">
       <NuxtLink :to="{ name: 'homes-homeId-score', params: { homeId: homeId } }">

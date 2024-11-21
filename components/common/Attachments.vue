@@ -1,6 +1,7 @@
 <template>
+    <h3 class="text-xl font-semibold mb-4">Attachments</h3>
     <div v-if="attachments" class="flex flex-col md:col-span-2">
-        <UCarousel v-slot="{ item }" :items="attachments" indicators>
+        <UCarousel v-slot="{ item }" :items="attachments">
             <div class="relative group">
                 <video v-if="isVideo(item)" width="300" height="400" draggable="false" controls class="rounded">
                     <source :src="item.preview" type="video/mp4" />
@@ -32,8 +33,8 @@
         </button>
         <!-- Display uploaded files in a carousel -->
         <div v-if="uploadedFiles.length > 0" class="mt-6">
-            <h3 class="text-xl font-semibold mb-4">Attachments</h3>
-            <UCarousel v-slot="{ item }" :items="uploadedFiles" indicators>
+            <h3 class="text-xl font-semibold mb-4">Pending Upload</h3>
+            <UCarousel v-slot="{ item }" :items="uploadedFiles">
                 <video width="300" height="400" draggable="false" v-if="isVideo(item)" controls class="rounded">
                     <source :src="item.preview" type="video/mp4" />
                     Your browser does not support the video tag.
@@ -144,20 +145,15 @@ async function generatePdfThumbnail(file) {
   });
 }
 
-// Add this function to handle file deletion
 const deleteFile = async (file) => {
-        // Emit the fileDeleted event to the parent
-        console.log("Emitting...")
-        emit('fileDeleted', file); // Pass the deleted file as payload
+    emit('fileDeleted', file); // Pass the deleted file as payload
 };
 
-// Function to handle delete confirmation
 const confirmDelete = (file) => {
   fileToDelete.value = file;
   showDeleteConfirm.value = true;
 };
 
-// Function to execute delete after confirmation
 const handleDeleteConfirm = async () => {
   if (fileToDelete.value) {
     await deleteFile(fileToDelete.value);
@@ -165,7 +161,4 @@ const handleDeleteConfirm = async () => {
   }
   showDeleteConfirm.value = false;
 };
-
-
-
 </script>
