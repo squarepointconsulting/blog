@@ -71,7 +71,12 @@ const deleteFile = async (file) => {
   try {
     // Delete file from Storage
     const fileRef = storageRef($storage, `properties/${homeId}/appliances/${applianceId}/${file.name}`);
-    await deleteObject(fileRef);
+    try {
+      await deleteObject(fileRef);
+    }
+    catch (error) {
+      console.warn('Error deleting file:', error);
+    }
 
     // If it's a PDF, also delete the thumbnail
     if (file.type.startsWith('application/pdf')) {
@@ -80,12 +85,9 @@ const deleteFile = async (file) => {
     }
 
     appliance.value.attachments = appliance.value.attachments.filter(f => f.url !== file.url);
+    console.log(appliance.value.attachments)
     const docRef = doc($db, 'properties', homeId, 'appliances', applianceId)
-    await updateDoc(docRef, {
-      appliance: {
-        ...appliance.value
-      },
-    });
+    await updateDoc(docRef, { ...appliance.value });
 
   } catch (error) {
     console.error('Error deleting file:', error);
@@ -119,7 +121,6 @@ const deleteAppliance = async () => {
           try { await deleteObject(thumbnailRef); }
           catch (error) {
             console.log('Error deleting file:', error);
-            //alert("An error occurred while deleting the appliance.");
           }
         }
       }
@@ -135,78 +136,167 @@ const deleteAppliance = async () => {
   }
 };
 
+const formatDate = (timestamp) => {
+  if (!timestamp) return 'N/A';
+  return new Date(timestamp).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true
+  });
+};
+
 </script>
 
 <template>
   <div v-if="appliance" class="max-w-4xl mx-auto p-4">
-    <form @submit.prevent="submitForm" class="max-w-4xl mx-auto px-4">
-
-    <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-        <div class="md:col-span-2">
-          <p class="font-bold">{{ appliance.type }}</p>
-
+    <form @submit.prevent="submitForm" class="max-w-4xl mx-auto">
+      <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <!-- Header Section -->
+        <div class="border-b pb-4 mb-6">
+          <h1 class="text-2xl font-bold text-gray-900">Appliance Details</h1>
         </div>
 
-        <!-- User Display Name -->
-        <div class="flex flex-col">
-          <label class="text-sm font-medium text-gray-600 mb-1">
-            Created By
-          </label>
-          <p class="text-gray-900">
-            {{ appliance.completedByUserDisplayName || 'Unknown User' }}
-          </p>
-        </div>
+        <!-- Main Form Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Category -->
+          <div class="flex flex-col">
+            <label class="text-sm font-medium text-gray-600 mb-1">
+              Category
+            </label>
+            <input 
+              type="text" 
+              v-model="appliance.category"
+              class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="e.g., Dishwasher"
+            />
+          </div>
 
-        <!-- Timestamp -->
-        <div class="flex flex-col">
-          <label class="text-sm font-medium text-gray-600 mb-1">
-            Created On
-          </label>
-          <p class="text-gray-900">
-            {{ appliance.timestamp?.toDate().toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              hour: 'numeric',
-              minute: 'numeric',
-              hour12: true
-            }) }}
-          </p>
-        </div>
+          <!-- Manufacturer -->
+          <div class="flex flex-col">
+            <label class="text-sm font-medium text-gray-600 mb-1">
+              Manufacturer
+            </label>
+            <input 
+              type="text" 
+              v-model="appliance.manufacturer"
+              class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="e.g., Maytag"
+            />
+          </div>
 
-        <!-- Notes -->
-        <div class="md:col-span-2">
-          <label for="notes" class="block text-sm font-medium text-gray-600 mb-1">
-            Notes
-          </label>
-          <textarea id="notes" v-model="appliance.notes" rows="4"
-            class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Add appliance notes here..."></textarea>
-        </div>
-        <div class="flex flex-col md:col-span-2">
-          <CommonAttachments ref="attachmentsRef" :attachments="appliance.attachments" @fileDeleted="deleteFile" />
-        </div>
-        <div class="md:col-span-2 mt-4 flex justify-between">
-          <button type="submit"
-            class="bg-blue-500 text-white rounded p-3 w-1/2 hover:bg-blue-600 transition duration-200">
-            Submit
-          </button>
-          <button @click="confirmDeleteAppliance"
-            class="bg-red-500 text-white rounded p-3 w-1/2 ml-4 hover:bg-red-600 transition duration-200">
-            Delete Appliance
-          </button>
+          <!-- Model -->
+          <div class="flex flex-col">
+            <label class="text-sm font-medium text-gray-600 mb-1">
+              Model Number
+            </label>
+            <input 
+              type="text" 
+              v-model="appliance.model"
+              class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="Enter model number"
+            />
+          </div>
+
+          <!-- Serial Number -->
+          <div class="flex flex-col">
+            <label class="text-sm font-medium text-gray-600 mb-1">
+              Serial Number
+            </label>
+            <input 
+              type="text" 
+              v-model="appliance.serialNumber"
+              class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="Enter serial number"
+            />
+          </div>
+
+          <!-- Purchase Date -->
+          <div class="flex flex-col">
+            <label class="text-sm font-medium text-gray-600 mb-1">
+              Date of Purchase
+            </label>
+            <input 
+              type="date" 
+              v-model="appliance.dateOfPurchase"
+              class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+
+          <!-- Purchase Location -->
+          <div class="flex flex-col">
+            <label class="text-sm font-medium text-gray-600 mb-1">
+              Purchase Location
+            </label>
+            <input 
+              type="text" 
+              v-model="appliance.purchaseLocation"
+              class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="Where was it purchased?"
+            />
+          </div>
+
+          <!-- Created By Info -->
+          <div class="flex flex-col">
+            <label class="text-sm font-medium text-gray-600 mb-1">
+              Created By
+            </label>
+            <p class="text-gray-900 py-2">
+              {{ appliance.createdByDisplayName || 'Unknown User' }}
+            </p>
+          </div>
+
+          <!-- Created At -->
+          <div class="flex flex-col">
+            <label class="text-sm font-medium text-gray-600 mb-1">
+              Created On
+            </label>
+            <p class="text-gray-900 py-2">
+              {{ formatDate(appliance.createdAt) }}
+            </p>
+          </div>
+
+          <!-- Attachments Section -->
+          <div class="md:col-span-2">
+            <label class="text-sm font-medium text-gray-600 mb-1">
+              Attachments
+            </label>
+            <CommonAttachments 
+              ref="attachmentsRef" 
+              :attachments="appliance.attachments" 
+              @fileDeleted="deleteFile" 
+            />
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="md:col-span-2 mt-6 flex gap-4">
+            <button 
+              type="submit"
+              class="flex-1 bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition duration-200 flex items-center justify-center gap-2"
+            >
+              <UIcon name="i-heroicons-check" class="w-5 h-5" />
+              Save Changes
+            </button>
+            <button 
+              @click="confirmDeleteAppliance"
+              class="flex-1 bg-red-500 text-white rounded-lg px-4 py-2 hover:bg-red-600 transition duration-200 flex items-center justify-center gap-2"
+            >
+              <UIcon name="i-heroicons-trash" class="w-5 h-5" />
+              Delete Appliance
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  </form>
+    </form>
 
+    <!-- Loading Modal -->
     <UModal v-model="isUploading">
       <div class="p-4 flex flex-col items-center">
+        <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin mb-2" />
         <p>Uploading files, please wait...</p>
       </div>
     </UModal>
   </div>
-
 </template>

@@ -77,11 +77,7 @@ const deleteFile = async (file) => {
 
     project.value.attachments = project.value.attachments.filter(f => f.url !== file.url);
     const docRef = doc($db, 'properties', homeId, 'project_records', projectId)
-    await updateDoc(docRef, {
-      project: {
-        ...project.value
-      },
-    });
+    await updateDoc(docRef, { ...project.value });
 
   } catch (error) {
     console.error('Error deleting file:', error);
