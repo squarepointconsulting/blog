@@ -1,44 +1,45 @@
 <script setup>
 import { useRoute } from 'vue-router';
-import { doc } from 'firebase/firestore'
+import { useCollection } from 'vuefire'
+import { collection, query, orderBy, doc, where } from 'firebase/firestore'
 
 const route = useRoute();
-const homeIdRef = useState('homeId') 
 const homeId = route.params.homeId;
-homeIdRef.value = homeId;
-
 const { $db } = useNuxtApp();
 const docRef = doc($db, 'properties', homeId);
 const home = useDocument(docRef)
+const appliancesRef = collection($db, 'properties', homeId, 'appliances');
+const appliancesQuery = query(appliancesRef, orderBy('category', 'asc'));
+const appliances = useCollection(appliancesQuery);
+
+const columns = [
+    {
+        key: 'category',
+        label: 'Category',
+    },
+    {
+        key: 'manufacturer',
+        label: 'Manufacturer',
+    },
+]
+
 
 </script>
 
 <template>
-    <article class="p-4 bg-white shadow-md rounded-md">
-      <NuxtLink :to="{ name: 'homes-homeId-score', params: { homeId: homeId } }">
-        <h2 class="text-lg font-bold">Send It
-          <UIcon name="i-heroicons-chevron-double-right" class="w-4 h-4" />
-        </h2>
-        <p class="text-gray-700">Increase your home's VillaFact Score to increase your net asset value. Complete these
-          simple
-          activities to build your profile.</p>
-      </NuxtLink>
+  <div v-if="appliances && appliances.length" class="space-y-4">
+    <article 
+      class="p-4 bg-white shadow-md rounded-md" 
+      v-for="appliance in appliances" 
+      :key="appliance.id"
+    >
+      <h2 class="text-lg font-semibold">{{ appliance.name }}</h2> <!-- Display appliance name -->
+      <p><strong>Manufacturer:</strong> {{ appliance.manufacturer }}</p> <!-- Display manufacturer -->
+      <p><strong>Category:</strong> {{ appliance.category }}</p> <!-- Display category -->
+      <p><strong>Description:</strong> {{ appliance.description }}</p> <!-- Display description -->
+      <NuxtLink :to="`./appliances/${appliance.id}`" class="text-blue-600 hover:text-blue-800 hover:underline">
+        View Details
+      </NuxtLink> <!-- Link to appliance details -->
     </article>
-    <article class="p-4 bg-white shadow-md rounded-md">
-      <NuxtLink to="/invest">
-        <h2 class="text-lg font-bold">Invest
-          <UIcon name="i-heroicons-chevron-double-right" class="w-4 h-4" />
-        </h2>
-        <p class="text-gray-700">Plan and track home improvement projects to maximize your costs basis.</p>
-      </NuxtLink>
-    </article>
-    <article class="p-4 bg-white shadow-md rounded-md">
-      <NuxtLink to="/advice">
-        <h2 class="text-lg font-bold">Advice
-          <UIcon name="i-heroicons-chevron-double-right" class="w-4 h-4" />
-        </h2>
-        <p class="text-gray-700">GenAI Powered advice for homeowners about the best way to increase the value and lower
-          the costs of your home.</p>
-      </NuxtLink>
-    </article>
-  </template>
+  </div>
+</template>
