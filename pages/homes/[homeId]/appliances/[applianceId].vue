@@ -18,7 +18,6 @@ const attachmentsRef = ref(null);
 const { $db, $storage } = useNuxtApp();
 const docRef = doc($db, 'properties', homeId, 'appliances', applianceId);
 
-
 const appliance = useDocument(docRef)
 
 const submitForm = async () => {
@@ -104,7 +103,7 @@ const confirmDeleteAppliance = async () => {
 const deleteAppliance = async () => {
   try {
     // Delete all associated files from Firebase Storage
-    if (appliance.value.attachments.length > 0) {
+    if (appliance.value.attachments && appliance.value.attachments.length > 0) {
       for (const file of appliance.value.attachments) {
         const fileRef = storageRef($storage, `properties/${homeId}/appliances/${applianceId}/${file.name}`);
         try { await deleteObject(fileRef); }
