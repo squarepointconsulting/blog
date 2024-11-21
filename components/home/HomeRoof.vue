@@ -10,29 +10,6 @@ const { $db, $storage } = useNuxtApp();
 const homeSource = ref()
 const isUploading = ref(false);
 
-onMounted(() => {
-  const docRef = doc($db, "properties", homeId);
-  getDoc(docRef).then((docSnap) => {
-    if (docSnap.exists()) {
-      homeSource.value = docSnap.data()
-      if (!homeSource.value.roof) {
-        homeSource.value.roof = {
-          squareFeet: '',
-          materials: '',
-          dateInstalled: '',
-          installer: '',
-          price: '',
-          notes: '',
-          files: [],
-        };
-      }
-      roof.value = {
-        ...homeSource.value.roof
-      }
-    }
-  })
-})
-
 const roof = ref({
   squareFeet: '',
   materials: '',
@@ -42,6 +19,25 @@ const roof = ref({
   notes: '',
   files: [],
 });
+
+onMounted(() => {
+  const docRef = doc($db, "properties", homeId);
+  getDoc(docRef).then((docSnap) => {
+    if (docSnap.exists()) {
+      homeSource.value = docSnap.data()
+      if (!homeSource.value.roof) {
+        homeSource.value.roof = {
+          ...roof.value
+        };
+      }
+      else {
+        roof.value = {
+          ...homeSource.value.roof
+        }
+      }
+    }
+  })
+})
 
 const attachmentsRef = ref(null);
 
@@ -58,7 +54,6 @@ const submitForm = async () => {
         const thumbnailRef = storageRef($storage, `properties/${homeId}/${file.name}-thumbnail.png`);
         const thumbnailSnapshot = await uploadBytes(thumbnailRef, file.preview_file);
         const thumbnailUrl = await getDownloadURL(thumbnailRef);
-        console.log('Thumbnail uploaded:', thumbnailUrl);
         return {
           name: file.name,
           url: url,
