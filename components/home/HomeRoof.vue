@@ -9,6 +9,7 @@ const homeId = route.params.homeId;
 const { $db, $storage } = useNuxtApp();
 const homeSource = ref()
 const isUploading = ref(false);
+const attachmentsRef = ref(null);
 
 const roof = ref({
   squareFeet: '',
@@ -38,9 +39,6 @@ onMounted(() => {
     }
   })
 })
-
-const attachmentsRef = ref(null);
-
 
 const submitForm = async () => {
   isUploading.value = true;
@@ -85,7 +83,6 @@ const submitForm = async () => {
   } finally {
     attachmentsRef.value.uploadedFiles = [];
     isUploading.value = false;
-
   }
 };
 
@@ -105,7 +102,6 @@ const deleteFile = async (file) => {
       const thumbnailRef = storageRef($storage, `properties/${homeId}/${file.name}-thumbnail.png`);
       await deleteObject(thumbnailRef);
     }
-
     roof.value.files = roof.value.files.filter(f => f.url !== file.url);
     const docRef = doc($db, "properties", homeId);
     await updateDoc(docRef, {

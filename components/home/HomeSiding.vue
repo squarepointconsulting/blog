@@ -173,7 +173,7 @@ const handleDeleteConfirm = async () => {
         </div>
         <div class="md:col-span-2 mt-4">
           <button type="submit" class="bg-blue-500 text-white rounded p-2 w-full">
-            Submit
+            Save Changes
           </button>
         </div>
       </div>
