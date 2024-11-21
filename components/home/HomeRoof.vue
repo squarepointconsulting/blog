@@ -160,7 +160,6 @@ const deleteFile = async (file) => {
       </div>
     </form>
 
-    <!-- Upload Modal -->
     <UModal v-model="isUploading">
       <div class="p-4 flex flex-col items-center">
         <Spinner />

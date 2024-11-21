@@ -89,7 +89,7 @@ appliances.value = [ {description: 'Dishwasher', key: "hjgdsfa82"}]
             </UAccordion>
           </div>
           <div v-if="item.key === 'appliances'" class="space-y-3">
-            <Appliance />
+            <ApplianceList />
 
           </div>
 

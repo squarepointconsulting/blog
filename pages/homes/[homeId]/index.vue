@@ -1,103 +1,15 @@
 <script setup>
 import { useRoute } from 'vue-router';
-import { doc, updateDoc } from 'firebase/firestore'
-import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { doc } from 'firebase/firestore'
 
 const route = useRoute();
 const homeIdRef = useState('homeId') 
 const homeId = route.params.homeId;
 homeIdRef.value = homeId;
 
-const { $db, $storage } = useNuxtApp();
+const { $db } = useNuxtApp();
 const docRef = doc($db, 'properties', homeId);
 const home = useDocument(docRef)
-
-
-const attachmentsRef = ref(null);
-
-const saveFiles = async () => {
-    try {
-    // Create an array of promises for file uploads
-    const uploadPromises = attachmentsRef.value.uploadedFiles.map(async (file) => {
-      const fileRef = storageRef($storage, `properties/${homeId}/${file.name}`);
-      const snapshot = await uploadBytes(fileRef, file.file);
-      const url = await getDownloadURL(fileRef);
-
-      if (file.type.startsWith('application/pdf')) {
-        const thumbnailRef = storageRef($storage, `properties/${homeId}/${file.name}-thumbnail.png`);
-        const thumbnailSnapshot = await uploadBytes(thumbnailRef, file.preview_file);
-        const thumbnailUrl = await getDownloadURL(thumbnailRef);
-        console.log('Thumbnail uploaded:', thumbnailUrl);
-        return {
-          name: file.name,
-          url: url,
-          type: file.type,
-          preview: thumbnailUrl,
-        };
-      }
-      else {
-        return {
-          name: file.name,
-          url: url,
-          type: file.type,
-          preview: url,
-        };
-      }
-    });
-
-    // Wait for all file uploads to complete
-    const uploadedFileData = await Promise.all(uploadPromises);
-    home.value.roof.files = [...home.value.roof.files, ...uploadedFileData];
-    const docRef = doc($db, "properties", homeId);
-    await updateDoc(docRef, {
-      roof: {
-        ...home.value.roof
-      },
-    }, { merge: true });
-
-  } catch (error) {
-    console.error('Error in submitForm:', error);
-  } finally {
-    attachmentsRef.value.uploadedFiles = [];
-    //isUploading.value = false;
-
-  }
-};
-
-
-const deleteFile = async (file) => {
-  try {
-    console.log(`DELETEING: properties/${homeId}/${file.name}`)
-    // Delete file from Storage
-    const fileRef = storageRef($storage, `properties/${homeId}/${file.name}`);
-    
-    try {
-      await deleteObject(fileRef);
-    }
-   catch (error) {
-    console.error('Error deleting file:', error);
-  }
-
-    // If it's a PDF, also delete the thumbnail
-    if (file.type.startsWith('application/pdf')) {
-      const thumbnailRef = storageRef($storage, `properties/${homeId}/${file.name}-thumbnail.png`);
-      await deleteObject(thumbnailRef);
-    }
-
-    home.value.roof.files = home.value.roof.files.filter(f => f.url !== file.url);
-    const docRef = doc($db, "properties", homeId);
-    await updateDoc(docRef, {
-      roof: {
-        ...home.value.roof
-      },
-    });
-
-  } catch (error) {
-    console.error('Error deleting file:', error);
-  }
-};
-
-
 
 </script>
 
@@ -145,11 +57,7 @@ const deleteFile = async (file) => {
 
       </div>
     </article>
-
     <HomeValue :homeId="homeId" />
-
-
-
     <article class="p-4 bg-white shadow-md rounded-md">
       <NuxtLink :to="{ name: 'homes-homeId-score', params: { homeId: homeId } }">
         <h2 class="text-lg font-bold">Level Up
