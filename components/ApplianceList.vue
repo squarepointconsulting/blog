@@ -61,14 +61,31 @@ async function addAppliance() {
   <div v-if="appliances && appliances.length" class="space-y-4">
 
 
-    <article class="p-4 bg-white shadow-md rounded-md" v-for="appliance in appliances" :key="appliance.id">
-      <h2 class="text-lg font-semibold">{{ appliance.name }}</h2> <!-- Display appliance name -->
-      <p><strong>Manufacturer:</strong> {{ appliance.manufacturer }}</p> <!-- Display manufacturer -->
-      <p><strong>Category:</strong> {{ appliance.category }}</p> <!-- Display category -->
-      <p><strong>Description:</strong> {{ appliance.description }}</p> <!-- Display description -->
-      <NuxtLink :to="`./appliances/${appliance.id}`" class="text-blue-600 hover:text-blue-800 hover:underline">
-        View Details
-      </NuxtLink> <!-- Link to appliance details -->
+    <article class="p-4 bg-gray-100 shadow-md rounded-md" v-for="appliance in appliances" :key="appliance.id">
+      <div class="flex items-center space-x-4">
+    <!-- Image Container -->
+    <div class="flex-shrink-0">
+      <NuxtLink 
+          :to="`./appliances/${appliance.id}`" 
+          class="text-blue-600 hover:text-blue-800 hover:underline text-sm mt-1"
+        >      <img 
+        class="w-16 h-16 rounded-lg object-cover bg-white" 
+        :src="appliance.imageUrl"
+        alt="Appliance Avatar" 
+      />
+        </NuxtLink>
+
+
+    </div>
+
+    <!-- Content Container -->
+    <div class="flex-grow">
+      <div class="flex flex-col">
+        <p class="font-medium text-gray-900">{{ appliance.manufacturer }}</p>
+        <p class="text-gray-600">{{ appliance.category }}</p>
+      </div>
+        </div>
+      </div>
     </article>
   </div>
   <UModal v-model="showWizard" size="2xl">

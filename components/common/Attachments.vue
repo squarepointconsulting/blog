@@ -23,6 +23,7 @@
         </UCarousel>
     </div>
     <div class="flex flex-col">
+      <p class="text-sm text-gray-600 mb-2"></p>
         <input type="file" ref="fileInput" multiple @change="handleFileUpload" id="files" class="hidden" />
         <button @click="$refs.fileInput.click()"
             class="bg-blue-500 text-white rounded-full p-2 hover:bg-blue-600 transition duration-200 flex items-center justify-center"
