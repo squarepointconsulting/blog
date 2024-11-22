@@ -86,9 +86,53 @@
       <!-- Step 2: Manufacturer & Serial Number -->
       <div v-if="currentStep === 2">
         <h2 class="text-xl font-semibold mb-4">{{ isOtherType.value ? otherTypeValue.value : selectedType.label }} Details</h2>
-        
+                <!-- Photo Upload -->
+                <div class="border-t pt-6">
+          <p v-if="!previewImage" class="text-sm text-gray-600 mb-4">Please take a photo of your appliance to help identify it.</p>
+          
+          <!-- Image Preview -->
+          <div v-if="previewImage" class="mb-4">
+            <div class="relative w-48 h-48 mx-auto">
+              <img 
+                :src="previewImage" 
+                class="w-full h-full object-cover rounded-lg border-2 border-gray-200"
+                alt="Appliance photo preview"
+              />
+              <button 
+                @click="clearPhoto"
+                class="absolute top-2 right-2 p-1 bg-gray-800 bg-opacity-50 rounded-full text-white hover:bg-opacity-70"
+              >
+                <UIcon name="i-heroicons-x-mark" class="w-4 h-4"/>
+              </button>
+            </div>
+          </div>
+
+          <!-- Upload Button -->
+          <div class="flex justify-center">
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              @change="handlePhotoUpload"
+              class="hidden"
+              ref="photoInput"
+            />
+            <button v-if="!previewImage"
+              @click="$refs.photoInput.click()"
+              class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg"
+              :disabled="isProcessing"
+            >
+              <UIcon :name="isProcessing ? 'i-heroicons-arrow-path' : 'i-heroicons-camera'" 
+                class="w-5 h-5"
+                :class="{ 'animate-spin': isProcessing }"
+              />
+              {{ isProcessing ? 'Processing...' : 'Take Photo' }}
+            </button>
+          </div>
+        </div>
+
         <!-- Manual Input -->
-        <div class="space-y-4 mb-6">
+        <div class="space-y-4 mb-6 pt-6">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Manufacturer</label>
             <div class="space-y-2">
@@ -116,6 +160,7 @@
               />
             </div>
           </div>
+          
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Serial Number</label>
             <input
@@ -124,31 +169,20 @@
               class="w-full border rounded-md px-3 py-2"
             />
           </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Model</label>
+            <input
+              v-model="applianceModel"
+              type="text"
+              class="w-full border rounded-md px-3 py-2"
+            />
+          </div>
         </div>
 
-        <!-- Photo Upload -->
-        <div class="border-t pt-6">
-          <p class="text-sm text-gray-600 mb-4">Or take a photo of your appliance to automatically extract details</p>
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            @change="handlePhotoUpload"
-            class="hidden"
-            ref="photoInput"
-          />
-          <button
-            @click="$refs.photoInput.click()"
-            class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg"
-          >
-            <UIcon name="i-heroicons-camera" class="w-5 h-5"/>
-            Take Photo
-          </button>
-        </div>
       </div>
 
       <!-- Step 3: Purchase Information -->
-      <div v-if="currentStep === 3">
+      <div v-show="currentStep === 3">
         <h2 class="text-xl font-semibold mb-4">Purchase Information</h2>
         
         <div class="space-y-4">
@@ -169,7 +203,7 @@
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Upload Receipt</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Attachments (optional) such as receipts or manuals.</label>
             <CommonAttachments
               ref="attachmentsRef"
               :attachments="attachments"
@@ -192,6 +226,10 @@
             <div>
               <p class="font-medium text-gray-700">Manufacturer:</p>
               <p>{{ manufacturer }}</p>
+            </div>
+            <div>
+              <p class="font-medium text-gray-700">Model:</p>
+              <p>{{ applianceModel }}</p>
             </div>
             <div>
               <p class="font-medium text-gray-700">Serial Number:</p>
@@ -249,6 +287,13 @@
       </div>
     </div>
   </div>
+    <!-- Loading Modal -->
+    <UModal v-model="isUploading">
+    <div class="p-4 flex flex-col items-center">
+      <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin mb-2" />
+      <p>Uploading files, please wait...</p>
+    </div>
+  </UModal>
 </template>
 
 <script setup>
@@ -270,11 +315,14 @@ const otherTypeValue = ref('');
 const selectedManufacturer = ref('');
 const manufacturer = ref('');
 const serialNumber = ref('');
+const applianceModel = ref('');
 const purchaseLocation = ref('');
 const purchaseDate = ref('');
+const notes = ref('');
 const attachments = ref([]);
 const isProcessing = ref(false);
 const isMoreTypesOpen = ref(false);
+const previewImage = ref(null);
 
 // Refs
 const photoInput = ref(null);
@@ -347,65 +395,21 @@ const selectApplianceType = (type) => {
 const handlePhotoUpload = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
-
-  isProcessing.value = true;
-  try {
-    // Here you would implement the photo processing logic
-    // This could involve uploading to a cloud function that handles OCR
-    // and returns the extracted information
-    
-    // For now, we'll just simulate a delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Mock extracted data
-    manufacturer.value = 'Extracted Manufacturer';
-    serialNumber.value = 'Extracted Serial Number';
-  } catch (error) {
-    console.error('Error processing photo:', error);
-  } finally {
-    isProcessing.value = false;
-  }
+  previewImage.value = URL.createObjectURL(file);
 };
 
 const handleFileDeleted = (file) => {
   attachments.value = attachments.value.filter(f => f.id !== file.id);
 };
 
-
-async function addAppliance() {
-  const user = await useCurrentUser()
-  console.log(user.value)
-  const updated_at_timestamp = serverTimestamp()
-  const applianceRecord = {
-    category: "Dishwasher",
-    manufacturer: "Maytag",
-    model: "",
-    serialNumber: "",
-    dateOfPurchase: new Date(2023, 12, 15),
-    purchaseLocation: "",
-    createdAt: updated_at_timestamp,
-    updatedAt: updated_at_timestamp,
-    createdByUid: user.value.uid,
-    createdByDisplayName: user.value.displayName,
-    updatedByUid: user.value.uid,
-    updatedByDisplayName: user.value.displayName,
-    imageUrl: "https://placehold.co/60x60?text=icon",
-    attachments: [],
-  }
-  // Get a reference to the home document. Or do we have that already?
-
-  console.log(applianceRecord)
-  const docRef = await addDoc(collection($db, "properties", homeId, "appliances"), applianceRecord);
-  console.log("Document written with ID: ", docRef.id);
-  router.push(`./appliances/${docRef.id}`); // Adjust the path as necessary
-
-}
-
-// Add defineEmits at the top of your script
 const emit = defineEmits(['complete']);
+const isUploading = ref(false);
 
-// Update the createAppliance function to emit the event on success
 const createAppliance = async () => {
+  console.log('createAppliance')
+  isUploading.value = true;
+  console.log(attachmentsRef.value)
+  await new Promise(resolve => setTimeout(resolve, 5000));
   isProcessing.value = true;
   const user = await useCurrentUser()
   console.log(user.value)
@@ -415,10 +419,11 @@ const createAppliance = async () => {
     const applianceData = {
     category: isOtherType.value ? otherTypeValue.value : selectedType.value.label,
       manufacturer: manufacturer.value,
-      model: "",
       serialNumber: serialNumber.value,
+      model: applianceModel.value,
       purchaseLocation: purchaseLocation.value,
       purchaseDate: purchaseDate.value,
+      notes: notes.value,       
       createdAt: updated_at_timestamp,
         updatedAt: updated_at_timestamp,
         createdByUid: user.value.uid,
@@ -432,27 +437,27 @@ const createAppliance = async () => {
     console.log(applianceData)
   const docRef = await addDoc(collection($db, "properties", homeId, "appliances"), applianceData);
   console.log("Document written with ID: ", docRef.id);
-  // router.push(`./appliances/${docRef.id}`); // Adjust the path as necessary
-
-
-
-    // const docRef = await addDoc(collection($db, 'appliances'), applianceData);
-    // router.push(`/appliances/${docRef.id}`);
-  } catch (error) {
+    } catch (error) {
     console.error('Error creating appliance:', error);
   } finally {
     isProcessing.value = false;
-        // Emit the complete event after successful creation
+    isUploading.value = false;
         emit('complete');
   }
 };
 
-// Handle manufacturer selection
 const handleManufacturerChange = () => {
   if (selectedManufacturer.value !== 'other') {
     manufacturer.value = selectedManufacturer.value;
   } else {
     manufacturer.value = '';
+  }
+};
+
+const clearPhoto = () => {
+  previewImage.value = null;
+  if (photoInput.value) {
+    photoInput.value.value = ''; // Reset file input
   }
 };
 </script> 

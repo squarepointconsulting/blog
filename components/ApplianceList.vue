@@ -40,7 +40,7 @@ async function addAppliance() {
   console.log(applianceRecord)
   const docRef = await addDoc(collection($db, "properties", homeId, "appliances"), applianceRecord);
   console.log("Document written with ID: ", docRef.id);
-  router.push(`./appliances/${docRef.id}`); // Adjust the path as necessary
+  // router.push(`./appliances/${docRef.id`); // Adjust the path as necessary
 
 }
 
@@ -50,12 +50,9 @@ async function addAppliance() {
 
   <div class="space-y-4">
 
-    <UButton
-        @click="showWizard = true"
-        class="bg-blue-500 text-white hover:bg-blue-600"
-      >
-        Add New Appliance
-      </UButton>
+    <UButton @click="showWizard = true" class="bg-blue-500 text-white hover:bg-blue-600">
+      Add New Appliance
+    </UButton>
   </div>
 
   <div v-if="appliances && appliances.length" class="space-y-4">
@@ -63,32 +60,27 @@ async function addAppliance() {
 
     <article class="p-4 bg-gray-100 shadow-md rounded-md" v-for="appliance in appliances" :key="appliance.id">
       <div class="flex items-center space-x-4">
-    <!-- Image Container -->
-    <div class="flex-shrink-0">
-      <NuxtLink 
-          :to="`./appliances/${appliance.id}`" 
-          class="text-blue-600 hover:text-blue-800 hover:underline text-sm mt-1"
-        >      <img 
-        class="w-16 h-16 rounded-lg object-cover bg-white" 
-        :src="appliance.imageUrl"
-        alt="Appliance Avatar" 
-      />
-        </NuxtLink>
+        <!-- Image Container -->
+        <div class="flex-shrink-0">
+          <NuxtLink :to="`./appliances/${appliance.id}`"
+            class="text-blue-600 hover:text-blue-800 hover:underline text-sm mt-1"> <img
+              class="w-16 h-16 rounded-lg object-cover bg-white" :src="appliance.imageUrl" alt="Appliance Avatar" />
+          </NuxtLink>
 
 
-    </div>
+        </div>
 
-    <!-- Content Container -->
-    <div class="flex-grow">
-      <div class="flex flex-col">
-        <p class="font-medium text-gray-900">{{ appliance.manufacturer }}</p>
-        <p class="text-gray-600">{{ appliance.category }}</p>
-      </div>
+        <!-- Content Container -->
+        <div class="flex-grow">
+          <div class="flex flex-col">
+            <p class="font-medium text-gray-900">{{ appliance.manufacturer }}</p>
+            <p class="text-gray-600">{{ appliance.category }}</p>
+          </div>
         </div>
       </div>
     </article>
   </div>
   <UModal v-model="showWizard" size="2xl">
-      <ApplianceWizard @complete="showWizard = false" />
-    </UModal>
+    <ApplianceWizard @complete="showWizard = false" />
+  </UModal>
 </template>
