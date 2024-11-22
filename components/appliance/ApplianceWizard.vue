@@ -299,13 +299,13 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-
+import { collection, addDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 const router = useRouter();
 const route = useRoute();
 const homeId = route.params.homeId;
 
-const { $db } = useNuxtApp();
+const { $db, $storage } = useNuxtApp();
 
 // State
 const currentStep = ref(1);
@@ -386,7 +386,6 @@ const canProceed = computed(() => {
 
 // Methods
 const selectApplianceType = (type) => {
-    console.log(type)
   selectedType.value = type;
   isOtherType.value = false;
   currentStep.value++;
@@ -409,13 +408,17 @@ const createAppliance = async () => {
   console.log('createAppliance')
   isUploading.value = true;
   console.log(attachmentsRef.value)
-  await new Promise(resolve => setTimeout(resolve, 5000));
+  // await new Promise(resolve => setTimeout(resolve, 5000));
   isProcessing.value = true;
   const user = await useCurrentUser()
   console.log(user.value)
   const updated_at_timestamp = serverTimestamp()
+  const applianceId = ref('');
 
   try {
+
+
+    
     const applianceData = {
     category: isOtherType.value ? otherTypeValue.value : selectedType.value.label,
       manufacturer: manufacturer.value,
@@ -437,8 +440,54 @@ const createAppliance = async () => {
     console.log(applianceData)
   const docRef = await addDoc(collection($db, "properties", homeId, "appliances"), applianceData);
   console.log("Document written with ID: ", docRef.id);
+   applianceId.value = docRef.id;
+
+    // Now that we have created an appliance, we can upload the attachments
+    const uploadPromises = attachmentsRef.value.uploadedFiles.map(async (file) => {
+      const fileRef = storageRef($storage, `properties/${homeId}/appliances/${applianceId.value}/${file.name}`);
+      const snapshot = await uploadBytes(fileRef, file.file);
+      const url = await getDownloadURL(fileRef);
+
+      if (file.type.startsWith('application/pdf')) {
+        const thumbnailRef = storageRef($storage, `properties/${homeId}/appliances/${applianceId.value}/${file.name}-thumbnail.png`);
+        const thumbnailSnapshot = await uploadBytes(thumbnailRef, file.preview_file);
+        const thumbnailUrl = await getDownloadURL(thumbnailRef);
+        console.log('Thumbnail uploaded:', thumbnailUrl);
+        return {
+          name: file.name,
+          url: url,
+          type: file.type,
+          preview: thumbnailUrl,
+        };
+      }
+      else {
+        return {
+          name: file.name,
+          url: url,
+          type: file.type,
+          preview: url,
+        };
+      }
+    });
+
+    // Wait for all file uploads to complete
+    const uploadedFileData = await Promise.all(uploadPromises);
+    applianceData.attachments = uploadedFileData;
+    //const Ref = doc($db, 'properties', homeId, 'appliances', applianceId.value)
+    await updateDoc(docRef, { 
+        attachments: [...uploadedFileData]     
+    }, { merge: true });
+
+
+
+
+
+
     } catch (error) {
     console.error('Error creating appliance:', error);
+
+
+
   } finally {
     isProcessing.value = false;
     isUploading.value = false;

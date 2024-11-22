@@ -23,7 +23,6 @@ const appliance = useDocument(docRef)
 const saveAppliance = async () => {
   isUploading.value = true;
   try {
-    // Create an array of promises for file uploads
     const uploadPromises = attachmentsRef.value.uploadedFiles.map(async (file) => {
       const fileRef = storageRef($storage, `properties/${homeId}/appliances/${applianceId}/${file.name}`);
       const snapshot = await uploadBytes(fileRef, file.file);
