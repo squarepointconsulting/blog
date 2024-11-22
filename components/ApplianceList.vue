@@ -13,6 +13,8 @@ const appliancesRef = collection($db, 'properties', homeId, 'appliances');
 const appliancesQuery = query(appliancesRef, orderBy('category', 'asc'));
 const appliances = useCollection(appliancesQuery);
 
+const showWizard = ref(false);
+
 async function addAppliance() {
   const user = await useCurrentUser()
   console.log(user.value)
@@ -48,11 +50,12 @@ async function addAppliance() {
 
   <div class="space-y-4">
 
-    <article>
-      <UButton @click="addAppliance" class="bg-blue-500 text-white hover:bg-blue-600">
-      Add New Appliance
+    <UButton
+        @click="showWizard = true"
+        class="bg-blue-500 text-white hover:bg-blue-600"
+      >
+        Add New Appliance
       </UButton>
-    </article>
   </div>
 
   <div v-if="appliances && appliances.length" class="space-y-4">
@@ -68,4 +71,7 @@ async function addAppliance() {
       </NuxtLink> <!-- Link to appliance details -->
     </article>
   </div>
+  <UModal v-model="showWizard" size="2xl">
+      <ApplianceWizard @complete="showWizard = false" />
+    </UModal>
 </template>

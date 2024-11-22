@@ -8,7 +8,7 @@
                 </video>
                 <img v-else width="300" height="400" draggable="false" :src="item.preview" :alt="item.name"
                     class="rounded" />
-                <div
+                <div v-if="!isVideo(item)"
                     class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-4">
                     <a :href="item.url" target="_blank"
                         class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">

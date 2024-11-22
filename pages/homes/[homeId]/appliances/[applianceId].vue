@@ -210,7 +210,6 @@ async function updateAppliance() {
     await updateDoc(docRef, {
         ...appliance.value,
     })
-    isEditing.value = false
 }
 
 // Function to handle the file upload
