@@ -30,6 +30,7 @@ async function addAppliance() {
     createdByDisplayName: user.value.displayName,
     updatedByUid: user.value.uid,
     updatedByDisplayName: user.value.displayName,
+    imageUrl: "https://placehold.co/60x60?text=icon",
     attachments: [],
   }
   // Get a reference to the home document. Or do we have that already?

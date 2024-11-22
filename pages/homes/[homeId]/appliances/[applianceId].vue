@@ -1,5 +1,5 @@
 <script setup>
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { ref } from 'vue';
@@ -8,7 +8,7 @@ const route = useRoute();
 const router = useRouter();
 const homeId = route.params.homeId;
 console.log(homeId)
-const applianceId  = route.params.applianceId;
+const applianceId = route.params.applianceId;
 console.log(applianceId)
 const projectId = route.params.projectId;
 
@@ -148,148 +148,253 @@ const formatDate = (timestamp) => {
   });
 };
 
+const placeholder = ref("https://placehold.co/60x60?text=icon")
+
+const sections = [{
+  label: 'Details',
+  icon: 'i-mdi-home-outline',
+  defaultOpen: false,
+  slot: 'details'
+}, {
+  label: 'Notes',
+  icon: 'i-heroicons-arrow-down-tray',
+  defaultOpen: false,
+  slot: 'notes'
+}, {
+  label: 'Attachments',
+  icon: 'i-heroicons-rectangle-group',
+  slot: 'attachments',
+},]
+
+const applianceOptions = [
+  {
+    label: 'Major Appliances',
+    children: [
+      { value: 'Refrigerator', label: 'Refrigerator' },
+      { value: 'Freezer', label: 'Freezer (standalone or part of refrigerator)' },
+      { value: 'Stove/Range', label: 'Stove/Range (gas or electric)' },
+      { value: 'Microwave', label: 'Microwave Oven' },
+      { value: 'Dishwasher', label: 'Dishwasher' },
+      { value: 'Wine Cooler', label: 'Wine Cooler' },
+    ]
+  },
+  {
+    label: 'Counter Appliances',
+    children: [
+      { value: 'Toaster', label: 'Toaster or Toaster Oven' },
+      { value: 'Coffee Maker', label: 'Coffee Maker or Espresso Machine' },
+      { value: 'Blender', label: 'Blender' },
+      { value: 'Food Processor', label: 'Food Processor' },
+      { value: 'Slow Cooker', label: 'Slow Cooker or Instant Pot' },
+      { value: 'Electric Kettle', label: 'Electric Kettle' },
+      { value: 'Stand Mixer', label: 'Stand Mixer (e.g., KitchenAid)' },
+      { value: 'Air Fryer', label: 'Air Fryer' },
+      { value: 'Juicer', label: 'Juicer' },
+    ]
+  }
+];
+
+const files = ref([]);
+const handleFileChange = (event) => {
+    files.value = event.target.files;
+};
+
+const fileInput = ref(null)
+
+const updatePhoto = () => {
+    fileInput.value.click()
+}
+
+async function updateAppliance() {
+    const docRef = doc($db, `properties/${homeId}/appliances/${applianceId}`);
+    await updateDoc(docRef, {
+        ...appliance.value,
+    })
+    isEditing.value = false
+}
+
+// Function to handle the file upload
+const handleFileUpload = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        console.log('Selected file:', file)
+        try {
+            const fileRef = storageRef($storage, `properties/${homeId}/appliances/${applianceId}/${file.name}`);
+            uploadBytes(fileRef, file).then((snapshot) => {
+                getDownloadURL(fileRef)
+                    .then((url) => {
+                        appliance.value.imageUrl = url
+                        //editHome.value.imageUrl = url
+                        //editHome.value.updated_at = serverTimestamp()
+                        updateAppliance().then(() => {
+                            // addProject()
+                        })
+                    })
+            });
+        }
+        catch (error) {
+            console.error('Error uploading files:', error);
+            alert('Failed to upload files.');
+        }
+    }
+}
+
+
 </script>
 
 <template>
-  <div v-if="appliance" class="max-w-4xl mx-auto p-4">
+
+  <article v-if="appliance" class="p-4 bg-white shadow-md rounded-md">
     <form @submit.prevent="submitForm" class="max-w-4xl mx-auto">
-      <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
-        <!-- Header Section -->
-        <div class="border-b pb-4 mb-6">
-          <h1 class="text-2xl font-bold text-gray-900">Appliance Details</h1>
+
+    <div class="flex w-full">
+      <!-- Inner Div 1 -->
+      <div class="flex-1 flex flex-col justify-center items-center">
+        <div class="w-full flex justify-center items-center">
+          <button @click="updatePhoto" class="bg-transparent hover:bg-transparent">
+            <img class="w-24 h-24 rounded-full object-fill" style="text-align: center;" :src="appliance.imageUrl"
+              alt="Appliance Avatar" />
+          </button>
         </div>
-
-        <!-- Main Form Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Category -->
-          <div class="flex flex-col">
-            <label class="text-sm font-medium text-gray-600 mb-1">
-              Category
-            </label>
-            <input 
-              type="text" 
-              v-model="appliance.category"
-              class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              placeholder="e.g., Dishwasher"
-            />
-          </div>
-
-          <!-- Manufacturer -->
-          <div class="flex flex-col">
-            <label class="text-sm font-medium text-gray-600 mb-1">
-              Manufacturer
-            </label>
-            <input 
-              type="text" 
-              v-model="appliance.manufacturer"
-              class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              placeholder="e.g., Maytag"
-            />
-          </div>
-
-          <!-- Model -->
-          <div class="flex flex-col">
-            <label class="text-sm font-medium text-gray-600 mb-1">
-              Model Number
-            </label>
-            <input 
-              type="text" 
-              v-model="appliance.model"
-              class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              placeholder="Enter model number"
-            />
-          </div>
-
-          <!-- Serial Number -->
-          <div class="flex flex-col">
-            <label class="text-sm font-medium text-gray-600 mb-1">
-              Serial Number
-            </label>
-            <input 
-              type="text" 
-              v-model="appliance.serialNumber"
-              class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              placeholder="Enter serial number"
-            />
-          </div>
-
-          <!-- Purchase Date -->
-          <div class="flex flex-col">
-            <label class="text-sm font-medium text-gray-600 mb-1">
-              Date of Purchase
-            </label>
-            <input 
-              type="date" 
-              v-model="appliance.dateOfPurchase"
-              class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
-
-          <!-- Purchase Location -->
-          <div class="flex flex-col">
-            <label class="text-sm font-medium text-gray-600 mb-1">
-              Purchase Location
-            </label>
-            <input 
-              type="text" 
-              v-model="appliance.purchaseLocation"
-              class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              placeholder="Where was it purchased?"
-            />
-          </div>
-
-          <!-- Created By Info -->
-          <div class="flex flex-col">
-            <label class="text-sm font-medium text-gray-600 mb-1">
-              Created By
-            </label>
-            <p class="text-gray-900 py-2">
-              {{ appliance.createdByDisplayName || 'Unknown User' }}
-            </p>
-          </div>
-
-          <!-- Created At -->
-          <div class="flex flex-col">
-            <label class="text-sm font-medium text-gray-600 mb-1">
-              Created On
-            </label>
-            <p class="text-gray-900 py-2">
-              {{ formatDate(appliance.createdAt) }}
-            </p>
-          </div>
-
-          <!-- Attachments Section -->
-          <div class="md:col-span-2">
-            <label class="text-sm font-medium text-gray-600 mb-1">
-              Attachments
-            </label>
-            <CommonAttachments 
-              ref="attachmentsRef" 
-              :attachments="appliance.attachments" 
-              @fileDeleted="deleteFile" 
-            />
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="md:col-span-2 mt-6 flex gap-4">
+        <!-- Row 2 -->
+        <div class="w-full flex justify-center items-center p-1">
+          <p class=""></p>
+        </div>
+        <div>
+          <input type="file" accept="image/*" @change="handleFileUpload" hidden ref="fileInput" />
+        </div>
+      </div>
+      <!-- Inner Div 2 -->
+      <div class="flex-1 flex flex-col justify-center items-center">
+        <!-- Row 1 -->
+        <div class="w-full flex justify-center items-center">
+          <p>{{ appliance.manufacturer }}</p>
+        </div>
+        <!-- Row 2 -->
+        <div class="w-full flex justify-center items-center">
+          <p class="font-bold text-center">{{ appliance.category }}</p>
+        </div>
+        <div class="w-full flex justify-center items-center">
+          <div class="md:col-span-2 mt-6 flex justify-end gap-2">
+            <button 
+              type="button"
+              @click="router.back()"
+              class="px-3 py-1.5 bg-gray-500 text-white text-sm rounded-md hover:bg-gray-600 transition duration-200 flex items-center gap-1.5"
+            >
+              <UIcon name="i-heroicons-arrow-left" class="w-3.5 h-3.5" />
+              Cancel
+            </button>
             <button 
               type="submit"
-              class="flex-1 bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition duration-200 flex items-center justify-center gap-2"
+              class="px-3 py-1.5 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 transition duration-200 flex items-center gap-1.5"
             >
-              <UIcon name="i-heroicons-check" class="w-5 h-5" />
-              Save Changes
+              <UIcon name="i-heroicons-check" class="w-3.5 h-3.5" />
+              Save
             </button>
             <button 
               @click="confirmDeleteAppliance"
-              class="flex-1 bg-red-500 text-white rounded-lg px-4 py-2 hover:bg-red-600 transition duration-200 flex items-center justify-center gap-2"
+              class="px-3 py-1.5 bg-red-500 text-white text-sm rounded-md hover:bg-red-600 transition duration-200 flex items-center gap-1.5"
             >
-              <UIcon name="i-heroicons-trash" class="w-5 h-5" />
-              Delete Appliance
+              <UIcon name="i-heroicons-trash" class="w-3.5 h-3.5" />
+              Delete
             </button>
           </div>
         </div>
       </div>
-    </form>
+    </div>
+    <div>
+      <UAccordion :items="sections" color="gray">
+        <template #item="{ item }">
+          <p class="italic text-gray-900 dark:text-white text-center">
+            {{ item.description }}
+          </p>
+        </template>
+        <template #details>
+          <!-- Main Form Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Category -->
+            <div class="flex flex-col">
+              <label class="text-sm font-medium text-gray-600 mb-1">
+                Appliance Category
+              </label>
+              <USelect
+    v-model="appliance.category"
+    :options="applianceOptions"
+    placeholder="Select an appliance type"
+    class="rounded-md"
+    option-attribute="label"
+    value-attribute="value"
+  />
+            </div>
+
+            <!-- Manufacturer -->
+            <div class="flex flex-col">
+              <label class="text-sm font-medium text-gray-600 mb-1">
+                Manufacturer
+              </label>
+              <input type="text" v-model="appliance.manufacturer"
+                class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="e.g., Maytag" />
+            </div>
+
+            <!-- Model -->
+            <div class="flex flex-col">
+              <label class="text-sm font-medium text-gray-600 mb-1">
+                Model Number
+              </label>
+              <input type="text" v-model="appliance.model"
+                class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="Enter model number" />
+            </div>
+
+            <!-- Serial Number -->
+            <div class="flex flex-col">
+              <label class="text-sm font-medium text-gray-600 mb-1">
+                Serial Number
+              </label>
+              <input type="text" v-model="appliance.serialNumber"
+                class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="Enter serial number" />
+            </div>
+
+            <!-- Purchase Date -->
+            <div class="flex flex-col">
+              <label class="text-sm font-medium text-gray-600 mb-1">
+                Date of Purchase
+              </label>
+              <input type="date" v-model="appliance.dateOfPurchase"
+                class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+
+            <!-- Purchase Location -->
+            <div class="flex flex-col">
+              <label class="text-sm font-medium text-gray-600 mb-1">
+                Purchase Location
+              </label>
+              <input type="text" v-model="appliance.purchaseLocation"
+                class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="Where was it purchased?" />
+            </div>
+
+          </div>
+
+        </template>
+
+        <template #notes>
+          <p>notes</p>
+        </template>
+        <template #attachments>
+          <CommonAttachments ref="attachmentsRef" :attachments="appliance.attachments" @fileDeleted="deleteFile" />
+        </template>
+      </UAccordion>
+    </div>
+  </form>
+
+</article>
+
+
+
+
 
     <!-- Loading Modal -->
     <UModal v-model="isUploading">
@@ -298,5 +403,6 @@ const formatDate = (timestamp) => {
         <p>Uploading files, please wait...</p>
       </div>
     </UModal>
-  </div>
+
+
 </template>

@@ -1,7 +1,6 @@
 <template>
-    <h3 class="text-xl font-semibold mb-4">Attachments</h3>
-    <div v-if="attachments" class="flex flex-col md:col-span-2">
-        <UCarousel v-slot="{ item }" :items="attachments">
+    <div v-if="attachments" class="flex flex-col">
+        <UCarousel v-slot="{ item }" :items="attachments" indicators="true">
             <div class="relative group">
                 <video v-if="isVideo(item)" width="300" height="400" draggable="false" controls class="rounded">
                     <source :src="item.preview" type="video/mp4" />
@@ -23,8 +22,7 @@
             </div>
         </UCarousel>
     </div>
-    <div class="flex flex-col md:col-span-1">
-        <label for="files" class="mb-1">Upload Files:</label>
+    <div class="flex flex-col">
         <input type="file" ref="fileInput" multiple @change="handleFileUpload" id="files" class="hidden" />
         <button @click="$refs.fileInput.click()"
             class="bg-blue-500 text-white rounded-full p-2 hover:bg-blue-600 transition duration-200 flex items-center justify-center"
