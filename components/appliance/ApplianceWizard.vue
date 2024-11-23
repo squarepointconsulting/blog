@@ -323,6 +323,7 @@ const attachments = ref([]);
 const isProcessing = ref(false);
 const isMoreTypesOpen = ref(false);
 const previewImage = ref(null);
+const previewImageFile = ref(null);
 
 // Refs
 const photoInput = ref(null);
@@ -395,6 +396,7 @@ const handlePhotoUpload = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
   previewImage.value = URL.createObjectURL(file);
+  previewImageFile.value = file;    
 };
 
 const handleFileDeleted = (file) => {
@@ -404,10 +406,10 @@ const handleFileDeleted = (file) => {
 const emit = defineEmits(['complete']);
 const isUploading = ref(false);
 
+const appliance = ref(null);
+
 const createAppliance = async () => {
-  console.log('createAppliance')
   isUploading.value = true;
-  console.log(attachmentsRef.value)
   // await new Promise(resolve => setTimeout(resolve, 5000));
   isProcessing.value = true;
   const user = await useCurrentUser()
@@ -416,10 +418,7 @@ const createAppliance = async () => {
   const applianceId = ref('');
 
   try {
-
-
-    
-    const applianceData = {
+    appliance.value = {
     category: isOtherType.value ? otherTypeValue.value : selectedType.value.label,
       manufacturer: manufacturer.value,
       serialNumber: serialNumber.value,
@@ -434,13 +433,29 @@ const createAppliance = async () => {
         updatedByUid: user.value.uid,
         updatedByDisplayName: user.value.displayName,
         imageUrl: "https://placehold.co/60x60?text=icon",
+        avatar: null,
         attachments: [],
     };
 
-    console.log(applianceData)
-  const docRef = await addDoc(collection($db, "properties", homeId, "appliances"), applianceData);
-  console.log("Document written with ID: ", docRef.id);
+  const docRef = await addDoc(collection($db, "properties", homeId, "appliances"), { ...appliance.value });
    applianceId.value = docRef.id;
+
+    if (previewImageFile.value ) {
+        const avatarRef = storageRef($storage, `properties/${homeId}/appliances/${applianceId.value}/${previewImageFile.value.name}`);  
+        const avatarSnapshot = await uploadBytes(avatarRef, previewImageFile.value);
+        const avatarUrl = await getDownloadURL(avatarRef);
+        appliance.value.avatar = {
+        name: previewImageFile.value.name,
+        url: avatarUrl,
+        type: previewImageFile.value.type,
+        preview: avatarUrl,
+        };
+        await updateDoc(docRef, { 
+        avatar: { ...appliance.value.avatar },
+        imageUrl: avatarUrl,    
+    }, { merge: true });
+
+    }
 
     // Now that we have created an appliance, we can upload the attachments
     const uploadPromises = attachmentsRef.value.uploadedFiles.map(async (file) => {
@@ -472,10 +487,11 @@ const createAppliance = async () => {
 
     // Wait for all file uploads to complete
     const uploadedFileData = await Promise.all(uploadPromises);
-    applianceData.attachments = uploadedFileData;
+    //applianceData.attachments = uploadedFileData;
     //const Ref = doc($db, 'properties', homeId, 'appliances', applianceId.value)
     await updateDoc(docRef, { 
-        attachments: [...uploadedFileData]     
+
+        attachments: [...uploadedFileData] ,    
     }, { merge: true });
 
 

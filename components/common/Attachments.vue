@@ -1,6 +1,6 @@
 <template>
     <div v-if="attachments" class="flex flex-col">
-        <UCarousel v-slot="{ item }" :items="attachments" indicators="true">
+        <UCarousel v-slot="{ item }" :items="attachments">
             <div class="relative group">
                 <video v-if="isVideo(item)" width="300" height="400" draggable="false" controls class="rounded">
                     <source :src="item.preview" type="video/mp4" />

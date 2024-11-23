@@ -128,6 +128,11 @@ const deleteAppliance = async () => {
       }
     }
 
+    if (appliance.value.avatar) {
+      const avatarRef = storageRef($storage, `properties/${homeId}/appliances/${applianceId}/${appliance.value.avatar.name}`);
+      await deleteObject(avatarRef);
+    }
+
     // Delete the appliance record from Firestore
     const docRef = doc($db, 'properties', homeId, 'appliances', applianceId);
     await deleteDoc(docRef);
@@ -226,10 +231,13 @@ const handleFileUpload = (event) => {
         getDownloadURL(fileRef)
           .then((url) => {
             appliance.value.imageUrl = url
-            //editHome.value.imageUrl = url
-            //editHome.value.updated_at = serverTimestamp()
+            appliance.value.avatar = {
+              name: file.name,
+              url: url,
+              type: file.type,
+              preview: url,
+            };
             updateAppliance().then(() => {
-              // addProject()
             })
           })
       });

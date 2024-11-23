@@ -9,18 +9,17 @@ const { $db } = useNuxtApp();
 const docRef = doc($db, 'properties', homeId);
 const home = useDocument(docRef)
 
-// Get initial tab from URL query or default to 'exterior'
+// Get initial tab from URL query or default to 0
 const activeTab = ref(route.query.tab || 0);
 
 // Update URL when tab changes
 const handleTabChange = (tab) => {
   activeTab.value = tab;
-  console.log(activeTab.value)
   // Update URL query parameter without navigation
   router.replace({ 
     query: { 
       ...route.query, 
-      tab: tab 
+      tab: tab
     }
   });
 };
