@@ -112,7 +112,7 @@ const deleteAppliance = async () => {
         const fileRef = storageRef($storage, `properties/${homeId}/appliances/${applianceId}/${file.name}`);
         try { await deleteObject(fileRef); }
         catch (error) {
-          console.log('Error deleting file:', error);
+          console.log('ERROR:  deleting file:', error);
           //alert("An error occurred while deleting the appliance.");
         }
 
@@ -122,7 +122,7 @@ const deleteAppliance = async () => {
 
           try { await deleteObject(thumbnailRef); }
           catch (error) {
-            console.log('Error deleting file:', error);
+            console.log('ERROR: Error deleting file:', error);
           }
         }
       }
@@ -130,7 +130,10 @@ const deleteAppliance = async () => {
 
     if (appliance.value.avatar) {
       const avatarRef = storageRef($storage, `properties/${homeId}/appliances/${applianceId}/${appliance.value.avatar.name}`);
-      await deleteObject(avatarRef);
+      try { await deleteObject(avatarRef); }
+      catch (error) {
+        console.log('ERROR: Error deleting file:', error);
+      }
     }
 
     // Delete the appliance record from Firestore
@@ -284,17 +287,17 @@ const handleFileUpload = (event) => {
               <button type="button" @click="router.back()"
                 class="px-3 py-1.5 bg-gray-500 text-white text-sm rounded-md hover:bg-gray-600 transition duration-200 flex items-center gap-1.5">
                 <UIcon name="i-heroicons-arrow-left" class="w-3.5 h-3.5" />
-                Cancel
+                
               </button>
               <button type="submit" @click="saveAppliance"
                 class="px-3 py-1.5 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 transition duration-200 flex items-center gap-1.5">
                 <UIcon name="i-heroicons-check" class="w-3.5 h-3.5" />
-                Save
+                
               </button>
               <button @click="confirmDeleteAppliance"
                 class="px-3 py-1.5 bg-red-500 text-white text-sm rounded-md hover:bg-red-600 transition duration-200 flex items-center gap-1.5">
                 <UIcon name="i-heroicons-trash" class="w-3.5 h-3.5" />
-                Delete
+                
               </button>
             </div>
           </div>
