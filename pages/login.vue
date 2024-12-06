@@ -1,15 +1,61 @@
 <script setup>
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, sendSignInLinkToEmail, createUserWithEmailAndPassword, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
 import { getAnalytics, logEvent } from "firebase/analytics";
 import { collection, doc, setDoc, addDoc, query, where, getDocs, serverTimestamp } from "firebase/firestore";
 import { onMounted, ref } from 'vue'
 
 const auth = useFirebaseAuth()
+
+if (isSignInWithEmailLink(auth, window.location.href)) {
+  console.log("Sign in with email link")
+  // Additional state parameters can also be passed via URL.
+  // This can be used to continue the user's intended action before triggering
+  // the sign-in operation.
+  // Get the email if available. This should be available if the user completes
+  // the flow on the same device where they started it.
+  let email = window.localStorage.getItem('emailForSignIn');
+  console.log("Email: ", email)
+  if (!email) {
+    // User opened the link on a different device. To prevent session fixation
+    // attacks, ask the user to provide the associated email again. For example:
+    email = window.prompt('Please provide your email for confirmation');
+  }
+  // The client SDK will parse the code from the link for you.
+  signInWithEmailLink(auth, email, window.location.href)
+    .then((result) => {
+      console.log("Sign in with email link result: ", result)
+      // Clear email from storage.
+      window.localStorage.removeItem('emailForSignIn');
+      // You can access the new user by importing getAdditionalUserInfo
+      // and calling it with result:
+      // getAdditionalUserInfo(result)
+      // You can access the user's profile via:
+      // getAdditionalUserInfo(result)?.profile
+      // You can check if the user is new or existing:
+      // getAdditionalUserInfo(result)?.isNewUser
+    })
+    .catch((error) => {
+      console.log("Sign in with email link error: ", error)
+      // Some error occurred, you can inspect the code: error.code
+      // Common errors could be invalid email and invalid or expired OTPs.
+    });
+}
+
+
+
+
+
 const router = useRouter()
 const { $analytics } = useNuxtApp();
 const { $db } = useNuxtApp();
 
 const user = useCurrentUser()
+
+const showEmailLogin = ref(false)
+const error = ref(null)
+const email = ref('')
+const isValidEmail = ref(false)
+const password = ref('');
 
 const newUser = ref({
   docVersion: 1.1,
@@ -49,7 +95,6 @@ async function addHouse() {
     ...newHome.value
   })
 }
-
 
 async function getOrCreateDefaultHome(uid) {
   const q = query(collection($db, "properties"), where("ownerId", "==", uid));
@@ -106,17 +151,91 @@ function signInWithGoogle() {
       router.replace('/profile')
     })
 }
+
+const signup = async () => {
+  try {
+    await signInWithEmailAndPassword(auth, email.value, password.value);
+    router.push('/');
+  } catch (err) {
+    error.value = err.message;
+  }
+};
+
+const actionCodeSettings = {
+  // URL you want to redirect back to. The domain (www.example.com) for this
+  // URL must be in the authorized domains list in the Firebase Console.
+  url: 'http://localhost:3000/login',
+  // This must be true.
+  handleCodeInApp: true,
+  // iOS: {
+  //   bundleId: 'com.example.ios'
+  // },
+  // android: {
+  //   packageName: 'com.example.android',
+  //   installApp: true,
+  //   minimumVersion: '12'
+  // },
+  //dynamicLinkDomain: 'localhost'
+};
+
+//const auth = getAuth();
+const signInWithEmail = async () => {
+  if (!isValidEmail.value) {
+    return
+  }
+  console.log("Sending sign in link to email: ", email.value)
+  await sendSignInLinkToEmail(auth, email.value, actionCodeSettings)
+  .then(() => {
+    // The link was successfully sent. Inform the user.
+    // Save the email locally so you don't need to ask the user for it again
+    // if they open the link on the same device.
+    window.localStorage.setItem('emailForSignIn', email.value);
+    // ...
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    console.log("Error sending sign in link: ", errorCode, errorMessage)
+    // ...
+  });
+}
+
+const validateEmail = () => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  isValidEmail.value = emailRegex.test(email.value)
+}
+
 </script>
 
 <template>
-  <div class="container">
+  <div class="container space-y-4">
     <UCard>
       <template #header>
-        Log in to continue
+        Please log in to continue
       </template>
-      <UButton @click="signInWithGoogle">
-        Login with Google
+      <div class="space-y-4">
+        <UButton @click="signInWithGoogle">Sign in with Google</UButton>
+        <hr />
+        <h3>Sign in with email</h3>
+      <UInput
+        v-model="email"
+        label="Email"
+        type="email"
+        placeholder="Enter your email"
+        :rules="[
+          { required: true, message: 'Email is required' },
+          { email: true, message: 'Please enter a valid email' }
+        ]"
+        @blur="validateEmail"
+      />
+      <UButton 
+        @click="signInWithEmail"
+        :disabled="!isValidEmail"
+      >
+        Send Sign In Link
       </UButton>
+        <p v-if="error" class="text-red-500">{{ error }}</p>
+      </div>
     </UCard>
   </div>
 </template>
