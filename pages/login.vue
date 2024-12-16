@@ -1,5 +1,5 @@
 <script setup>
-import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, sendSignInLinkToEmail, createUserWithEmailAndPassword, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
+import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, sendSignInLinkToEmail, createUserWithEmailAndPassword, isSignInWithEmailLink, signInWithEmailLink, getAdditionalUserInfo } from 'firebase/auth';
 import { getAnalytics, logEvent } from "firebase/analytics";
 import { collection, doc, setDoc, addDoc, query, where, getDocs, serverTimestamp } from "firebase/firestore";
 import { onMounted, ref } from 'vue'
@@ -33,16 +33,35 @@ if (isSignInWithEmailLink(auth, window.location.href)) {
       // getAdditionalUserInfo(result)?.profile
       // You can check if the user is new or existing:
       // getAdditionalUserInfo(result)?.isNewUser
+            // Signed in
+      logEvent($analytics, `user_logged_in`);
+      const user = result.user // getAdditionalUserInfo(result) // userCredential.user;
+      const updated_at_timestamp = serverTimestamp()
+      // const ts = Timestamp.fromDate(Date.now())
+      // console.log(Date.now().toString(), "User logged in: ", user.uid, user.displayName)
+      console.log(user)
+      newUser.value.displayName = user.displayName
+      newUser.value.providerId = user.providerId
+      newUser.value.photoURL = user.photoURL
+      newUser.value.email = user.email
+      newUser.value.emailVerified = user.emailVerified
+      newUser.value.lastLogin = updated_at_timestamp // Timestamp.fromDate() // ate.now();
+      
+      // Update user in firestore
+      addUser(user.uid)    
+      
+      home.value.id = getOrCreateDefaultHome(user.uid)
+    }).then((homeId) => {
+      console.log("Home value", homeId)
+      router.replace('/profile')
     })
+
     .catch((error) => {
       console.log("Sign in with email link error: ", error)
       // Some error occurred, you can inspect the code: error.code
       // Common errors could be invalid email and invalid or expired OTPs.
     });
 }
-
-
-
 
 
 const router = useRouter()
@@ -161,21 +180,11 @@ const signup = async () => {
   }
 };
 
+const config = useRuntimeConfig()
+
 const actionCodeSettings = {
-  // URL you want to redirect back to. The domain (www.example.com) for this
-  // URL must be in the authorized domains list in the Firebase Console.
-  url: 'http://localhost:3000/login',
-  // This must be true.
+  url: `${config.public.authDomain}/login`,
   handleCodeInApp: true,
-  // iOS: {
-  //   bundleId: 'com.example.ios'
-  // },
-  // android: {
-  //   packageName: 'com.example.android',
-  //   installApp: true,
-  //   minimumVersion: '12'
-  // },
-  //dynamicLinkDomain: 'localhost'
 };
 
 //const auth = getAuth();
@@ -187,6 +196,7 @@ const signInWithEmail = async () => {
   await sendSignInLinkToEmail(auth, email.value, actionCodeSettings)
   .then(() => {
     // The link was successfully sent. Inform the user.
+    alert("Sign in link sent to email: " + email.value)
     // Save the email locally so you don't need to ask the user for it again
     // if they open the link on the same device.
     window.localStorage.setItem('emailForSignIn', email.value);

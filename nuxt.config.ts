@@ -100,5 +100,10 @@ export default defineNuxtConfig({
         }
       ]
     }
+  },
+  runtimeConfig: {
+    public: {
+      authDomain: process.env.NUXT_PUBLIC_AUTH_DOMAIN
+    }
   }
 })
