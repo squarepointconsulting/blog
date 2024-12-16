@@ -90,5 +90,20 @@ export default defineNuxtConfig({
   },
   build: {
     transpile: ['pdfjs-dist']
+  },
+  app: {
+    head: {
+      script: [
+        {
+          src: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',
+          defer: true
+        }
+      ]
+    }
+  },
+  runtimeConfig: {
+    public: {
+      authDomain: process.env.NUXT_PUBLIC_AUTH_DOMAIN
+    }
   }
 })

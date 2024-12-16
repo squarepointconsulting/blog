@@ -59,13 +59,15 @@ async function addAppliance() {
 
 
     <article class="p-4 bg-gray-100 shadow-md rounded-md" v-for="appliance in appliances" :key="appliance.id">
+      <NuxtLink :to="`./appliances/${appliance.id}`"
+      class="text-blue-600 hover:text-blue-800 text-sm mt-1"> 
       <div class="flex items-center space-x-4">
+       
         <!-- Image Container -->
         <div class="flex-shrink-0">
-          <NuxtLink :to="`./appliances/${appliance.id}`"
-            class="text-blue-600 hover:text-blue-800 hover:underline text-sm mt-1"> <img
+<img
               class="w-16 h-16 rounded-lg object-cover bg-white" :src="appliance.imageUrl" alt="Appliance Avatar" />
-          </NuxtLink>
+
 
 
         </div>
@@ -77,7 +79,9 @@ async function addAppliance() {
             <p class="text-gray-600">{{ appliance.category }}</p>
           </div>
         </div>
+   
       </div>
+    </NuxtLink>
     </article>
   </div>
   <UModal v-model="showWizard" size="2xl">
