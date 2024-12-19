@@ -13,6 +13,7 @@ const home = useDocument(docRef)
 const homeSource = ref()
 
 const router = useRouter();
+const project_type = ref("fire_extinguisher_inspection")
 
 const isLoading = ref(false)
 const isEditing = ref(false)
@@ -53,14 +54,12 @@ const saveChanges = async () => {
     }
 }
 
-//const selectedOption = ref(fireExtinguishers.basicInformation.fireExtinguishersPerFloor || 'Some')
 const selectedOption = ref('Some')
 
 const fireExtinguishers = ref({
   basicInformation: {
     fireExtinguishersPerFloor: 'None',
   },
-  inspections: [],
 });
 
 onMounted(() => {
@@ -102,14 +101,16 @@ onMounted(() => {
                 <UButton icon="i-heroicons-pencil" variant="soft" color="gray"
                     class="rounded-full h-8 w-8 absolute top-2 right-2" />
                 <div>
-                    <h2>Basic Information</h2>
+                    <h2 class="text-lg font-bold">Basic Information</h2>
                     <p>Fire extinguishers per floor</p>
-                    <p>
+                    <p class="text-gray-500">
                         {{ fireExtinguishers.basicInformation.fireExtinguishersPerFloor }}
                     </p>
                 </div>
             </div>
         </article>
+            <ProjectRecord :homeId="homeId" :projectType="project_type" />
+
     </div>
 
     <div v-else class="space-y-4">
