@@ -105,5 +105,9 @@ export default defineNuxtConfig({
     public: {
       authDomain: process.env.NUXT_PUBLIC_AUTH_DOMAIN
     }
+  },
+  ui: {
+    primary: 'blue',
+    gray: 'cool'
   }
 })

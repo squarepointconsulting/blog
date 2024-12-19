@@ -20,20 +20,20 @@ const sectionLinks = [{
 }, {
   label: 'Home Devices',
   icon: 'i-heroicons-home',
-  to: './info/protection'
+  to: 'protection/home-devices'
 }, {
   label: 'Smoke And Carbon Monoxide Detectors',
   icon: 'i-mdi-home',
-  to: './info/exterior'
+  to: 'protection/home-detectors'
 },
 {
   label: 'Home Security',
   icon: 'i-mdi-home',
-  to: './info/exterior'
+  to: 'protection/home-security'
 },{
   label: 'Fire Sprinklers',
   icon: 'i-mdi-home',
-  to: './info/exterior'
+  to: 'protection/home-fire-sprinklers'
 }
 ]
 
