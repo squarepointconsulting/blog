@@ -13,6 +13,7 @@ const home = useDocument(docRef)
 
 const router = useRouter();
 
+
 </script>
 
 <template>
@@ -20,15 +21,10 @@ const router = useRouter();
         <article class="p-4 bg-white shadow-md rounded-md">
 
             <h2 class="text-lg font-bold flex items-center gap-3">
-  <UButton
-    icon="i-heroicons-arrow-left"
-    variant="soft"
-    color="gray"
-    class="rounded-full h-8 w-8"
-    @click="() => router.back()"
-  />
-  Protection
-</h2>
+                <UButton icon="i-heroicons-arrow-left" variant="soft" color="gray" class="rounded-full h-8 w-8"
+                    @click="() => router.back()" />
+                Fire Extinguishers
+            </h2>
 
         </article>
     </div>
