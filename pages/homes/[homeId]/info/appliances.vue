@@ -11,6 +11,8 @@ const { $db } = useNuxtApp();
 const docRef = doc($db, 'properties', homeId);
 const home = useDocument(docRef)
 
+const router = useRouter();
+
 </script>
 
 <template>
@@ -18,9 +20,19 @@ const home = useDocument(docRef)
         
         <article class="p-4 bg-white shadow-md rounded-md">
 
-            <h2 class="text-lg font-bold">Appliances </h2>
+            <h2 class="text-lg font-bold flex items-center gap-3">
+  <UButton
+    icon="i-heroicons-arrow-left"
+    variant="soft"
+    color="gray"
+    class="rounded-full h-8 w-8"
+    @click="() => router.back()"
+  />
+  Appliances
+</h2>
 
         </article>
+        <ApplianceList />
     </div>
     <div v-else class="space-y-4">
         <article class="p-4 bg-white shadow-md rounded-md">
