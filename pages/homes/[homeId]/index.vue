@@ -11,10 +11,30 @@ const { $db } = useNuxtApp();
 const docRef = doc($db, 'properties', homeId);
 const home = useDocument(docRef)
 
+const sharedState = useSharedState()
+
+onMounted(async () => {
+  if (home.value) {
+    sharedState.value.homeId = homeId
+    sharedState.value.address1 = home.value.address.street1
+  }
+})
+
+const links = [{
+  label: 'Dashboard',
+  icon: 'i-heroicons-chart-bar',
+  to: '/homes/' + homeId
+}, {
+  label: 'Profile',
+  icon: 'i-heroicons-home',
+  to: { name: 'homes-homeId-edit', params: { homeId: homeId } }
+}, ]
+
 </script>
 
 <template>
   <div v-if="home" class="space-y-4">
+    <UHorizontalNavigation :links="links" class="border-b border-gray-200 dark:border-gray-800" />
     <article v-if="home" class="p-4 bg-white shadow-md rounded-md">
       <div class="flex w-full">
         <!-- Inner Div 1 -->
@@ -45,14 +65,6 @@ const home = useDocument(docRef)
           <div class="w-full flex justify-center items-center">
             <p class="font-bold text-center">{{ Math.round(home.villaFactScore) }}</p>
           </div>
-        </div>
-        <!-- Edit Button -->
-        <div class="relative top-2 right-2">
-          <NuxtLink :to="{ name: 'homes-homeId-edit', params: { homeId: homeId } }">
-            <p>
-              <UIcon name="i-heroicons-pencil-square" />&nbsp;Edit
-            </p>
-          </NuxtLink>
         </div>
 
       </div>

@@ -72,12 +72,63 @@ const appliances = ref([])
 
 appliances.value = [ {description: 'Dishwasher', key: "hjgdsfa82"}]
 
+const links = [{
+  label: 'Dashboard',
+  icon: 'i-heroicons-chart-bar',
+  to: '/homes/' + homeId
+}, {
+  label: 'Profile',
+  icon: 'i-heroicons-home',
+  to: { name: 'homes-homeId-edit', params: { homeId: homeId } }
+}, ]
+
+const sectionLinks = [{
+  label: 'Home Information',
+  icon: 'i-heroicons-chart-bar',
+  to: './info/home-info'
+}, {
+  label: 'Protection',
+  icon: 'i-heroicons-home',
+  to: './info/protection'
+}, {
+  label: 'Exterior',
+  icon: 'i-mdi-home',
+  to: './info/exterior'
+},
+{
+  label: 'Interior',
+  icon: 'i-mdi-sofa',
+  to: './info/interior'
+}, {
+  label: 'Appliances',
+  icon:  'i-mdi-fridge',
+  to: './info/appliances'
+},
+{
+  label: 'Plumbing',
+  icon: 'i-heroicons-home',
+  to: './info/plumbing'
+},
+{
+  label: 'HVAC',
+  icon: 'i-heroicons-home',
+  to: './info/hvac'
+},
+{
+  label: 'Electrical',
+  icon: 'i-heroicons-home',
+  to: './info/electrical'
+},
+]
 
 </script>
 
 <template>
   <div v-if="home" class="space-y-4">
-    <HomeSummary :homeId="homeId" />
+    <UHorizontalNavigation :links="links" class="border-b border-gray-200 dark:border-gray-800" />
+    <article class="p-4 bg-white shadow-md rounded-md space-y-4">
+      <UVerticalNavigation :links="sectionLinks" />
+    </article>    
     <article class="p-4 bg-white shadow-md rounded-md">
       <UTabs 
         :items="items" 
