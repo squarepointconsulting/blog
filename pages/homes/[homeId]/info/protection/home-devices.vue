@@ -1,10 +1,10 @@
 <script setup>
-import { useRoute } from 'vue-router';
-import { cloneDeep } from 'lodash'
-
+import { useRoute } from 'vue-router'
+import cloneDeep from 'lodash-es/cloneDeep';
 
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 const route = useRoute();
+
 const homeIdRef = useState('homeId')
 const homeId = route.params.homeId;
 homeIdRef.value = homeId;
@@ -85,15 +85,6 @@ onMounted(() => {
 
     })
 })
-
-watch(() => homeDevicesSource, (newValue, oldValue) => {
-  console.log('homeDevicesSource changed:', {
-    new: newValue,
-    old: oldValue,
-    timestamp: new Date().toISOString()
-  })
-}, { deep: true }) // Add deep: true if homeDevicesSource is an object or array
-
 
 const cancelChanges = () => {
     homeDevicesEdit.value = cloneDeep(homeDevicesSource.value)

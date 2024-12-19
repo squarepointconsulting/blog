@@ -63,7 +63,7 @@ export default defineNuxtConfig({
   },
   vite: {
     optimizeDeps: {
-      include: ['pdfjs-dist']
+      include: ['pdfjs-dist', 'lodash-es']
     },
     build: {
       commonjsOptions: {
