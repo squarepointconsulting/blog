@@ -1,57 +1,80 @@
 <script setup>
 import { useRoute } from 'vue-router'
-import cloneDeep from 'lodash-es/cloneDeep';
-
+import cloneDeep from 'lodash-es/cloneDeep'
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
-const route = useRoute();
-
+const route = useRoute()
 const homeIdRef = useState('homeId')
 const homeId = route.params.homeId;
-homeIdRef.value = homeId;
-const { $db } = useNuxtApp();
-const homeSource = ref()
-const router = useRouter();
-const isLoading = ref(false)
-const isEditing = ref(false)
-
+homeIdRef.value = homeId
+const { $db } = useNuxtApp()
+const router = useRouter()
+const isLoadingBasic = ref(false)
+const isLoadingDetailed = ref(false)
+const isEditingBasic = ref(false)
+const isEditingDetailed = ref(false)
 const openBasicEditModal = async () => {
-    isLoading.value = true
+    isLoadingBasic.value = true
     try {
-        isLoading.value = false
-        isEditing.value = true
+        isLoadingBasic.value = false
+        isEditingBasic.value = true
     } catch (error) {
         console.error('Error loading data:', error)
-        isLoading.value = false
+        isLoadingBasic.value = false
     }
 }
 
-const saveChanges = async () => {
-    isLoading.value = true
+const openDetailedEditModal = async () => {
+    isLoadingDetailed.value = true
+    try {
+        isLoadingDetailed.value = false
+        isEditingDetailed.value = true
+    } catch (error) {
+        console.error('Error loading data:', error)
+        isLoadingDetailed.value = false
+    }
+}
+
+const saveChangesBasic = async () => {
+    isLoadingBasic.value = true
     try {
         const docRef = doc($db, "properties", homeId);
         await updateDoc(docRef, {
             info: {
                 protection: {
                     homeDevices: {
-                        ...homeDevicesEdit.value
+                        ...pageEdit.value
                     }
                 }
             }
         }, { merge: true });
-        homeDevicesSource.value = cloneDeep(homeDevicesEdit.value)
-        isEditing.value = false
+        pageSource.value = cloneDeep(pageEdit.value)
+        isEditingBasic.value = false
+        isEditingDetailed.value = false
     } catch (error) {
         console.error('Error saving changes:', error)
+        isLoadingBasic.value = false
     } finally {
-        isLoading.value = false
+        isLoadingBasic.value = false
     }
 }
 
-const homeDevicesSource = ref()
-const homeDevicesEdit = ref()
-const homeDevicesTemplate = ref({
+const saveChangesDetailed = async () => {
+    isLoadingDetailed.value = true
+    try {
+        isLoadingDetailed.value = false
+        isEditingDetailed.value = false
+    } catch (error) {
+        console.error('Error saving changes:', error)
+        isLoadingDetailed.value = false
+    }
+}
+
+const pageSource = ref()
+const pageEdit = ref()
+const pageTemplate = ref({
     basicInformation: {
-        brand: 'Nest',
+        brand: 'Google',
+        otherBrand: '',
         smartSystem: 'Yes',
         centrallyMonitored: 'Yes',
     },
@@ -66,35 +89,40 @@ onMounted(() => {
     const docRef = doc($db, "properties", homeId);
     getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
-            homeSource.value = docSnap.data()
-            if (homeSource.value.info && homeSource.value.info.protection && homeSource.value.info.protection.homeDevices) {
-                homeDevicesSource.value =  homeSource.value.info.protection.homeDevices
+            pageSource.value = docSnap.data()
+            if (pageSource.value.info && pageSource.value.info.protection && pageSource.value.info.protection.homeDevices) {
+                pageSource.value =  pageSource.value.info.protection.homeDevices
             }
             else {
-                homeDevicesSource.value = {
-                    ...homeDevicesTemplate.value
+                pageSource.value = {
+                    ...pageTemplate.value
                 }
             }
         }
         else {
-            homeDevicesSource.value = {
-                    ...homeDevicesTemplate.value
+            pageSource.value = {
+                    ...pageTemplate.value
                 }
         }
-        homeDevicesEdit.value = cloneDeep(homeDevicesSource.value)
+        pageEdit.value = cloneDeep(pageSource.value)
 
     })
 })
 
-const cancelChanges = () => {
-    homeDevicesEdit.value = cloneDeep(homeDevicesSource.value)
-    isEditing.value = false
+const cancelChangesBasic = () => {
+    pageEdit.value = cloneDeep(pageSource.value)
+    isEditingBasic.value = false            
+}
+
+const cancelChangesDetailed = () => {
+    pageEdit.value = cloneDeep(pageSource.value)
+    isEditingDetailed.value = false
 }
 
 </script>
 
 <template>
-    <div v-if="homeSource" class="space-y-4">
+    <div v-if="pageSource" class="space-y-4">
         <article class="p-4 bg-white shadow-md rounded-md">
             <h2 class="text-lg font-bold flex items-center gap-3">
                 <UButton icon="i-heroicons-arrow-left" variant="soft" color="gray" class="rounded-full h-8 w-8"
@@ -107,22 +135,44 @@ const cancelChanges = () => {
                 <UButton icon="i-heroicons-pencil" variant="soft" color="gray"
                     class="rounded-full h-8 w-8 absolute top-2 right-2" />
                 <div>
-                    <h2 class="text-lg font-bold">Basic Information</h2>
+                    <h2 class="text-lg font-bold">Basic information</h2>
                     <p>Brand</p>
                     <p class="text-gray-500">
-                        {{ homeDevicesSource.basicInformation.brand }}
+                        {{ pageSource.basicInformation.brand }}
                     </p>
-                    <p>Smart System</p>
+                    <p>Smart system</p>
                     <p class="text-gray-500">
-                        {{ homeDevicesSource.basicInformation.smartSystem }}
+                        {{ pageSource.basicInformation.smartSystem }}
                     </p>
-                    <p>Centrally Monitored</p>
+                    <p>Centrally monitored</p>
                     <p class="text-gray-500">
-                        {{ homeDevicesSource.basicInformation.centrallyMonitored }}
+                        {{ pageSource.basicInformation.centrallyMonitored }}
                     </p>
                 </div>
             </div>
         </article>
+        <article class="p-4 bg-white shadow-md rounded-md">
+            <div class="space-y-3 relative p-4 rounded-lg hover:bg-gray-50 cursor-pointer" @click="openDetailedEditModal">
+                <UButton icon="i-heroicons-pencil" variant="soft" color="gray"
+                    class="rounded-full h-8 w-8 absolute top-2 right-2" />
+                <div>
+                    <h2 class="text-lg font-bold">Detailed information</h2>
+                    <p>Number of smart thermostats</p>
+                    <p class="text-gray-500">
+                        {{ pageSource.detailedInformation.numberOfSmartThermostats }}
+                    </p>
+                    <p>Number of leak sensors</p>
+                    <p class="text-gray-500">
+                        {{ pageSource.detailedInformation.numberOfLeakSensors }}
+                    </p>
+                    <p>Number of other sensors</p>
+                    <p class="text-gray-500">
+                        {{ pageSource.detailedInformation.numberOfOtherSensors }}
+                    </p>
+                </div>
+            </div>
+        </article>
+
     </div>
 
     <div v-else class="space-y-4">
@@ -142,8 +192,7 @@ const cancelChanges = () => {
         </div>
     </UModal>
 
-    <!-- Edit Modal -->
-    <UModal v-model="isEditing" >
+    <UModal v-model="isEditingBasic" >
         <div class="flex flex-col h-full">
             <!-- Header -->
             <div class="p-4 border-b">
@@ -160,15 +209,26 @@ const cancelChanges = () => {
                     <div class="space-y-3">
                         <div v-for="option in ['Google', 'Ring', 'Notion', 'Mixed', 'Other']" :key="option" :class="[
                             'flex items-center justify-between p-4 rounded-lg border',
-                            homeDevicesEdit.basicInformation.brand === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="console.log('help'); homeDevicesEdit.basicInformation.brand = option">
+                            pageEdit.basicInformation.brand === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.basicInformation.brand = option">
                             <span class="text-base">{{ option }}</span>
                             <div :class="[
                                 'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                homeDevicesEdit.basicInformation.brand === option ? 'border-blue-500' : 'border-gray-300'
+                                pageEdit.basicInformation.brand === option ? 'border-blue-500' : 'border-gray-300'
                             ]">
-                                <div v-if="homeDevicesEdit.basicInformation.brand === option" class="w-3 h-3 rounded-full bg-blue-500" />
+                                <div v-if="pageEdit.basicInformation.brand === option" class="w-3 h-3 rounded-full bg-blue-500" />
                             </div>
+                        </div>
+                        <div v-if="pageEdit.basicInformation.brand === 'Other'" class="mt-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Other brand
+                            </label>
+                            <input 
+                                type="text" 
+                                v-model="pageEdit.basicInformation.otherBrand"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Enter brand name"
+                            />
                         </div>
                     </div>
 
@@ -180,14 +240,14 @@ const cancelChanges = () => {
                     <div class="space-y-3">
                         <div v-for="option in ['Yes', 'No']" :key="option" :class="[
                             'flex items-center justify-between p-4 rounded-lg border',
-                            homeDevicesEdit.basicInformation.smartSystem === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="homeDevicesEdit.basicInformation.smartSystem = option">
+                            pageEdit.basicInformation.smartSystem === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.basicInformation.smartSystem = option">
                             <span class="text-base">{{ option }}</span>
                             <div :class="[
                                 'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                homeDevicesEdit.basicInformation.smartSystem === option ? 'border-blue-500' : 'border-gray-300'
+                                pageEdit.basicInformation.smartSystem === option ? 'border-blue-500' : 'border-gray-300'
                             ]">
-                                <div v-if="homeDevicesEdit.basicInformation.smartSystem === option" class="w-3 h-3 rounded-full bg-blue-500" />
+                                <div v-if="pageEdit.basicInformation.smartSystem === option" class="w-3 h-3 rounded-full bg-blue-500" />
                             </div>
                         </div>
                     </div>
@@ -199,14 +259,14 @@ const cancelChanges = () => {
                     <div class="space-y-3">
                         <div v-for="option in ['Yes', 'No']" :key="option" :class="[
                             'flex items-center justify-between p-4 rounded-lg border',
-                            homeDevicesEdit.basicInformation.centrallyMonitored === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="homeDevicesEdit.basicInformation.centrallyMonitored = option">
+                            pageEdit.basicInformation.centrallyMonitored === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.basicInformation.centrallyMonitored = option">
                             <span class="text-base">{{ option }}</span>
                             <div :class="[
                                 'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                homeDevicesEdit.basicInformation.centrallyMonitored === option ? 'border-blue-500' : 'border-gray-300'
+                                pageEdit.basicInformation.centrallyMonitored === option ? 'border-blue-500' : 'border-gray-300'
                             ]">
-                                <div v-if="homeDevicesEdit.basicInformation.centrallyMonitored === option" class="w-3 h-3 rounded-full bg-blue-500" />
+                                <div v-if="pageEdit.basicInformation.centrallyMonitored === option" class="w-3 h-3 rounded-full bg-blue-500" />
                             </div>
                         </div>
                     </div>
@@ -215,8 +275,78 @@ const cancelChanges = () => {
             </div>
             <div class="p-4 border-t mt-auto">
                 <div class="flex justify-end gap-2">
-                    <UButton color="gray" variant="soft" label="Cancel" @click="cancelChanges" />
-                    <UButton color="blue" label="Save" @click="saveChanges" />
+                    <UButton color="gray" variant="soft" label="Cancel" @click="cancelChangesBasic" />
+                    <UButton color="blue" label="Save" @click="saveChangesBasic" />
+                </div>
+            </div>
+        </div>
+    </UModal>
+
+    <UModal v-model="isEditingDetailed" >
+        <div class="flex flex-col h-full">
+            <!-- Header -->
+            <div class="p-4 border-b">
+                <h3 class="text-lg font-bold">Home Devices</h3>
+                <h4>Detailed information</h4>
+            </div>
+
+            <!-- Content (scrollable) -->
+            <div class="flex-1 p-4 overflow-y-auto space-y-4">
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Number of smart thermostats
+                    </label>
+                    <input 
+                                type="text" 
+                                v-model="pageEdit.detailedInformation.numberOfSmartThermostats"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Number of smart thermostats"
+                            />
+                </div>
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Smart System
+                    </label>
+                    <div class="space-y-3">
+                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
+                            'flex items-center justify-between p-4 rounded-lg border',
+                            pageEdit.basicInformation.smartSystem === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.basicInformation.smartSystem = option">
+                            <span class="text-base">{{ option }}</span>
+                            <div :class="[
+                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
+                                pageEdit.basicInformation.smartSystem === option ? 'border-blue-500' : 'border-gray-300'
+                            ]">
+                                <div v-if="pageEdit.basicInformation.smartSystem === option" class="w-3 h-3 rounded-full bg-blue-500" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Centrally Monitored
+                    </label>
+                    <div class="space-y-3">
+                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
+                            'flex items-center justify-between p-4 rounded-lg border',
+                            pageEdit.basicInformation.centrallyMonitored === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.basicInformation.centrallyMonitored = option">
+                            <span class="text-base">{{ option }}</span>
+                            <div :class="[
+                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
+                                pageEdit.basicInformation.centrallyMonitored === option ? 'border-blue-500' : 'border-gray-300'
+                            ]">
+                                <div v-if="pageEdit.basicInformation.centrallyMonitored === option" class="w-3 h-3 rounded-full bg-blue-500" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="p-4 border-t mt-auto">
+                <div class="flex justify-end gap-2">
+                    <UButton color="gray" variant="soft" label="Cancel" @click="cancelChangesDetailed" />
+                    <UButton color="blue" label="Save" @click="saveChangesDetailed" />
                 </div>
             </div>
         </div>
