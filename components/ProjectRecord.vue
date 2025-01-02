@@ -6,7 +6,6 @@ import { collection, addDoc, query, orderBy, where, getDoc, doc, updateDoc, dele
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 const { $db, $storage } = useNuxtApp();
 
-
 const home = ref()
 const props = defineProps({
   homeId: {
@@ -16,6 +15,11 @@ const props = defineProps({
   projectType: {
     type: String,
     required: true,
+  },
+  recordType: {
+    type: String,
+    required: false,
+    default: 'project_record',
   },
 
 });
@@ -45,8 +49,8 @@ const projectRecord = ref({
 const tasksRef = collection($db, 'properties', props.homeId, 'project_records');
 const tasksQuery = query(
   tasksRef,
-  where('type', '==', props.projectType), // Filter for gutter_cleaning type
-  orderBy('timestamp', 'desc') // Order by timestamp in descending order
+  where('type', '==', props.projectType), 
+  orderBy('timestamp', 'desc') 
 );
 const tasks = useCollection(tasksQuery);
 
@@ -197,7 +201,7 @@ const submitForm = async () => {
         <section>
             <div class="md:col-span-2 mt-4">
                 <button @click="isOpen = true" type="submit" class="bg-blue-500 text-white rounded p-2 w-full">
-                    Log Project
+                    Log {{ recordType }}
                 </button>
             </div>
         </section>

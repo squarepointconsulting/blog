@@ -40,8 +40,8 @@ const saveChangesBasic = async () => {
         const docRef = doc($db, "properties", homeId);
         await updateDoc(docRef, {
             info: {
-                protection: {
-                    homeDevices: {
+                plumbing: {
+                    pipes: {
                         ...pageEdit.value
                     }
                 }
@@ -73,15 +73,12 @@ const pageSource = ref()
 const pageEdit = ref()
 const pageTemplate = ref({
     basicInformation: {
-        brand: 'Google',
-        otherBrand: '',
-        smartSystem: 'Yes',
-        centrallyMonitored: 'Yes',
+        installationYear: 2004,
+        materialType: 'PVC',
     },
     detailedInformation: {
-        numberOfSmartThermostats: 3,
-        numberOfLeakSensors: 0,
-        numberOfOtherSensors: 0,
+        smartWaterMonitor: 'No',
+        smartShutoffValve: 'No',
     },
 });
 
@@ -90,8 +87,8 @@ onMounted(() => {
     getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
             pageSource.value = docSnap.data()
-            if (pageSource.value.info && pageSource.value.info.protection && pageSource.value.info.protection.homeDevices) {
-                pageSource.value =  pageSource.value.info.protection.homeDevices
+            if (pageSource.value.info && pageSource.value.info.plumbing && pageSource.value.info.plumbing.pipes) {
+                pageSource.value =  pageSource.value.info.plumbing.pipes
             }
             else {
                 pageSource.value = {
@@ -136,17 +133,13 @@ const cancelChangesDetailed = () => {
                     class="rounded-full h-8 w-8 absolute top-2 right-2" />
                 <div>
                     <h2 class="text-lg font-bold">Basic information</h2>
-                    <p>Brand</p>
+                    <p>Installation year</p>
                     <p class="text-gray-500">
-                        {{ pageSource.basicInformation.brand }}
+                        {{ pageSource.basicInformation.installationYear }}
                     </p>
-                    <p>Smart system</p>
+                    <p>Material type</p>
                     <p class="text-gray-500">
-                        {{ pageSource.basicInformation.smartSystem }}
-                    </p>
-                    <p>Centrally monitored</p>
-                    <p class="text-gray-500">
-                        {{ pageSource.basicInformation.centrallyMonitored }}
+                        {{ pageSource.basicInformation.materialType }}
                     </p>
                 </div>
             </div>
@@ -157,17 +150,13 @@ const cancelChangesDetailed = () => {
                     class="rounded-full h-8 w-8 absolute top-2 right-2" />
                 <div>
                     <h2 class="text-lg font-bold">Detailed information</h2>
-                    <p>Number of smart thermostats</p>
+                    <p>Smart water monitor</p>
                     <p class="text-gray-500">
-                        {{ pageSource.detailedInformation.numberOfSmartThermostats }}
+                        {{ pageSource.detailedInformation.smartWaterMonitor }}
                     </p>
-                    <p>Number of leak sensors</p>
+                    <p>Smart shutoff valve</p>
                     <p class="text-gray-500">
-                        {{ pageSource.detailedInformation.numberOfLeakSensors }}
-                    </p>
-                    <p>Number of other sensors</p>
-                    <p class="text-gray-500">
-                        {{ pageSource.detailedInformation.numberOfOtherSensors }}
+                        {{ pageSource.detailedInformation.smartShutoffValve }}
                     </p>
                 </div>
             </div>
@@ -204,74 +193,36 @@ const cancelChangesDetailed = () => {
             <div class="flex-1 p-4 overflow-y-auto space-y-4">
                 <div class="space-y-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Brand
+                        Installation year
                     </label>
-                    <div class="space-y-3">
-                        <div v-for="option in ['Google', 'Ring', 'Notion', 'Mixed', 'Other']" :key="option" :class="[
-                            'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.basicInformation.brand === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.basicInformation.brand = option">
-                            <span class="text-base">{{ option }}</span>
-                            <div :class="[
-                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.basicInformation.brand === option ? 'border-blue-500' : 'border-gray-300'
-                            ]">
-                                <div v-if="pageEdit.basicInformation.brand === option" class="w-3 h-3 rounded-full bg-blue-500" />
-                            </div>
-                        </div>
-                        <div v-if="pageEdit.basicInformation.brand === 'Other'" class="mt-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Other brand
-                            </label>
-                            <input 
+                    <input 
                                 type="text" 
-                                v-model="pageEdit.basicInformation.otherBrand"
+                                v-model="pageEdit.basicInformation.installationYear"
                                 class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Enter brand name"
+                                placeholder="Installation year"
                             />
+                </div>
+
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Material type
+                    </label>
+                    <div class="space-y-3">
+                        <div v-for="option in ['Brass', 'Copper', 'CPVC', 'Iron', 'PEX', 'PVC', 'Steel', 'Mixed']" :key="option" :class="[
+                            'flex items-center justify-between p-4 rounded-lg border',
+                            pageEdit.basicInformation.materialType === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.basicInformation.materialType = option">
+                            <span class="text-base">{{ option }}</span>
+                            <div :class="[
+                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
+                                pageEdit.basicInformation.materialType === option ? 'border-blue-500' : 'border-gray-300'
+                            ]">
+                                <div v-if="pageEdit.basicInformation.materialType === option" class="w-3 h-3 rounded-full bg-blue-500" />
+                            </div>
                         </div>
                     </div>
 
                 </div>
-                <div class="space-y-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Smart System
-                    </label>
-                    <div class="space-y-3">
-                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
-                            'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.basicInformation.smartSystem === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.basicInformation.smartSystem = option">
-                            <span class="text-base">{{ option }}</span>
-                            <div :class="[
-                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.basicInformation.smartSystem === option ? 'border-blue-500' : 'border-gray-300'
-                            ]">
-                                <div v-if="pageEdit.basicInformation.smartSystem === option" class="w-3 h-3 rounded-full bg-blue-500" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Centrally Monitored
-                    </label>
-                    <div class="space-y-3">
-                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
-                            'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.basicInformation.centrallyMonitored === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.basicInformation.centrallyMonitored = option">
-                            <span class="text-base">{{ option }}</span>
-                            <div :class="[
-                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.basicInformation.centrallyMonitored === option ? 'border-blue-500' : 'border-gray-300'
-                            ]">
-                                <div v-if="pageEdit.basicInformation.centrallyMonitored === option" class="w-3 h-3 rounded-full bg-blue-500" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
             <div class="p-4 border-t mt-auto">
                 <div class="flex justify-end gap-2">
@@ -286,7 +237,7 @@ const cancelChangesDetailed = () => {
         <div class="flex flex-col h-full">
             <!-- Header -->
             <div class="p-4 border-b">
-                <h3 class="text-lg font-bold">Home Devices</h3>
+                <h3 class="text-lg font-bold">Pipes</h3>
                 <h4>Detailed information</h4>
             </div>
 
@@ -294,37 +245,43 @@ const cancelChangesDetailed = () => {
             <div class="flex-1 p-4 overflow-y-auto space-y-4">
                 <div class="space-y-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Number of smart thermostats
+                        Smart water monitor
                     </label>
-                    <input 
-                                type="text" 
-                                v-model="pageEdit.detailedInformation.numberOfSmartThermostats"
-                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Number of smart thermostats"
-                            />
+                    <div class="space-y-3">
+                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
+                            'flex items-center justify-between p-4 rounded-lg border',
+                            pageEdit.detailedInformation.smartWaterMonitor === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.detailedInformation.smartWaterMonitor = option">
+                            <span class="text-base">{{ option }}</span>
+                            <div :class="[
+                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
+                                pageEdit.detailedInformation.smartWaterMonitor === option ? 'border-blue-500' : 'border-gray-300'
+                            ]">
+                                <div v-if="pageEdit.detailedInformation.smartWaterMonitor === option" class="w-3 h-3 rounded-full bg-blue-500" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="space-y-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Number of smart thermostats
+                        Smart shutoff valve
                     </label>
-                    <input 
-                                type="text" 
-                                v-model="pageEdit.detailedInformation.numberOfLeakSensors"
-                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Number of smart thermostats"
-                            />
+                    <div class="space-y-3">
+                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
+                            'flex items-center justify-between p-4 rounded-lg border',
+                            pageEdit.detailedInformation.smartShutoffValve === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.detailedInformation.smartShutoffValve  = option">
+                            <span class="text-base">{{ option }}</span>
+                            <div :class="[
+                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
+                                pageEdit.detailedInformation.smartShutoffValve === option ? 'border-blue-500' : 'border-gray-300'
+                            ]">
+                                <div v-if="pageEdit.detailedInformation.smartShutoffValve === option" class="w-3 h-3 rounded-full bg-blue-500" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="space-y-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Number of smart thermostats
-                    </label>
-                    <input 
-                                type="text" 
-                                v-model="pageEdit.detailedInformation.numberOfOtherSensors"
-                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Number of smart thermostats"
-                            />
-                </div>
+
             </div>
             <div class="p-4 border-t mt-auto">
                 <div class="flex justify-end gap-2">

@@ -17,6 +17,7 @@ const isEditing = ref(false)
 
 const openEditModal = async () => {
     isLoading.value = true
+    selectedOption.value = homeSource.value.info.protection.fireExtinguishers.basicInformation.fireExtinguishersPerFloor
     try {
         //await new Promise(resolve => setTimeout(resolve, 1000))
         isLoading.value = false
@@ -49,7 +50,7 @@ const saveChanges = async () => {
     }
 }
 
-const selectedOption = ref('Some')
+const selectedOption = ref('')
 
 const fireExtinguishers = ref({
     basicInformation: {
@@ -61,6 +62,8 @@ onMounted(() => {
     const docRef = doc($db, "properties", homeId);
     getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
+            console.log("Home Exists")
+            console.log(docSnap.data())
             homeSource.value = docSnap.data()
             if (homeSource.value.info
                 && homeSource.value.info.protection
@@ -68,7 +71,6 @@ onMounted(() => {
                 fireExtinguishers.value = {
                     ...homeSource.value.info.protection.fireExtinguishers
                 };
-                selectedOption.value = fireExtinguishers.value.basicInformation.fireExtinguishersPerFloor
             }
             else {
                 fireExtinguishers.value = {
@@ -103,7 +105,7 @@ onMounted(() => {
                 </div>
             </div>
         </article>
-        <ProjectRecord :homeId="homeId" :projectType="project_type" />
+        <ProjectRecord :homeId="homeId" :projectType="project_type" :recordType="inspection_record" />
 
     </div>
 
