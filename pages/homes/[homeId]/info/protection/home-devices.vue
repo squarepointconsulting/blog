@@ -8,34 +8,23 @@ const homeId = route.params.homeId;
 homeIdRef.value = homeId
 const { $db } = useNuxtApp()
 const router = useRouter()
-const isLoadingBasic = ref(false)
-const isLoadingDetailed = ref(false)
-const isEditingBasic = ref(false)
-const isEditingDetailed = ref(false)
+const editType = ref('basic')
+const isLoading = ref(false)
+//const isLoadingDetailed = ref(false)
+const isEditing = ref(false)
+// const isEditingDetailed = ref(false)
 const openBasicEditModal = async () => {
-    isLoadingBasic.value = true
-    try {
-        isLoadingBasic.value = false
-        isEditingBasic.value = true
-    } catch (error) {
-        console.error('Error loading data:', error)
-        isLoadingBasic.value = false
-    }
+    editType.value = 'basic'
+    isEditing.value = true
 }
 
 const openDetailedEditModal = async () => {
-    isLoadingDetailed.value = true
-    try {
-        isLoadingDetailed.value = false
-        isEditingDetailed.value = true
-    } catch (error) {
-        console.error('Error loading data:', error)
-        isLoadingDetailed.value = false
-    }
+    editType.value = 'detailed'
+    isEditing.value = true
 }
 
-const saveChangesBasic = async () => {
-    isLoadingBasic.value = true
+const saveChanges = async () => {
+    isLoading.value = true
     try {
         const docRef = doc($db, "properties", homeId);
         await updateDoc(docRef, {
@@ -48,24 +37,12 @@ const saveChangesBasic = async () => {
             }
         }, { merge: true });
         pageSource.value = cloneDeep(pageEdit.value)
-        isEditingBasic.value = false
-        isEditingDetailed.value = false
+        isEditing.value = false
     } catch (error) {
         console.error('Error saving changes:', error)
-        isLoadingBasic.value = false
+        isLoading.value = false
     } finally {
-        isLoadingBasic.value = false
-    }
-}
-
-const saveChangesDetailed = async () => {
-    isLoadingDetailed.value = true
-    try {
-        isLoadingDetailed.value = false
-        isEditingDetailed.value = false
-    } catch (error) {
-        console.error('Error saving changes:', error)
-        isLoadingDetailed.value = false
+        isLoading.value = false
     }
 }
 
@@ -105,20 +82,13 @@ onMounted(() => {
                 }
         }
         pageEdit.value = cloneDeep(pageSource.value)
-
     })
 })
 
-const cancelChangesBasic = () => {
+const cancelChanges = () => {
     pageEdit.value = cloneDeep(pageSource.value)
-    isEditingBasic.value = false            
+    isEditing.value = false            
 }
-
-const cancelChangesDetailed = () => {
-    pageEdit.value = cloneDeep(pageSource.value)
-    isEditingDetailed.value = false
-}
-
 </script>
 
 <template>
@@ -172,9 +142,7 @@ const cancelChangesDetailed = () => {
                 </div>
             </div>
         </article>
-
     </div>
-
     <div v-else class="space-y-4">
         <article class="p-4 bg-white shadow-md rounded-md">
             <div class="flex items-center gap-2">
@@ -183,25 +151,22 @@ const cancelChangesDetailed = () => {
             </div>
         </article>
     </div>
-
-    <!-- Loading Modal -->
     <UModal v-model="isLoading">
         <div class="p-4 flex items-center justify-center">
             <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
             <span class="ml-2">Loading...</span>
         </div>
     </UModal>
-
-    <UModal v-model="isEditingBasic" >
+    <UModal v-model="isEditing" >
         <div class="flex flex-col h-full">
             <!-- Header -->
             <div class="p-4 border-b">
                 <h3 class="text-lg font-bold">Home Devices</h3>
-                <h4>Basic Information</h4>
+                <h4>{{ editType === 'basic' ? 'Basic' : 'Detailed' }} Information</h4>
             </div>
 
             <!-- Content (scrollable) -->
-            <div class="flex-1 p-4 overflow-y-auto space-y-4">
+            <div v-if="editType === 'basic'" class="flex-1 p-4 overflow-y-auto space-y-4">
                 <div class="space-y-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         Brand
@@ -273,25 +238,7 @@ const cancelChangesDetailed = () => {
                 </div>
 
             </div>
-            <div class="p-4 border-t mt-auto">
-                <div class="flex justify-end gap-2">
-                    <UButton color="gray" variant="soft" label="Cancel" @click="cancelChangesBasic" />
-                    <UButton color="blue" label="Save" @click="saveChangesBasic" />
-                </div>
-            </div>
-        </div>
-    </UModal>
-
-    <UModal v-model="isEditingDetailed" >
-        <div class="flex flex-col h-full">
-            <!-- Header -->
-            <div class="p-4 border-b">
-                <h3 class="text-lg font-bold">Home Devices</h3>
-                <h4>Detailed information</h4>
-            </div>
-
-            <!-- Content (scrollable) -->
-            <div class="flex-1 p-4 overflow-y-auto space-y-4">
+            <div v-else class="flex-1 p-4 overflow-y-auto space-y-4">
                 <div class="space-y-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         Number of smart thermostats
@@ -328,8 +275,8 @@ const cancelChangesDetailed = () => {
             </div>
             <div class="p-4 border-t mt-auto">
                 <div class="flex justify-end gap-2">
-                    <UButton color="gray" variant="soft" label="Cancel" @click="cancelChangesDetailed" />
-                    <UButton color="blue" label="Save" @click="saveChangesDetailed" />
+                    <UButton color="gray" variant="soft" label="Cancel" @click="cancelChanges" />
+                    <UButton color="blue" label="Save" @click="saveChanges" />
                 </div>
             </div>
         </div>
