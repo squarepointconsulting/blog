@@ -53,7 +53,6 @@ onMounted(() => {
     getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
             const property = docSnap.data()
-             console.log(property)
             if (property.info && property.info.protection && property.info.protection.fireExtinguishers) {
                 pageSource.value = property.info.protection.fireExtinguishers
             }
@@ -69,8 +68,6 @@ onMounted(() => {
             }
         }
         pageEdit.value = cloneDeep(pageSource.value)
-    }).then(() => {
-         console.log(pageSource.value)
     })
 })
 

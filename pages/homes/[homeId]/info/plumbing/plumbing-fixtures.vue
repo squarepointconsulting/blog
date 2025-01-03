@@ -26,12 +26,8 @@ const saveChanges = async () => {
     try {
         const docRef = doc($db, "properties", homeId);
         await updateDoc(docRef, {
-            info: {
-                protection: {
-                    homeDevices: {
-                        ...pageEdit.value
-                    }
-                }
+            "info.plumbing.fixtures": {
+                ...pageEdit.value
             }
         }, { merge: true });
         pageSource.value = cloneDeep(pageEdit.value)
@@ -51,10 +47,10 @@ const page_title = ref("Plumbing Fixtures")
 const project_type = ref("plumbing_fixtures_inspection")
 const pageTemplate = ref({
     basicInformation: {
-        numberOfToilets: '0',
-        numberOfSinks: '0',
-        numberOfBathtubs: '0',
-        numberOfShowers: '0',
+        numberOfToilets: '',
+        numberOfSinks: '',
+        numberOfBathtubs: '',
+        numberOfShowers: '',
     },
     detailedInformation: {
 
@@ -65,14 +61,14 @@ onMounted(() => {
     const docRef = doc($db, "properties", homeId);
     getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
-            pageSource.value = docSnap.data()
-            if (pageSource.value.info && pageSource.value.info.plumbing && pageSource.value.info.plumbing.pipes) {
-                pageSource.value = pageSource.value.info.plumbing.pipes
+            const property = docSnap.data()
+            if (property.info && property.info.plumbing && property.info.plumbing.fixtures) {
+                pageSource.value = property.info.plumbing.fixtures
             }
             else {
-                pageSource.value = {
-                    ...pageTemplate.value
-                }
+            pageSource.value = {
+                ...pageTemplate.value
+            }
             }
         }
         else {
