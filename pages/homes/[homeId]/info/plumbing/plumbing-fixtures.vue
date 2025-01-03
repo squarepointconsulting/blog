@@ -174,195 +174,97 @@ const cancelChanges = () => {
                         </div>
                     </div>
                 </div>
-
-                
                 <div class="space-y-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        System type
+                            Number of toilets
                     </label>
                     <div class="space-y-3">
-                        <div v-for="option in ['Gas', 'Electric']" :key="option"
-                            :class="[
-                                'flex items-center justify-between p-4 rounded-lg border',
-                                pageEdit.basicInformation.systemType === option ? 'border-blue-500' : 'border-gray-200'
-                            ]" @click="pageEdit.basicInformation.systemType = option">
-                            <span class="text-base">{{ option }}</span>
-                            <div :class="[
-                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.basicInformation.systemType === option ? 'border-blue-500' : 'border-gray-300'
-                            ]">
-                                <div v-if="pageEdit.basicInformation.systemType === option"
-                                    class="w-3 h-3 rounded-full bg-blue-500" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="space-y-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Insulated    
-                    </label>
-                    <p class="text-sm text-gray-500">Indicate whether your water heater is insulated.</p>
-                    <div class="space-y-3">
-                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
+                        <div v-for="option in ['1', '2', '3', 'More']" :key="option" :class="[
                             'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.basicInformation.isInsulated === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.basicInformation.isInsulated = option">
+                            pageEdit.basicInformation.numberOfSinks === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.basicInformation.numberOfSinks = option">
                             <span class="text-base">{{ option }}</span>
                             <div :class="[
                                 'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.basicInformation.isInsulated === option ? 'border-blue-500' : 'border-gray-300'
+                                pageEdit.basicInformation.numberOfSinks === option ? 'border-blue-500' : 'border-gray-300'
                             ]">
-                                <div v-if="pageEdit.basicInformation.isInsulated === option"
-                                    class="w-3 h-3 rounded-full bg-blue-500" />
+                                <div v-if="pageEdit.basicInformation.numberOfSinks === option" class="w-3 h-3 rounded-full bg-blue-500" />
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Location
-                    </label>
-                    <div class="space-y-3">
-                        <div v-for="option in ['Garage', 'Basement', 'Exterior', 'First Floor', 'Second Floor', 'Attic', 'Roof', 'Other']" :key="option" :class="[
-                            'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.basicInformation.location === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.basicInformation.location = option">
-                            <span class="text-base">{{ option }}</span>
-                            <div :class="[
-                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.basicInformation.location === option ? 'border-blue-500' : 'border-gray-300'
-                            ]">
-                                <div v-if="pageEdit.basicInformation.location === option" class="w-3 h-3 rounded-full bg-blue-500" />
-                            </div>
-                        </div>
-                        <div v-if="pageEdit.basicInformation.location === 'Other'" class="mt-2">
+                        <div v-if="!['1', '2', '3'].includes(pageEdit.basicInformation.numberOfSinks)" class="mt-2">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Other location
+                                Enter the value manually
                             </label>
                             <input 
                                 type="text" 
-                                v-model="pageEdit.basicInformation.otherLocation"
+                                v-model="pageEdit.basicInformation.numberOfSinksOther"
                                 class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Enter location name"
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div v-else class="flex-1 p-4 overflow-y-auto space-y-4">
-                <div class="space-y-4">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">
-                        Has tank
-                    </label>
-                    <p class="text-sm text-gray-500">Indicate whether the water heater has a tank.</p>
-
-                    <div class="space-y-3">
-                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
-                            'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.detailedInformation.hasTank === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.detailedInformation.hasTank = option">
-                            <span class="text-base">{{ option }}</span>
-                            <div :class="[
-                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.detailedInformation.hasTank === option ? 'border-blue-500' : 'border-gray-300'
-                            ]">
-                                <div v-if="pageEdit.detailedInformation.hasTank === option"
-                                    class="w-3 h-3 rounded-full bg-blue-500" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">
-                        Has drip pan
-                    </label>
-                    <p class="text-sm text-gray-500">Indicate whether the water heater has a drip pan.</p>
-
-                    <div class="space-y-3">
-                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
-                            'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.detailedInformation.hasDripPan === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.detailedInformation.hasDripPan = option">
-                            <span class="text-base">{{ option }}</span>
-                            <div :class="[
-                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.detailedInformation.hasDripPan === option ? 'border-blue-500' : 'border-gray-300'
-                            ]">
-                                <div v-if="pageEdit.detailedInformation.hasDripPan === option"
-                                    class="w-3 h-3 rounded-full bg-blue-500" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">
-                        Supply line type
-                    </label>
-                    <p class="text-sm text-gray-500">Indicate the type of supply line.</p>
-
-                    <div class="space-y-3">
-                        <div v-for="option in ['Braided Metal', 'Rubber']" :key="option" :class="[
-                            'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.detailedInformation.supplyLineType === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.detailedInformation.supplyLineType = option">
-                            <span class="text-base">{{ option }}</span>
-                            <div :class="[
-                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.detailedInformation.supplyLineType === option ? 'border-blue-500' : 'border-gray-300'
-                            ]">
-                                <div v-if="pageEdit.detailedInformation.supplyLineType === option"
-                                    class="w-3 h-3 rounded-full bg-blue-500" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Last flushed
-                    </label>
-                        <input type="text" v-model="pageEdit.detailedInformation.lastFlushed"
-                        class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter last flushed date" />
-                </div>
-                <div class="space-y-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Brand
-                    </label>
-                    <div class="space-y-3">
-                        <div v-for="option in ['Rheem', 'Rinnai', 'A. O. Smith', 'Bradford White', 'Stiebel Eltron', 'Eco Smart', 'Bosch', 'Tagaki', 'Other']" :key="option" :class="[
-                            'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.detailedInformation.brand === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.detailedInformation.brand = option">
-                            <span class="text-base">{{ option }}</span>
-                            <div :class="[
-                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                    pageEdit.detailedInformation.brand === option ? 'border-blue-500' : 'border-gray-300'
-                            ]">
-                                <div v-if="pageEdit.detailedInformation.brand === option" class="w-3 h-3 rounded-full bg-blue-500" />
-                            </div>
-                        </div>
-                        <div v-if="pageEdit.detailedInformation.brand === 'Other'" class="mt-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Other brand
-                            </label>
-                            <input 
-                                type="text" 
-                                v-model="pageEdit.detailedInformation.otherBrand"
-                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Enter brand"
+                                placeholder="Enter number of sinks"
                             />
                         </div>
                     </div>
                 </div>
                 <div class="space-y-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Model
+                        Number of bathtubs
                     </label>
-                        <input type="text" v-model="pageEdit.detailedInformation.model"
-                        class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter model" />
+                    <div class="space-y-3">
+                        <div v-for="option in ['1', '2', '3', 'More']" :key="option" :class="[
+                            'flex items-center justify-between p-4 rounded-lg border',
+                            pageEdit.basicInformation.numberOfBathtubs === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.basicInformation.numberOfBathtubs = option">
+                            <span class="text-base">{{ option }}</span>
+                            <div :class="[
+                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
+                                pageEdit.basicInformation.numberOfToilets === option ? 'border-blue-500' : 'border-gray-300'
+                            ]">
+                                <div v-if="pageEdit.basicInformation.numberOfBathtubs === option" class="w-3 h-3 rounded-full bg-blue-500" />
+                            </div>
+                        </div>
+                        <div v-if="!['1', '2', '3'].includes(pageEdit.basicInformation.numberOfBathtubs)" class="mt-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Enter the value manually
+                            </label>
+                            <input 
+                                type="text" 
+                                v-model="pageEdit.basicInformation.numberOfBathtubsOther"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Enter number of bathtubs"
+                            />
+                        </div>
+                    </div>
                 </div>
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Number of showers
+                    </label>
+                    <div class="space-y-3">
+                        <div v-for="option in ['1', '2', '3', 'More']" :key="option" :class="[
+                            'flex items-center justify-between p-4 rounded-lg border',
+                            pageEdit.basicInformation.numberOfShowers === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.basicInformation.numberOfShowers = option">
+                            <span class="text-base">{{ option }}</span>
+                            <div :class="[
+                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
+                                pageEdit.basicInformation.numberOfToilets === option ? 'border-blue-500' : 'border-gray-300'
+                            ]">
+                                <div v-if="pageEdit.basicInformation.numberOfShowers === option" class="w-3 h-3 rounded-full bg-blue-500" />
+                            </div>
+                        </div>
+                        <div v-if="!['1', '2', '3'].includes(pageEdit.basicInformation.numberOfShowers)" class="mt-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Enter the value manually
+                            </label>
+                            <input 
+                                type="text" 
+                                v-model="pageEdit.basicInformation.numberOfShowersOther"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Enter number of showers"
+                            />
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <div class="p-4 border-t mt-auto">
                 <div class="flex justify-end gap-2">

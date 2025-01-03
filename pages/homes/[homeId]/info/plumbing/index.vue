@@ -29,7 +29,7 @@ const links = [{
   label: 'Plumbing Fixtures',
   icon: 'i-mdi-home',
   to: 'plumbing/plumbing-fixtures',
-  id: 'info.plumbing.plumbingFixtures'
+  id: 'info.plumbing.fixtures'
 },
 ]
 
