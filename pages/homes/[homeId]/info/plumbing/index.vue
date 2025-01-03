@@ -1,6 +1,8 @@
 <script setup>
 import { useRoute } from 'vue-router';
 import { doc } from 'firebase/firestore'
+import { useProtectionSection } from '@/composables/useProtectionStatus'
+const { checkSectionExists } = useProtectionSection()
 
 const route = useRoute();
 const homeIdRef = useState('homeId')
@@ -13,18 +15,21 @@ const home = useDocument(docRef)
 
 const router = useRouter();
 
-const sectionLinks = [{
+const links = [{
   label: 'Pipes',
   icon: 'i-heroicons-home',
-  to: 'plumbing/pipes'
+  to: 'plumbing/pipes',
+  id: 'info.plumbing.pipes'
 }, {
   label: 'Water Heater',
   icon: 'i-heroicons-home',
-  to: 'plumbing/water-heater'
+  to: 'plumbing/water-heater',
+  id: 'info.plumbing.waterHeater'
 }, {
   label: 'Plumbing Fixtures',
   icon: 'i-mdi-home',
-  to: 'plumbing/plumbing-fixtures'
+  to: 'plumbing/plumbing-fixtures',
+  id: 'info.plumbing.plumbingFixtures'
 },
 ]
 
@@ -42,7 +47,15 @@ const sectionLinks = [{
 
         </article>
         <article class="p-4 bg-white shadow-md rounded-md space-y-4">
-            <UVerticalNavigation :links="sectionLinks" />
+            <UVerticalNavigation :links="links">
+            <template #default="{ link }">
+              <span class="group-hover:text-primary relative">{{ link.label }}</span>
+              <div v-if="checkSectionExists(home, link.id)">
+                <p class="text-sm text-green-500">Completed</p>
+              </div>
+            </template>
+
+        </UVerticalNavigation>
         </article>
 
     </div>

@@ -1,6 +1,8 @@
 <script setup>
 import { useRoute } from 'vue-router';
 import { doc } from 'firebase/firestore'
+import { useProtectionSection } from '@/composables/useProtectionStatus'
+const { checkSectionExists } = useProtectionSection()
 
 const route = useRoute();
 const homeIdRef = useState('homeId')
@@ -42,18 +44,6 @@ const links = [{
 }
 ]
 
-const checkSectionExists = (path) => {
-    const keys = path.split('.')
-    let current = home.value
-    
-    for (const key of keys) {
-        if (!current || typeof current !== 'object') {
-            return false
-        }
-        current = current[key]
-    }
-    return current !== undefined && current !== null
-}
 </script>
 
 
@@ -72,7 +62,7 @@ const checkSectionExists = (path) => {
           <UVerticalNavigation :links="links">
             <template #default="{ link }">
               <span class="group-hover:text-primary relative">{{ link.label }}</span>
-              <div v-if="checkSectionExists(link.id)">
+              <div v-if="checkSectionExists(home, link.id)">
                 <p class="text-sm text-green-500">Completed</p>
               </div>
             </template>
