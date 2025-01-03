@@ -50,7 +50,7 @@ const pageTemplate = ref({
     },
     detailedInformation: {
         powerSource: '',
-        lastReplacedBatteries: '2025-01-01',
+        lastReplacedBatteries: '',
     },
 });
 

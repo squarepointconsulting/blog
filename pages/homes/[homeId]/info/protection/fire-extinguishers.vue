@@ -22,7 +22,7 @@ const saveChanges = async () => {
         const docRef = doc($db, "properties", homeId);
         await updateDoc(docRef, {
             "info.protection.fireExtinguishers": {
-                        ...pageEdit.value
+                ...pageEdit.value
             }
         }, { merge: true });
         pageSource.value = cloneDeep(pageEdit.value)
