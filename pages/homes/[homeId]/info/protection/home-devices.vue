@@ -10,9 +10,7 @@ const { $db } = useNuxtApp()
 const router = useRouter()
 const editType = ref('basic')
 const isLoading = ref(false)
-//const isLoadingDetailed = ref(false)
 const isEditing = ref(false)
-// const isEditingDetailed = ref(false)
 const openBasicEditModal = async () => {
     editType.value = 'basic'
     isEditing.value = true
@@ -104,17 +102,17 @@ const cancelChanges = () => {
             <div class="space-y-3 relative p-4 rounded-lg hover:bg-gray-50 cursor-pointer" @click="openBasicEditModal">
                 <UButton icon="i-heroicons-pencil" variant="soft" color="gray"
                     class="rounded-full h-8 w-8 absolute top-2 right-2" />
-                <div>
+                <div class="space-y-2">
                     <h2 class="text-lg font-bold">Basic information</h2>
-                    <p>Brand</p>
+                    <p class="font-medium">Brand</p>
                     <p class="text-gray-500">
                         {{ pageSource.basicInformation.brand }}
                     </p>
-                    <p>Smart system</p>
+                    <p class="font-medium">Smart system</p>
                     <p class="text-gray-500">
                         {{ pageSource.basicInformation.smartSystem }}
                     </p>
-                    <p>Centrally monitored</p>
+                    <p class="font-medium">Centrally monitored</p>
                     <p class="text-gray-500">
                         {{ pageSource.basicInformation.centrallyMonitored }}
                     </p>
@@ -125,17 +123,17 @@ const cancelChanges = () => {
             <div class="space-y-3 relative p-4 rounded-lg hover:bg-gray-50 cursor-pointer" @click="openDetailedEditModal">
                 <UButton icon="i-heroicons-pencil" variant="soft" color="gray"
                     class="rounded-full h-8 w-8 absolute top-2 right-2" />
-                <div>
+                <div class="space-y-2">
                     <h2 class="text-lg font-bold">Detailed information</h2>
-                    <p>Number of smart thermostats</p>
+                    <p class="font-medium">Number of smart thermostats</p>
                     <p class="text-gray-500">
                         {{ pageSource.detailedInformation.numberOfSmartThermostats }}
                     </p>
-                    <p>Number of leak sensors</p>
+                    <p class="font-medium">Number of leak sensors</p>
                     <p class="text-gray-500">
                         {{ pageSource.detailedInformation.numberOfLeakSensors }}
                     </p>
-                    <p>Number of other sensors</p>
+                    <p class="font-medium">Number of other sensors</p>
                     <p class="text-gray-500">
                         {{ pageSource.detailedInformation.numberOfOtherSensors }}
                     </p>

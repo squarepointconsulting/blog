@@ -62,8 +62,6 @@ onMounted(() => {
     const docRef = doc($db, "properties", homeId);
     getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
-            console.log("Home Exists")
-            console.log(docSnap.data())
             homeSource.value = docSnap.data()
             if (homeSource.value.info
                 && homeSource.value.info.protection
@@ -105,7 +103,7 @@ onMounted(() => {
                 </div>
             </div>
         </article>
-        <ProjectRecord :homeId="homeId" :projectType="project_type" :recordType="inspection_record" />
+        <ProjectRecord :homeId="homeId" :projectType="project_type" recordType="inspection_record" />
 
     </div>
 

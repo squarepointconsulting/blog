@@ -8,34 +8,21 @@ const homeId = route.params.homeId;
 homeIdRef.value = homeId
 const { $db } = useNuxtApp()
 const router = useRouter()
-const isLoadingBasic = ref(false)
-const isLoadingDetailed = ref(false)
-const isEditingBasic = ref(false)
-const isEditingDetailed = ref(false)
+const editType = ref('basic')
+const isLoading = ref(false)
+const isEditing = ref(false)
 const openBasicEditModal = async () => {
-    isLoadingBasic.value = true
-    try {
-        isLoadingBasic.value = false
-        isEditingBasic.value = true
-    } catch (error) {
-        console.error('Error loading data:', error)
-        isLoadingBasic.value = false
-    }
+    editType.value = 'basic'
+    isEditing.value = true
 }
 
 const openDetailedEditModal = async () => {
-    isLoadingDetailed.value = true
-    try {
-        isLoadingDetailed.value = false
-        isEditingDetailed.value = true
-    } catch (error) {
-        console.error('Error loading data:', error)
-        isLoadingDetailed.value = false
-    }
+    editType.value = 'detailed'
+    isEditing.value = true
 }
 
-const saveChangesBasic = async () => {
-    isLoadingBasic.value = true
+const saveChanges = async () => {
+    isLoading.value = true
     try {
         const docRef = doc($db, "properties", homeId);
         await updateDoc(docRef, {
@@ -48,40 +35,34 @@ const saveChangesBasic = async () => {
             }
         }, { merge: true });
         pageSource.value = cloneDeep(pageEdit.value)
-        isEditingBasic.value = false
-        isEditingDetailed.value = false
+        isEditing.value = false
     } catch (error) {
         console.error('Error saving changes:', error)
-        isLoadingBasic.value = false
+        isLoading.value = false
     } finally {
-        isLoadingBasic.value = false
+        isLoading.value = false
     }
 }
 
-const saveChangesDetailed = async () => {
-    isLoadingDetailed.value = true
-    try {
-        isLoadingDetailed.value = false
-        isEditingDetailed.value = false
-    } catch (error) {
-        console.error('Error saving changes:', error)
-        isLoadingDetailed.value = false
-    }
-}
 
 const pageSource = ref()
 const pageEdit = ref()
+const page_title = ref("Water Heater")
+const project_type = ref("water_heater_inspection")
 const pageTemplate = ref({
     basicInformation: {
-        brand: 'Google',
-        otherBrand: '',
-        smartSystem: 'Yes',
-        centrallyMonitored: 'Yes',
+        installationYear: 2004,
+        systemType: 'Gas',
+        isInsulated: 'Yes',
+        location: 'Basement',
     },
     detailedInformation: {
-        numberOfSmartThermostats: 3,
-        numberOfLeakSensors: 0,
-        numberOfOtherSensors: 0,
+        hasTank: 'No',
+        hasDripPan: 'No',
+        supplyLineType: 'Rubber',
+        lastFlushed: '2024-01-01',
+        brand: 'GE',
+        model: '123456',
     },
 });
 
@@ -90,8 +71,8 @@ onMounted(() => {
     getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
             pageSource.value = docSnap.data()
-            if (pageSource.value.info && pageSource.value.info.protection && pageSource.value.info.protection.homeDevices) {
-                pageSource.value =  pageSource.value.info.protection.homeDevices
+            if (pageSource.value.info && pageSource.value.info.plumbing && pageSource.value.info.plumbing.pipes) {
+                pageSource.value = pageSource.value.info.plumbing.pipes
             }
             else {
                 pageSource.value = {
@@ -101,24 +82,18 @@ onMounted(() => {
         }
         else {
             pageSource.value = {
-                    ...pageTemplate.value
-                }
+                ...pageTemplate.value
+            }
         }
         pageEdit.value = cloneDeep(pageSource.value)
-
     })
 })
 
-const cancelChangesBasic = () => {
-    pageEdit.value = cloneDeep(pageSource.value)
-    isEditingBasic.value = false            
-}
 
-const cancelChangesDetailed = () => {
+const cancelChanges = () => {
     pageEdit.value = cloneDeep(pageSource.value)
-    isEditingDetailed.value = false
+    isEditing.value = false
 }
-
 </script>
 
 <template>
@@ -127,54 +102,70 @@ const cancelChangesDetailed = () => {
             <h2 class="text-lg font-bold flex items-center gap-3">
                 <UButton icon="i-heroicons-arrow-left" variant="soft" color="gray" class="rounded-full h-8 w-8"
                     @click="() => router.back()" />
-                    Home Devices
+                {{ page_title }}
             </h2>
         </article>
         <article class="p-4 bg-white shadow-md rounded-md">
             <div class="space-y-3 relative p-4 rounded-lg hover:bg-gray-50 cursor-pointer" @click="openBasicEditModal">
                 <UButton icon="i-heroicons-pencil" variant="soft" color="gray"
                     class="rounded-full h-8 w-8 absolute top-2 right-2" />
-                <div>
+                <div class="space-y-2">
                     <h2 class="text-lg font-bold">Basic information</h2>
-                    <p>Brand</p>
+                    <p class="font-medium">Installation year</p>
                     <p class="text-gray-500">
-                        {{ pageSource.basicInformation.brand }}
+                        {{ pageSource.basicInformation.installationYear }}
                     </p>
-                    <p>Smart system</p>
+                    <p class="font-medium">System type</p>
                     <p class="text-gray-500">
-                        {{ pageSource.basicInformation.smartSystem }}
+                        {{ pageSource.basicInformation.systemType }}
                     </p>
-                    <p>Centrally monitored</p>
+                    <p class="font-medium">Is insulated</p>
                     <p class="text-gray-500">
-                        {{ pageSource.basicInformation.centrallyMonitored }}
+                        {{ pageSource.basicInformation.isInsulated }}
+                    </p>
+                    <p class="font-medium">Location</p>
+                    <p class="text-gray-500">
+                        {{ pageSource.basicInformation.location }}
                     </p>
                 </div>
             </div>
         </article>
         <article class="p-4 bg-white shadow-md rounded-md">
-            <div class="space-y-3 relative p-4 rounded-lg hover:bg-gray-50 cursor-pointer" @click="openDetailedEditModal">
+            <div class="space-y-3 relative p-4 rounded-lg hover:bg-gray-50 cursor-pointer"
+                @click="openDetailedEditModal">
                 <UButton icon="i-heroicons-pencil" variant="soft" color="gray"
                     class="rounded-full h-8 w-8 absolute top-2 right-2" />
-                <div>
+                <div class="space-y-2">
                     <h2 class="text-lg font-bold">Detailed information</h2>
-                    <p>Number of smart thermostats</p>
+                    <p class="font-medium">Has tank</p>
                     <p class="text-gray-500">
-                        {{ pageSource.detailedInformation.numberOfSmartThermostats }}
+                        {{ pageSource.detailedInformation.hasTank }}
                     </p>
-                    <p>Number of leak sensors</p>
+                    <p class="font-medium">Has drip pan</p>
                     <p class="text-gray-500">
-                        {{ pageSource.detailedInformation.numberOfLeakSensors }}
+                        {{ pageSource.detailedInformation.hasDripPan }}
                     </p>
-                    <p>Number of other sensors</p>
+                    <p class="font-medium">Supply line type</p>
                     <p class="text-gray-500">
-                        {{ pageSource.detailedInformation.numberOfOtherSensors }}
+                        {{ pageSource.detailedInformation.supplyLineType }}
+                    </p>
+                    <p class="font-medium">Last flushed</p>
+                    <p class="text-gray-500">
+                        {{ pageSource.detailedInformation.lastFlushed }}
+                    </p>
+                    <p class="font-medium">Brand</p>
+                    <p class="text-gray-500">
+                        {{ pageSource.detailedInformation.brand }}
+                    </p>
+                    <p class="font-medium">Model</p>
+                    <p class="text-gray-500">
+                        {{ pageSource.detailedInformation.model }}
                     </p>
                 </div>
             </div>
         </article>
-
+        <ProjectRecord :homeId="homeId" :projectType="project_type" recordType="inspection_record" />
     </div>
-
     <div v-else class="space-y-4">
         <article class="p-4 bg-white shadow-md rounded-md">
             <div class="flex items-center gap-2">
@@ -183,170 +174,219 @@ const cancelChangesDetailed = () => {
             </div>
         </article>
     </div>
-
-    <!-- Loading Modal -->
     <UModal v-model="isLoading">
         <div class="p-4 flex items-center justify-center">
             <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
             <span class="ml-2">Loading...</span>
         </div>
     </UModal>
-
-    <UModal v-model="isEditingBasic" >
+    <UModal v-model="isEditing">
         <div class="flex flex-col h-full">
-            <!-- Header -->
             <div class="p-4 border-b">
                 <h3 class="text-lg font-bold">Home Devices</h3>
-                <h4>Basic Information</h4>
+                <h4>{{ editType === 'basic' ? 'Basic' : 'Detailed' }} Information</h4>
             </div>
+            <div v-if="editType === 'basic'" class="flex-1 p-4 overflow-y-auto space-y-4">
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Year of installation
+                    </label>
+                    <input type="text" v-model="pageEdit.basicInformation.installationYear"
+                        class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Year of installation" />
+                </div>
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        System type
+                    </label>
+                    <div class="space-y-3">
+                        <div v-for="option in ['Gas', 'Electric']" :key="option"
+                            :class="[
+                                'flex items-center justify-between p-4 rounded-lg border',
+                                pageEdit.basicInformation.systemType === option ? 'border-blue-500' : 'border-gray-200'
+                            ]" @click="pageEdit.basicInformation.systemType = option">
+                            <span class="text-base">{{ option }}</span>
+                            <div :class="[
+                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
+                                pageEdit.basicInformation.systemType === option ? 'border-blue-500' : 'border-gray-300'
+                            ]">
+                                <div v-if="pageEdit.basicInformation.systemType === option"
+                                    class="w-3 h-3 rounded-full bg-blue-500" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Insulated    
+                    </label>
+                    <p class="text-sm text-gray-500">Indicate whether your water heater is insulated.</p>
+                    <div class="space-y-3">
+                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
+                            'flex items-center justify-between p-4 rounded-lg border',
+                            pageEdit.basicInformation.isInsulated === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.basicInformation.isInsulated = option">
+                            <span class="text-base">{{ option }}</span>
+                            <div :class="[
+                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
+                                pageEdit.basicInformation.isInsulated === option ? 'border-blue-500' : 'border-gray-300'
+                            ]">
+                                <div v-if="pageEdit.basicInformation.isInsulated === option"
+                                    class="w-3 h-3 rounded-full bg-blue-500" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Location
+                    </label>
+                    <div class="space-y-3">
+                        <div v-for="option in ['Garage', 'Basement', 'Exterior', 'First Floor', 'Second Floor', 'Attic', 'Roof', 'Other']" :key="option" :class="[
+                            'flex items-center justify-between p-4 rounded-lg border',
+                            pageEdit.basicInformation.location === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.basicInformation.location = option">
+                            <span class="text-base">{{ option }}</span>
+                            <div :class="[
+                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
+                                pageEdit.basicInformation.location === option ? 'border-blue-500' : 'border-gray-300'
+                            ]">
+                                <div v-if="pageEdit.basicInformation.location === option" class="w-3 h-3 rounded-full bg-blue-500" />
+                            </div>
+                        </div>
+                        <div v-if="pageEdit.basicInformation.location === 'Other'" class="mt-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Other location
+                            </label>
+                            <input 
+                                type="text" 
+                                v-model="pageEdit.basicInformation.otherLocation"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Enter location name"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-else class="flex-1 p-4 overflow-y-auto space-y-4">
+                <div class="space-y-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Has tank
+                    </label>
+                    <p class="text-sm text-gray-500">Indicate whether the water heater has a tank.</p>
 
-            <!-- Content (scrollable) -->
-            <div class="flex-1 p-4 overflow-y-auto space-y-4">
+                    <div class="space-y-3">
+                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
+                            'flex items-center justify-between p-4 rounded-lg border',
+                            pageEdit.detailedInformation.hasTank === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.detailedInformation.hasTank = option">
+                            <span class="text-base">{{ option }}</span>
+                            <div :class="[
+                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
+                                pageEdit.detailedInformation.hasTank === option ? 'border-blue-500' : 'border-gray-300'
+                            ]">
+                                <div v-if="pageEdit.detailedInformation.hasTank === option"
+                                    class="w-3 h-3 rounded-full bg-blue-500" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Has drip pan
+                    </label>
+                    <p class="text-sm text-gray-500">Indicate whether the water heater has a drip pan.</p>
+
+                    <div class="space-y-3">
+                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
+                            'flex items-center justify-between p-4 rounded-lg border',
+                            pageEdit.detailedInformation.hasDripPan === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.detailedInformation.hasDripPan = option">
+                            <span class="text-base">{{ option }}</span>
+                            <div :class="[
+                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
+                                pageEdit.detailedInformation.hasDripPan === option ? 'border-blue-500' : 'border-gray-300'
+                            ]">
+                                <div v-if="pageEdit.detailedInformation.hasDripPan === option"
+                                    class="w-3 h-3 rounded-full bg-blue-500" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Supply line type
+                    </label>
+                    <p class="text-sm text-gray-500">Indicate the type of supply line.</p>
+
+                    <div class="space-y-3">
+                        <div v-for="option in ['Braided Metal', 'Rubber']" :key="option" :class="[
+                            'flex items-center justify-between p-4 rounded-lg border',
+                            pageEdit.detailedInformation.supplyLineType === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.detailedInformation.supplyLineType = option">
+                            <span class="text-base">{{ option }}</span>
+                            <div :class="[
+                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
+                                pageEdit.detailedInformation.supplyLineType === option ? 'border-blue-500' : 'border-gray-300'
+                            ]">
+                                <div v-if="pageEdit.detailedInformation.supplyLineType === option"
+                                    class="w-3 h-3 rounded-full bg-blue-500" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Last flushed
+                    </label>
+                        <input type="text" v-model="pageEdit.detailedInformation.lastFlushed"
+                        class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter last flushed date" />
+                </div>
                 <div class="space-y-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         Brand
                     </label>
                     <div class="space-y-3">
-                        <div v-for="option in ['Google', 'Ring', 'Notion', 'Mixed', 'Other']" :key="option" :class="[
+                        <div v-for="option in ['Rheem', 'Rinnai', 'A. O. Smith', 'Bradford White', 'Stiebel Eltron', 'Eco Smart', 'Bosch', 'Tagaki', 'Other']" :key="option" :class="[
                             'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.basicInformation.brand === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.basicInformation.brand = option">
+                            pageEdit.detailedInformation.brand === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.detailedInformation.brand = option">
                             <span class="text-base">{{ option }}</span>
                             <div :class="[
                                 'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.basicInformation.brand === option ? 'border-blue-500' : 'border-gray-300'
+                                    pageEdit.detailedInformation.brand === option ? 'border-blue-500' : 'border-gray-300'
                             ]">
-                                <div v-if="pageEdit.basicInformation.brand === option" class="w-3 h-3 rounded-full bg-blue-500" />
+                                <div v-if="pageEdit.detailedInformation.brand === option" class="w-3 h-3 rounded-full bg-blue-500" />
                             </div>
                         </div>
-                        <div v-if="pageEdit.basicInformation.brand === 'Other'" class="mt-2">
+                        <div v-if="pageEdit.detailedInformation.brand === 'Other'" class="mt-2">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Other brand
                             </label>
                             <input 
                                 type="text" 
-                                v-model="pageEdit.basicInformation.otherBrand"
+                                v-model="pageEdit.detailedInformation.otherBrand"
                                 class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Enter brand name"
+                                placeholder="Enter brand"
                             />
                         </div>
                     </div>
-
                 </div>
                 <div class="space-y-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Smart System
+                        Model
                     </label>
-                    <div class="space-y-3">
-                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
-                            'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.basicInformation.smartSystem === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.basicInformation.smartSystem = option">
-                            <span class="text-base">{{ option }}</span>
-                            <div :class="[
-                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.basicInformation.smartSystem === option ? 'border-blue-500' : 'border-gray-300'
-                            ]">
-                                <div v-if="pageEdit.basicInformation.smartSystem === option" class="w-3 h-3 rounded-full bg-blue-500" />
-                            </div>
-                        </div>
-                    </div>
+                        <input type="text" v-model="pageEdit.detailedInformation.model"
+                        class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter model" />
                 </div>
-                <div class="space-y-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Centrally Monitored
-                    </label>
-                    <div class="space-y-3">
-                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
-                            'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.basicInformation.centrallyMonitored === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.basicInformation.centrallyMonitored = option">
-                            <span class="text-base">{{ option }}</span>
-                            <div :class="[
-                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.basicInformation.centrallyMonitored === option ? 'border-blue-500' : 'border-gray-300'
-                            ]">
-                                <div v-if="pageEdit.basicInformation.centrallyMonitored === option" class="w-3 h-3 rounded-full bg-blue-500" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
             <div class="p-4 border-t mt-auto">
                 <div class="flex justify-end gap-2">
-                    <UButton color="gray" variant="soft" label="Cancel" @click="cancelChangesBasic" />
-                    <UButton color="blue" label="Save" @click="saveChangesBasic" />
-                </div>
-            </div>
-        </div>
-    </UModal>
-
-    <UModal v-model="isEditingDetailed" >
-        <div class="flex flex-col h-full">
-            <!-- Header -->
-            <div class="p-4 border-b">
-                <h3 class="text-lg font-bold">Home Devices</h3>
-                <h4>Detailed information</h4>
-            </div>
-
-            <!-- Content (scrollable) -->
-            <div class="flex-1 p-4 overflow-y-auto space-y-4">
-                <div class="space-y-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Number of smart thermostats
-                    </label>
-                    <input 
-                                type="text" 
-                                v-model="pageEdit.detailedInformation.numberOfSmartThermostats"
-                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Number of smart thermostats"
-                            />
-                </div>
-                <div class="space-y-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Smart System
-                    </label>
-                    <div class="space-y-3">
-                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
-                            'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.basicInformation.smartSystem === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.basicInformation.smartSystem = option">
-                            <span class="text-base">{{ option }}</span>
-                            <div :class="[
-                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.basicInformation.smartSystem === option ? 'border-blue-500' : 'border-gray-300'
-                            ]">
-                                <div v-if="pageEdit.basicInformation.smartSystem === option" class="w-3 h-3 rounded-full bg-blue-500" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Centrally Monitored
-                    </label>
-                    <div class="space-y-3">
-                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
-                            'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.basicInformation.centrallyMonitored === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.basicInformation.centrallyMonitored = option">
-                            <span class="text-base">{{ option }}</span>
-                            <div :class="[
-                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.basicInformation.centrallyMonitored === option ? 'border-blue-500' : 'border-gray-300'
-                            ]">
-                                <div v-if="pageEdit.basicInformation.centrallyMonitored === option" class="w-3 h-3 rounded-full bg-blue-500" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <div class="p-4 border-t mt-auto">
-                <div class="flex justify-end gap-2">
-                    <UButton color="gray" variant="soft" label="Cancel" @click="cancelChangesDetailed" />
-                    <UButton color="blue" label="Save" @click="saveChangesDetailed" />
+                    <UButton color="gray" variant="soft" label="Cancel" @click="cancelChanges" />
+                    <UButton color="blue" label="Save" @click="saveChanges" />
                 </div>
             </div>
         </div>
