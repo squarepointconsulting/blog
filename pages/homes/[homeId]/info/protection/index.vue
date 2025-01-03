@@ -40,7 +40,7 @@ const links = [{
   label: 'Fire Sprinklers',
   icon: 'i-mdi-home',
   to: 'protection/home-fire-sprinklers',
-  id: 'info.protection.homeFireSprinklers'
+  id: 'info.protection.fireSprinklers'
 }
 ]
 
@@ -62,14 +62,12 @@ const links = [{
           <UVerticalNavigation :links="links">
             <template #default="{ link }">
               <span class="group-hover:text-primary relative">{{ link.label }}</span>
-              <div v-if="checkSectionExists(home, link.id)">
+              <div  class="group-hover:text-primary relative" v-if="checkSectionExists(home, link.id)">
                 <p class="text-sm text-green-500">Completed</p>
               </div>
             </template>
-
         </UVerticalNavigation>
       </article>
-
   </div>
   <div v-else class="space-y-4">
       <article class="p-4 bg-white shadow-md rounded-md">

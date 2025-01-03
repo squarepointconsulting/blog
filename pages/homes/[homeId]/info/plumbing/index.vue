@@ -47,16 +47,15 @@ const links = [{
 
         </article>
         <article class="p-4 bg-white shadow-md rounded-md space-y-4">
-            <UVerticalNavigation :links="links">
+          <UVerticalNavigation :links="links">
             <template #default="{ link }">
               <span class="group-hover:text-primary relative">{{ link.label }}</span>
-              <div v-if="checkSectionExists(home, link.id)">
+              <div  class="group-hover:text-primary relative" v-if="checkSectionExists(home, link.id)">
                 <p class="text-sm text-green-500">Completed</p>
               </div>
             </template>
-
         </UVerticalNavigation>
-        </article>
+      </article>
 
     </div>
     <div v-else class="space-y-4">
