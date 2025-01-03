@@ -21,12 +21,8 @@ const saveChanges = async () => {
     try {
         const docRef = doc($db, "properties", homeId);
         await updateDoc(docRef, {
-            info: {
-                protection: {
-                    fireExtinguishers: {
+            "info.protection.fireExtinguishers": {
                         ...pageEdit.value
-                    }
-                }
             }
         }, { merge: true });
         pageSource.value = cloneDeep(pageEdit.value)
@@ -56,14 +52,15 @@ onMounted(() => {
     const docRef = doc($db, "properties", homeId);
     getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
-            pageSource.value = docSnap.data()
-            if (pageSource.value.info && pageSource.value.info.protection && pageSource.value.info.protection.fireExtinguishers) {
-                pageSource.value = pageSource.value.info.protection.fireExtinguishers
+            const property = docSnap.data()
+             console.log(property)
+            if (property.info && property.info.protection && property.info.protection.fireExtinguishers) {
+                pageSource.value = property.info.protection.fireExtinguishers
             }
             else {
-                pageSource.value = {
-                    ...pageTemplate.value
-                }
+            pageSource.value = {
+                ...pageTemplate.value
+            }
             }
         }
         else {
@@ -73,7 +70,7 @@ onMounted(() => {
         }
         pageEdit.value = cloneDeep(pageSource.value)
     }).then(() => {
-        console.log(pageSource.value)
+         console.log(pageSource.value)
     })
 })
 

@@ -26,12 +26,8 @@ const saveChanges = async () => {
     try {
         const docRef = doc($db, "properties", homeId);
         await updateDoc(docRef, {
-            info: {
-                protection: {
-                    homeDevices: {
-                        ...pageEdit.value
-                    }
-                }
+            "info.protection.homeDevices": {
+                ...pageEdit.value
             }
         }, { merge: true });
         pageSource.value = cloneDeep(pageEdit.value)
@@ -43,43 +39,46 @@ const saveChanges = async () => {
         isLoading.value = false
     }
 }
-
 const pageSource = ref()
 const pageEdit = ref()
 const pageTemplate = ref({
     basicInformation: {
-        brand: 'Google',
+        brand: '',
         otherBrand: '',
-        smartSystem: 'Yes',
-        centrallyMonitored: 'Yes',
+        smartSystem: '',
+        centrallyMonitored: '',
     },
     detailedInformation: {
-        numberOfSmartThermostats: 3,
-        numberOfLeakSensors: 0,
-        numberOfOtherSensors: 0,
+        numberOfSmartThermostats: '',
+        numberOfLeakSensors: '',
+        numberOfOtherSensors: '',
     },
 });
+
 
 onMounted(() => {
     const docRef = doc($db, "properties", homeId);
     getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
-            pageSource.value = docSnap.data()
-            if (pageSource.value.info && pageSource.value.info.protection && pageSource.value.info.protection.homeDevices) {
-                pageSource.value =  pageSource.value.info.protection.homeDevices
+            const property = docSnap.data()
+            console.log(property)
+            if (property.info && property.info.protection && property.info.protection.homeDevices) {
+                pageSource.value = property.info.protection.homeDevices
             }
             else {
-                pageSource.value = {
-                    ...pageTemplate.value
-                }
+            pageSource.value = {
+                ...pageTemplate.value
+            }
             }
         }
         else {
             pageSource.value = {
-                    ...pageTemplate.value
-                }
+                ...pageTemplate.value
+            }
         }
         pageEdit.value = cloneDeep(pageSource.value)
+    }).then(() => {
+         console.log(pageSource.value)
     })
 })
 

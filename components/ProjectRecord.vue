@@ -79,7 +79,7 @@ const isOpen = ref(false)
 const uploadedFiles = ref([]);
 const fileInput = ref(null);
 const isAccepted = ref(false);
-const inspectionCondition = ref('Excellent - like new');
+const inspectionCondition = ref('');
 const handleFileUpload = async (event) => {
     const files = Array.from(event.target.files);
     files.forEach((file) => {
@@ -116,7 +116,6 @@ const isVideo = (file) => file.type.startsWith('video/');
 const isUploading = ref(false);
 const localThumbnailUrl = ref(null);
 const thumbnailBlob = ref(null);
-
 
 async function generatePdfThumbnail(file) {
     const pdf = await getDocument(await file.arrayBuffer()).promise;
@@ -177,6 +176,7 @@ const submitForm = async () => {
         // Wait for all file uploads to complete
         const uploadedFileData = await Promise.all(uploadPromises);
         projectRecord.value.attachments = [...projectRecord.value.attachments, ...uploadedFileData];
+        projectRecord.value.inspectionCondition = inspectionCondition
         await setDoc(docRef, {...projectRecord.value}, { merge: true });
 
     } catch (error) {
@@ -193,6 +193,12 @@ const submitForm = async () => {
         isOpen.value = false;
     }
 };
+
+const setInspectionCondition = (option) => {
+    inspectionCondition.value = option;
+    isAccepted.value = true
+}
+
 
 </script>
 
@@ -247,7 +253,7 @@ const submitForm = async () => {
                             :class="[
                                 'flex items-center justify-between p-4 rounded-lg border',
                                 inspectionCondition === option ? 'border-blue-500' : 'border-gray-200'
-                            ]" @click="inspectionCondition = option">
+                            ]" @click="setInspectionCondition(option)">
                             <span class="text-base">{{ option }}</span>
                             <div :class="[
                                 'w-6 h-6 rounded-full border-2 flex items-center justify-center',
