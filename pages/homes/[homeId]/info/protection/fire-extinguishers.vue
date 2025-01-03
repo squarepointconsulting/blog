@@ -1,60 +1,54 @@
 <script setup>
-import { useRoute } from 'vue-router';
+import { useRoute } from 'vue-router'
+import cloneDeep from 'lodash-es/cloneDeep'
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
-
-const route = useRoute();
+const route = useRoute()
 const homeIdRef = useState('homeId')
 const homeId = route.params.homeId;
-homeIdRef.value = homeId;
-
-const { $db } = useNuxtApp();
-const homeSource = ref()
-const router = useRouter();
-const project_type = ref("fire_extinguisher_inspection")
-
+homeIdRef.value = homeId
+const { $db } = useNuxtApp()
+const router = useRouter()
+const editType = ref('basic')
 const isLoading = ref(false)
 const isEditing = ref(false)
-
-const openEditModal = async () => {
-    isLoading.value = true
-    selectedOption.value = homeSource.value.info.protection.fireExtinguishers.basicInformation.fireExtinguishersPerFloor
-    try {
-        //await new Promise(resolve => setTimeout(resolve, 1000))
-        isLoading.value = false
-        isEditing.value = true
-    } catch (error) {
-        console.error('Error loading data:', error)
-        isLoading.value = false
-    }
+const openBasicEditModal = async () => {
+    editType.value = 'basic'
+    isEditing.value = true
 }
 
 const saveChanges = async () => {
     isLoading.value = true
     try {
-        fireExtinguishers.value.basicInformation.fireExtinguishersPerFloor = selectedOption.value
         const docRef = doc($db, "properties", homeId);
         await updateDoc(docRef, {
             info: {
                 protection: {
                     fireExtinguishers: {
-                        ...fireExtinguishers.value
+                        ...pageEdit.value
                     }
                 }
             }
         }, { merge: true });
+        pageSource.value = cloneDeep(pageEdit.value)
         isEditing.value = false
     } catch (error) {
         console.error('Error saving changes:', error)
+        isLoading.value = false
     } finally {
         isLoading.value = false
     }
 }
 
-const selectedOption = ref('')
-
-const fireExtinguishers = ref({
+const pageSource = ref()
+const pageEdit = ref()
+const page_title = ref("Fire Extinguishers")
+const project_type = ref("fire_extinguishers_inspection")
+const pageTemplate = ref({
     basicInformation: {
-        fireExtinguishersPerFloor: 'None',
+        fireExtinguishersPerFloor: '',
+    },
+    detailedInformation: {
+
     },
 });
 
@@ -62,51 +56,57 @@ onMounted(() => {
     const docRef = doc($db, "properties", homeId);
     getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
-            homeSource.value = docSnap.data()
-            if (homeSource.value.info
-                && homeSource.value.info.protection
-                && homeSource.value.info.protection.fireExtinguishers) {
-                fireExtinguishers.value = {
-                    ...homeSource.value.info.protection.fireExtinguishers
-                };
+            pageSource.value = docSnap.data()
+            if (pageSource.value.info && pageSource.value.info.protection && pageSource.value.info.protection.fireExtinguishers) {
+                pageSource.value = pageSource.value.info.protection.fireExtinguishers
             }
             else {
-                fireExtinguishers.value = {
-                    ...fireExtinguishers.value
+                pageSource.value = {
+                    ...pageTemplate.value
                 }
             }
         }
+        else {
+            pageSource.value = {
+                ...pageTemplate.value
+            }
+        }
+        pageEdit.value = cloneDeep(pageSource.value)
+    }).then(() => {
+        console.log(pageSource.value)
     })
 })
 
+const cancelChanges = () => {
+    pageEdit.value = cloneDeep(pageSource.value)
+    isEditing.value = false
+}
 </script>
 
 <template>
-    <div v-if="homeSource" class="space-y-4">
+    <div v-if="pageSource" class="space-y-4">
         <article class="p-4 bg-white shadow-md rounded-md">
             <h2 class="text-lg font-bold flex items-center gap-3">
                 <UButton icon="i-heroicons-arrow-left" variant="soft" color="gray" class="rounded-full h-8 w-8"
                     @click="() => router.back()" />
-                    Fire Extinguishers
+                {{ page_title }}
             </h2>
         </article>
         <article class="p-4 bg-white shadow-md rounded-md">
-            <div class="space-y-3 relative p-4 rounded-lg hover:bg-gray-50 cursor-pointer" @click="openEditModal">
+            <div class="space-y-3 relative p-4 rounded-lg hover:bg-gray-50 cursor-pointer" @click="openBasicEditModal">
                 <UButton icon="i-heroicons-pencil" variant="soft" color="gray"
                     class="rounded-full h-8 w-8 absolute top-2 right-2" />
-                <div>
-                    <h2 class="text-lg font-bold">Basic Information</h2>
-                    <p>Fire extinguishers per floor</p>
+                <div class="space-y-2">
+                    <h2 class="text-lg font-bold">Basic information</h2>
+                    <p class="font-medium">Fire extinguishers per floor</p>
                     <p class="text-gray-500">
-                        {{ fireExtinguishers.basicInformation.fireExtinguishersPerFloor }}
+                        {{ pageSource.basicInformation.fireExtinguishersPerFloor }}
                     </p>
                 </div>
             </div>
         </article>
         <ProjectRecord :homeId="homeId" :projectType="project_type" recordType="inspection_record" />
-
     </div>
-
     <div v-else class="space-y-4">
         <article class="p-4 bg-white shadow-md rounded-md">
             <div class="flex items-center gap-2">
@@ -115,57 +115,46 @@ onMounted(() => {
             </div>
         </article>
     </div>
-
-    <!-- Loading Modal -->
     <UModal v-model="isLoading">
         <div class="p-4 flex items-center justify-center">
             <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
             <span class="ml-2">Loading...</span>
         </div>
     </UModal>
-
-    <!-- Edit Modal -->
-    <UModal v-model="isEditing" :ui="{
-        container: 'flex flex-col h-[90vh] max-w-2xl mx-auto',
-        width: 'sm:max-w-2xl',
-        padding: 'p-0'
-    }">
+    <UModal v-model="isEditing">
         <div class="flex flex-col h-full">
-            <!-- Header -->
             <div class="p-4 border-b">
-                <h3 class="text-lg font-bold">Fire Extinguishers</h3>
-                <h4>Basic Information</h4>
-                <p class="text-sm text-gray-500">Fire extinguishers per floor</p>
-                <p class="">Indicate if you have at least one fire extinguisher per floor in your home.</p>
+                <h3 class="text-lg font-bold">{{ page_title }}</h3>
+                <h4>{{ editType === 'basic' ? 'Basic' : 'Detailed' }} Information</h4>
             </div>
-
-            <!-- Content (scrollable) -->
-            <div class="flex-1 p-4 overflow-y-auto">
+            <div v-if="editType === 'basic'" class="flex-1 p-4 overflow-y-auto space-y-4">
                 <div class="space-y-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
                         Fire extinguishers per floor
                     </label>
+                    <p class="text-sm text-gray-500">Indicate wether you have at least one fire extinguisher on each floor of your home.</p>
+
                     <div class="space-y-3">
                         <div v-for="option in ['All', 'Some', 'None']" :key="option" :class="[
                             'flex items-center justify-between p-4 rounded-lg border',
-                            selectedOption === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="selectedOption = option">
+                            pageEdit.basicInformation.fireExtinguishersPerFloor === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.basicInformation.fireExtinguishersPerFloor = option">
                             <span class="text-base">{{ option }}</span>
                             <div :class="[
                                 'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                selectedOption === option ? 'border-blue-500' : 'border-gray-300'
+                                    pageEdit.basicInformation.fireExtinguishersPerFloor === option ? 'border-blue-500' : 'border-gray-300'
                             ]">
-                                <div v-if="selectedOption === option" class="w-3 h-3 rounded-full bg-blue-500" />
+                                <div v-if="pageEdit.basicInformation.fireExtinguishersPerFloor === option"
+                                    class="w-3 h-3 rounded-full bg-blue-500" />
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Footer -->
+            </div>
             <div class="p-4 border-t mt-auto">
                 <div class="flex justify-end gap-2">
-                    <UButton color="gray" variant="soft" label="Cancel" @click="isEditing = false" />
+                    <UButton color="gray" variant="soft" label="Cancel" @click="cancelChanges" />
                     <UButton color="blue" label="Save" @click="saveChanges" />
                 </div>
             </div>
