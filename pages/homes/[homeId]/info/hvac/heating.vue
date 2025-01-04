@@ -11,6 +11,7 @@ const router = useRouter()
 const editType = ref('basic')
 const isLoading = ref(false)
 const isEditing = ref(false)
+
 const openBasicEditModal = async () => {
     editType.value = 'basic'
     isEditing.value = true
@@ -26,7 +27,7 @@ const saveChanges = async () => {
     try {
         const docRef = doc($db, "properties", homeId);
         await updateDoc(docRef, {
-            "info.protection.homeDevices": {
+            "info.hvac.heating": {
                 ...pageEdit.value
             }
         }, { merge: true });
@@ -39,36 +40,38 @@ const saveChanges = async () => {
         isLoading.value = false
     }
 }
+
 const pageSource = ref()
 const pageEdit = ref()
+const page_title = ref("Heating System")
+const project_type = ref("heating_system_inspection")
 const pageTemplate = ref({
     basicInformation: {
-        brand: '',
-        otherBrand: '',
-        smartSystem: '',
-        centrallyMonitored: '',
+        installationYear: '',
+        systemType: '',
+        fuelType: '',
+        location: '',
     },
     detailedInformation: {
-        numberOfSmartThermostats: '',
-        numberOfLeakSensors: '',
-        numberOfOtherSensors: '',
+        distributionSystemType: '',
+        brand: '',
+        model: '',
+        lastServiceDate: '',
     },
 });
-
 
 onMounted(() => {
     const docRef = doc($db, "properties", homeId);
     getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
             const property = docSnap.data()
-            console.log(property)
-            if (property.info && property.info.protection && property.info.protection.homeDevices) {
-                pageSource.value = property.info.protection.homeDevices
+            if (property.info && property.info.hvac && property.info.hvac.heating) {
+                pageSource.value = property.info.hvac.heating
             }
             else {
-            pageSource.value = {
-                ...pageTemplate.value
-            }
+                pageSource.value = {
+                    ...pageTemplate.value
+                }
             }
         }
         else {
@@ -77,14 +80,13 @@ onMounted(() => {
             }
         }
         pageEdit.value = cloneDeep(pageSource.value)
-    }).then(() => {
-         console.log(pageSource.value)
     })
 })
 
+
 const cancelChanges = () => {
     pageEdit.value = cloneDeep(pageSource.value)
-    isEditing.value = false            
+    isEditing.value = false
 }
 </script>
 
@@ -94,7 +96,7 @@ const cancelChanges = () => {
             <h2 class="text-lg font-bold flex items-center gap-3">
                 <UButton icon="i-heroicons-arrow-left" variant="soft" color="gray" class="rounded-full h-8 w-8"
                     @click="() => router.back()" />
-                    Home Devices
+                {{ page_title }}
             </h2>
         </article>
         <article class="p-4 bg-white shadow-md rounded-md">
@@ -103,42 +105,52 @@ const cancelChanges = () => {
                     class="rounded-full h-8 w-8 absolute top-2 right-2" />
                 <div class="space-y-2">
                     <h2 class="text-lg font-bold">Basic information</h2>
-                    <p class="font-medium">Brand</p>
+                    <p class="font-medium">Installation year</p>
                     <p class="text-gray-500">
-                        {{ pageSource.basicInformation.brand }}
+                        {{ pageSource.basicInformation.installationYear }}
                     </p>
-                    <p class="font-medium">Smart system</p>
+                    <p class="font-medium">System type</p>
                     <p class="text-gray-500">
-                        {{ pageSource.basicInformation.smartSystem }}
+                        {{ pageSource.basicInformation.systemType }}
                     </p>
-                    <p class="font-medium">Centrally monitored</p>
+                    <p class="font-medium">Fuel type</p>
                     <p class="text-gray-500">
-                        {{ pageSource.basicInformation.centrallyMonitored }}
+                        {{ pageSource.basicInformation.fuelType }}
+                    </p>
+                    <p class="font-medium">Location</p>
+                    <p class="text-gray-500">
+                        {{ pageSource.basicInformation.location }}
                     </p>
                 </div>
             </div>
         </article>
         <article class="p-4 bg-white shadow-md rounded-md">
-            <div class="space-y-3 relative p-4 rounded-lg hover:bg-gray-50 cursor-pointer" @click="openDetailedEditModal">
+            <div class="space-y-3 relative p-4 rounded-lg hover:bg-gray-50 cursor-pointer"
+                @click="openDetailedEditModal">
                 <UButton icon="i-heroicons-pencil" variant="soft" color="gray"
                     class="rounded-full h-8 w-8 absolute top-2 right-2" />
                 <div class="space-y-2">
                     <h2 class="text-lg font-bold">Detailed information</h2>
-                    <p class="font-medium">Number of smart thermostats</p>
+                    <p class="font-medium">Distribution system type</p>
                     <p class="text-gray-500">
-                        {{ pageSource.detailedInformation.numberOfSmartThermostats }}
+                        {{ pageSource.detailedInformation.distributionSystemType }}
                     </p>
-                    <p class="font-medium">Number of leak sensors</p>
+                    <p class="font-medium">Brand</p>
                     <p class="text-gray-500">
-                        {{ pageSource.detailedInformation.numberOfLeakSensors }}
+                        {{ pageSource.detailedInformation.brand }}
                     </p>
-                    <p class="font-medium">Number of other sensors</p>
+                    <p class="font-medium">Model</p>
                     <p class="text-gray-500">
-                        {{ pageSource.detailedInformation.numberOfOtherSensors }}
+                        {{ pageSource.detailedInformation.model }}
+                    </p>
+                    <p class="font-medium">Last service date</p>
+                    <p class="text-gray-500">
+                        {{ pageSource.detailedInformation.lastServiceDate }}
                     </p>
                 </div>
             </div>
         </article>
+        <ProjectRecord :homeId="homeId" :projectType="project_type" recordType="inspection_record" />
     </div>
     <div v-else class="space-y-4">
         <article class="p-4 bg-white shadow-md rounded-md">
@@ -154,119 +166,120 @@ const cancelChanges = () => {
             <span class="ml-2">Loading...</span>
         </div>
     </UModal>
-    <UModal v-model="isEditing" >
+    <UModal v-model="isEditing">
         <div class="flex flex-col h-full">
-            <!-- Header -->
             <div class="p-4 border-b">
                 <h3 class="text-lg font-bold">Home Devices</h3>
                 <h4>{{ editType === 'basic' ? 'Basic' : 'Detailed' }} Information</h4>
             </div>
-
-            <!-- Content (scrollable) -->
             <div v-if="editType === 'basic'" class="flex-1 p-4 overflow-y-auto space-y-4">
                 <div class="space-y-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Brand
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Installation year
                     </label>
-                    <div class="space-y-3">
-                        <div v-for="option in ['Google', 'Ring', 'Notion', 'Mixed', 'Other']" :key="option" :class="[
-                            'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.basicInformation.brand === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.basicInformation.brand = option">
-                            <span class="text-base">{{ option }}</span>
-                            <div :class="[
-                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.basicInformation.brand === option ? 'border-blue-500' : 'border-gray-300'
-                            ]">
-                                <div v-if="pageEdit.basicInformation.brand === option" class="w-3 h-3 rounded-full bg-blue-500" />
-                            </div>
-                        </div>
-                        <div v-if="pageEdit.basicInformation.brand === 'Other'" class="mt-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Other brand
-                            </label>
-                            <input 
-                                type="text" 
-                                v-model="pageEdit.basicInformation.otherBrand"
-                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Enter brand name"
-                            />
-                        </div>
-                    </div>
-
+                    <select v-model="pageEdit.basicInformation.installationYear"
+                        class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select year</option>
+                        <option v-for="year in Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i)"
+                            :key="year" :value="year">
+                            {{ year }}
+                        </option>
+                    </select>
                 </div>
                 <div class="space-y-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Smart System
+                        System type
                     </label>
                     <div class="space-y-3">
-                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
+                        <div v-for="option in ['Furnace', 'Heat Pump', 'Boiler']" :key="option" :class="[
                             'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.basicInformation.smartSystem === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.basicInformation.smartSystem = option">
+                            pageEdit.basicInformation.systemType === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.basicInformation.systemType = option">
                             <span class="text-base">{{ option }}</span>
                             <div :class="[
                                 'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.basicInformation.smartSystem === option ? 'border-blue-500' : 'border-gray-300'
+                                pageEdit.basicInformation.systemType === option ? 'border-blue-500' : 'border-gray-300'
                             ]">
-                                <div v-if="pageEdit.basicInformation.smartSystem === option" class="w-3 h-3 rounded-full bg-blue-500" />
+                                <div v-if="pageEdit.basicInformation.systemType === option"
+                                    class="w-3 h-3 rounded-full bg-blue-500" />
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="space-y-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Centrally Monitored
+                        Fuel type
                     </label>
                     <div class="space-y-3">
-                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
+                        <div v-for="option in ['Electric', 'Gas', 'Oil', 'Propane', 'Solar']" :key="option" :class="[
                             'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.basicInformation.centrallyMonitored === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.basicInformation.centrallyMonitored = option">
+                            pageEdit.basicInformation.fuelType === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.basicInformation.fuelType = option">
                             <span class="text-base">{{ option }}</span>
                             <div :class="[
                                 'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.basicInformation.centrallyMonitored === option ? 'border-blue-500' : 'border-gray-300'
+                                pageEdit.basicInformation.fuelType === option ? 'border-blue-500' : 'border-gray-300'
                             ]">
-                                <div v-if="pageEdit.basicInformation.centrallyMonitored === option" class="w-3 h-3 rounded-full bg-blue-500" />
+                                <div v-if="pageEdit.basicInformation.fuelType === option"
+                                    class="w-3 h-3 rounded-full bg-blue-500" />
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Location
+                    </label>
+                    <select v-model="pageEdit.basicInformation.location"
+                        class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select location</option>
+                        <option
+                            v-for="option in ['Garage', 'Basement', 'Exterior', 'First Floor', 'Second Floor', 'Attic', 'FRoof', 'Other']"
+                            :key="option" :value="option">
+                            {{ option }}
+                        </option>
+                    </select>
                 </div>
 
             </div>
             <div v-else class="flex-1 p-4 overflow-y-auto space-y-4">
                 <div class="space-y-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Number of smart thermostats
+                        Location
                     </label>
-                    <input 
-                                type="number" 
-                                v-model="pageEdit.detailedInformation.numberOfSmartThermostats"
-                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Number of smart thermostats"
-                            />
+                    <select v-model="pageEdit.detailedInformation.distributionSystemType"
+                        class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select distribution system type</option>
+                        <option
+                            v-for="option in ['Forced Air', 'Ductless', 'Baseboard', 'Steam', 'Radiant', 'Other']"
+                            :key="option" :value="option">
+                            {{ option }}
+                        </option>
+                    </select>
                 </div>
                 <div class="space-y-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Number of smart thermostats
+                        Brand
                     </label>
-                    <input 
-                                type="number" 
-                                v-model="pageEdit.detailedInformation.numberOfLeakSensors"
-                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Number of smart thermostats"
-                            />
+                    <select v-model="pageEdit.detailedInformation.brand"
+                        class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select brand</option>
+                        <option
+                            v-for="option in ['American Standard', 'Arctic Air', 'Amana', 'Bryant', 'Carrier', 'Daikin', 'Frigidaire', 'Lennox', 'Mitsubishi', 'Other', 'Panasonic', 'Rheem', 'Trane', 'Whirlpool', 'York']"
+                            :key="option" :value="option">
+                            {{ option }}
+                        </option>
+                    </select>
                 </div>
                 <div class="space-y-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Number of smart thermostats
+                        Last serviced
                     </label>
                     <input 
-                                type="number" 
-                                v-model="pageEdit.detailedInformation.numberOfOtherSensors"
+                                type="date" 
+                                v-model="pageEdit.detailedInformation.lastServiceDate"
                                 class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Number of smart thermostats"
+                                    placeholder="Date heating system was last serviced"
                             />
                 </div>
             </div>
