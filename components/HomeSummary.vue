@@ -148,13 +148,12 @@ const handleFileUpload = (event) => {
 
             <!-- Edit Button -->
             <div class="relative top-2 right-2">
-                <UButton @click="isEditing = true" icon="i-heroicons-pencil-square" class="focus:outline-none">
+                <UButton @click="isEditing = true" icon="i-heroicons-pencil-square" class="focus:outline-none" v-if="false">
                 </UButton>
             </div>
 
         </div>
     </article>
-    <transition name="fade">
         <article v-if="homeSource && isEditing" class="p-4 bg-white shadow-md rounded-md relative">
             <div class="flex flex-col space-y-2">
                 <UInput v-model="homeSource.address.street1" type="text" placeholder="Street 1"
@@ -187,7 +186,7 @@ const handleFileUpload = (event) => {
             <!-- Hidden File Input -->
             <input ref="fileInput" type="file" class="hidden" @change="handleFileChange" />
         </article>
-    </transition>
+
     <article v-if="!homeSource" class="p-4 bg-white shadow-md rounded-md">
 
         <div class="flex items-center space-x-4">
