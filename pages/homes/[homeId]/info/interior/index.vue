@@ -43,7 +43,7 @@ const links = [{
   id: 'info.interior.mainStructureDoors'
 },{
   label: 'Windows',
-  icon: 'i-mdi-home',
+  icon: 'i-mdi-window-closed',
   to: 'interior/windows',
   id: 'info.interior.windows'
 },{
