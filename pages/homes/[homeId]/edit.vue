@@ -22,36 +22,37 @@ const links = [{
 
 const sectionLinks = [{
   label: 'Home Information',
-  icon: 'i-heroicons-chart-bar',
+  icon: 'i-mdi-lightbulb-question-outline',
   to: './info/home-info'
 }, {
   label: 'Protection',
-  icon: 'i-heroicons-home',
+  icon: 'i-mdi-shield-account-variant-outline',
   to: './info/protection'
 }, {
   label: 'Exterior',
-  icon: 'i-mdi-home',
+  icon: 'i-mdi-home-outline',
   to: './info/exterior'
 },
 {
   label: 'Interior',
-  icon: 'i-mdi-sofa',
+  icon: 'i-mdi-sofa-outline',
   to: './info/interior'
 }, {
   label: 'Appliances',
-  icon:  'i-mdi-fridge',
+  icon:  'i-mdi-fridge-outline',
   to: './info/appliances'
 },
 {
   label: 'Plumbing',
-  icon: 'i-heroicons-home',
+  icon: 'i-mdi-pipe-disconnected',
   to: './info/plumbing'
 },
 {
   label: 'HVAC',
-  icon: 'i-heroicons-home',
+  icon: 'i-mdi-hvac',
   to: './info/hvac'
 },
+
 ]
 
 </script>

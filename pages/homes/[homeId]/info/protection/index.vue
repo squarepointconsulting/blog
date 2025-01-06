@@ -17,7 +17,7 @@ const router = useRouter();
 
 const links = [{
   label: 'Fire Extinguishers',
-  icon: 'i-heroicons-home',
+  icon: 'i-mdi-fire-extinguisher',
   to: 'protection/fire-extinguishers',
   id: 'info.protection.fireExtinguishers'
 }, {
@@ -27,18 +27,18 @@ const links = [{
   id: 'info.protection.homeDevices'
 }, {
   label: 'Smoke And Carbon Monoxide Detectors',
-  icon: 'i-mdi-home',
+  icon: 'i-mdi-fire-circle',
   to: 'protection/home-detectors',
   id: 'info.protection.homeDetectors'
 },
 {
   label: 'Home Security',
-  icon: 'i-mdi-home',
+  icon: 'i-mdi-home-clock-outline',
   to: 'protection/home-security',
   id: 'info.protection.homeSecurity'
 },{
   label: 'Fire Sprinklers',
-  icon: 'i-mdi-home',
+  icon: 'i-mdi-fire-off',
   to: 'protection/home-fire-sprinklers',
   id: 'info.protection.fireSprinklers'
 }
