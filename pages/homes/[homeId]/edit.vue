@@ -52,11 +52,6 @@ const sectionLinks = [{
   icon: 'i-heroicons-home',
   to: './info/hvac'
 },
-{
-  label: 'Electrical',
-  icon: 'i-heroicons-home',
-  to: './info/electrical'
-},
 ]
 
 </script>
