@@ -6,7 +6,6 @@ import { collection, addDoc, query, orderBy, where, getDoc, doc, updateDoc, dele
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 const { $db, $storage } = useNuxtApp();
 
-
 const home = ref()
 const props = defineProps({
   homeId: {
@@ -16,6 +15,11 @@ const props = defineProps({
   projectType: {
     type: String,
     required: true,
+  },
+  recordType: {
+    type: String,
+    required: false,
+    default: 'project_record',
   },
 
 });
@@ -45,8 +49,8 @@ const projectRecord = ref({
 const tasksRef = collection($db, 'properties', props.homeId, 'project_records');
 const tasksQuery = query(
   tasksRef,
-  where('type', '==', props.projectType), // Filter for gutter_cleaning type
-  orderBy('timestamp', 'desc') // Order by timestamp in descending order
+  where('type', '==', props.projectType), 
+  orderBy('timestamp', 'desc') 
 );
 const tasks = useCollection(tasksQuery);
 
@@ -75,7 +79,7 @@ const isOpen = ref(false)
 const uploadedFiles = ref([]);
 const fileInput = ref(null);
 const isAccepted = ref(false);
-
+const inspectionCondition = ref('');
 const handleFileUpload = async (event) => {
     const files = Array.from(event.target.files);
     files.forEach((file) => {
@@ -112,7 +116,6 @@ const isVideo = (file) => file.type.startsWith('video/');
 const isUploading = ref(false);
 const localThumbnailUrl = ref(null);
 const thumbnailBlob = ref(null);
-
 
 async function generatePdfThumbnail(file) {
     const pdf = await getDocument(await file.arrayBuffer()).promise;
@@ -173,6 +176,7 @@ const submitForm = async () => {
         // Wait for all file uploads to complete
         const uploadedFileData = await Promise.all(uploadPromises);
         projectRecord.value.attachments = [...projectRecord.value.attachments, ...uploadedFileData];
+        projectRecord.value.inspectionCondition = inspectionCondition
         await setDoc(docRef, {...projectRecord.value}, { merge: true });
 
     } catch (error) {
@@ -190,6 +194,12 @@ const submitForm = async () => {
     }
 };
 
+const setInspectionCondition = (option) => {
+    inspectionCondition.value = option;
+    isAccepted.value = true
+}
+
+
 </script>
 
 <template>
@@ -197,7 +207,7 @@ const submitForm = async () => {
         <section>
             <div class="md:col-span-2 mt-4">
                 <button @click="isOpen = true" type="submit" class="bg-blue-500 text-white rounded p-2 w-full">
-                    Log Project
+                     {{ recordType === 'project_record' ? 'Log Project' : 'Complete Inspection' }}
                 </button>
             </div>
         </section>
@@ -214,7 +224,7 @@ const submitForm = async () => {
                     }) }}
                 </template>
                 <template #type-data="{ row }">
-                    <NuxtLink :to="`./${row.id}`"
+                    <NuxtLink :to="{ name: 'homes-homeId-projects-projectId', params: {homeId: props.homeId, projectId: row.id }}"
                         class="text-blue-600 hover:text-blue-800 hover:underline">
                         {{ snakeToNormalText(row.type) }}
                     </NuxtLink>
@@ -226,12 +236,35 @@ const submitForm = async () => {
         <form @submit.prevent="submitForm" class="max-w-4xl mx-auto px-4">
             <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
                 <template #header>
-                    <article>
+                    <article v-if="recordType === 'project_record'">
                         <div>
                             <UCheckbox v-model="isAccepted" label="Complete"
                                 help="I certify I have completed the task according to the instructions provided.">
                             </UCheckbox>
                         </div>
+                    </article>
+                    <article v-else>
+                        <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Inspection condition
+                    </label>
+                    <div class="space-y-3">
+                        <div v-for="option in ['Excellent - like new', 'Good - no issues', 'Fair - minor wear and tear', 'Poor - major issues', 'Very Poor - not functional']" :key="option"
+                            :class="[
+                                'flex items-center justify-between p-4 rounded-lg border',
+                                inspectionCondition === option ? 'border-blue-500' : 'border-gray-200'
+                            ]" @click="setInspectionCondition(option)">
+                            <span class="text-base">{{ option }}</span>
+                            <div :class="[
+                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
+                                inspectionCondition === option ? 'border-blue-500' : 'border-gray-300'
+                            ]">
+                                <div v-if="inspectionCondition === option"
+                                    class="w-3 h-3 rounded-full bg-blue-500" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
                     </article>
                 </template>
 

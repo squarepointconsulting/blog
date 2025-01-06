@@ -145,29 +145,15 @@ const handleFileUpload = (event) => {
                     <input type="file" accept="image/*" @change="handleFileUpload" hidden ref="fileInput" />
                 </div>
             </div>
-            <!-- Inner Div 2 -->
-            <div class="flex-1 flex flex-col justify-center items-center">
-                <!-- Row 1 -->
-                <div class="w-full flex justify-center items-center">
-                    <div class="chart-container">
-                        <GaugeChart :villaFactScore="Math.round(homeSource.villaFactScore)" />
-                    </div>
-                </div>
-                <!-- Row 2 -->
-                <div class="w-full flex justify-center items-center">
-                    <p class="font-bold text-center">{{ Math.round(homeSource.villaFactScore ? homeSource.villaFactScore :
-                        homeSource.villafactScore) }}</p>
-                </div>
-            </div>
+
             <!-- Edit Button -->
             <div class="relative top-2 right-2">
-                <UButton @click="isEditing = true" icon="i-heroicons-pencil-square" class="focus:outline-none">
+                <UButton @click="isEditing = true" icon="i-heroicons-pencil-square" class="focus:outline-none" v-if="false">
                 </UButton>
             </div>
 
         </div>
     </article>
-    <transition name="fade">
         <article v-if="homeSource && isEditing" class="p-4 bg-white shadow-md rounded-md relative">
             <div class="flex flex-col space-y-2">
                 <UInput v-model="homeSource.address.street1" type="text" placeholder="Street 1"
@@ -200,7 +186,7 @@ const handleFileUpload = (event) => {
             <!-- Hidden File Input -->
             <input ref="fileInput" type="file" class="hidden" @change="handleFileChange" />
         </article>
-    </transition>
+
     <article v-if="!homeSource" class="p-4 bg-white shadow-md rounded-md">
 
         <div class="flex items-center space-x-4">

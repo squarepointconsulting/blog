@@ -63,7 +63,7 @@ export default defineNuxtConfig({
   },
   vite: {
     optimizeDeps: {
-      include: ['pdfjs-dist']
+      include: ['pdfjs-dist', 'lodash-es']
     },
     build: {
       commonjsOptions: {
@@ -105,5 +105,9 @@ export default defineNuxtConfig({
     public: {
       authDomain: process.env.NUXT_PUBLIC_AUTH_DOMAIN
     }
+  },
+  ui: {
+    primary: 'blue',
+    gray: 'cool'
   }
 })

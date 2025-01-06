@@ -67,6 +67,14 @@ function navigateToHome() {
   }
 }
 
+const sharedState = useSharedState()
+
+// Access the shared state
+const homeId = computed(() => sharedState.value.homeId)
+const address1 = computed(() => sharedState.value.address1)
+
+
+
 
 </script>
 

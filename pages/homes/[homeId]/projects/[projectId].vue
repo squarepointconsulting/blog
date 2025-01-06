@@ -135,75 +135,83 @@ const deleteProject = async () => {
 </script>
 
 <template>
-  <div v-if="project" class="max-w-4xl mx-auto p-4">
-    <form @submit.prevent="submitForm" class="max-w-4xl mx-auto px-4">
+  <div v-if="project" class="space-y-4">
+    <article class="p-4 bg-white shadow-md rounded-md">
 
-    <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <h2 class="text-lg font-bold flex items-center gap-3">
+        <UButton icon="i-heroicons-arrow-left" variant="soft" color="gray" class="rounded-full h-8 w-8"
+          @click="() => router.back()" />
+        {{ project.type }}
+      </h2>
 
-        <div class="md:col-span-2">
-          <p class="font-bold">{{ project.type }}</p>
+    </article>
 
+    <article class="p-4 bg-white shadow-md rounded-md">
+      <form @submit.prevent="submitForm" class="max-w-4xl mx-auto px-4">
+
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- User Display Name -->
+            <div class="flex flex-col">
+              <label class="text-sm font-medium text-gray-600 mb-1">
+                Created By
+              </label>
+              <p class="text-gray-900">
+                {{ project.completedByUserDisplayName || 'Unknown User' }}
+              </p>
+            </div>
+
+            <!-- Timestamp -->
+            <div class="flex flex-col">
+              <label class="text-sm font-medium text-gray-600 mb-1">
+                Created On
+              </label>
+              <p class="text-gray-900">
+                {{ project.timestamp?.toDate().toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                hour12: true
+                }) }}
+              </p>
+            </div>
+
+            <!-- Notes -->
+            <div class="md:col-span-2">
+              <label for="notes" class="block text-sm font-medium text-gray-600 mb-1">
+                Notes
+              </label>
+              <textarea id="notes" v-model="project.notes" rows="4"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="Add project notes here..."></textarea>
+            </div>
+
+            <div class="flex flex-col md:col-span-2">
+              <CommonAttachments ref="attachmentsRef" :attachments="project.attachments" @fileDeleted="deleteFile" />
+            </div>
+
+            <div class="md:col-span-2 mt-4 flex justify-between">
+              <button type="submit"
+                class="bg-blue-500 text-white rounded p-3 w-1/2 hover:bg-blue-600 transition duration-200">
+                Submit
+              </button>
+              <button @click="confirmDeleteProject"
+                class="bg-red-500 text-white rounded p-3 w-1/2 ml-4 hover:bg-red-600 transition duration-200">
+                Delete Project
+              </button>
+            </div>
+            
+          </div>
         </div>
-
-        <!-- User Display Name -->
-        <div class="flex flex-col">
-          <label class="text-sm font-medium text-gray-600 mb-1">
-            Created By
-          </label>
-          <p class="text-gray-900">
-            {{ project.completedByUserDisplayName || 'Unknown User' }}
-          </p>
-        </div>
-
-        <!-- Timestamp -->
-        <div class="flex flex-col">
-          <label class="text-sm font-medium text-gray-600 mb-1">
-            Created On
-          </label>
-          <p class="text-gray-900">
-            {{ project.timestamp?.toDate().toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              hour: 'numeric',
-              minute: 'numeric',
-              hour12: true
-            }) }}
-          </p>
-        </div>
-
-        <!-- Notes -->
-        <div class="md:col-span-2">
-          <label for="notes" class="block text-sm font-medium text-gray-600 mb-1">
-            Notes
-          </label>
-          <textarea id="notes" v-model="project.notes" rows="4"
-            class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Add project notes here..."></textarea>
-        </div>
-        <div class="flex flex-col md:col-span-2">
-          <CommonAttachments ref="attachmentsRef" :attachments="project.attachments" @fileDeleted="deleteFile" />
-        </div>
-        <div class="md:col-span-2 mt-4 flex justify-between">
-          <button type="submit"
-            class="bg-blue-500 text-white rounded p-3 w-1/2 hover:bg-blue-600 transition duration-200">
-            Submit
-          </button>
-          <button @click="confirmDeleteProject"
-            class="bg-red-500 text-white rounded p-3 w-1/2 ml-4 hover:bg-red-600 transition duration-200">
-            Delete Project
-          </button>
-        </div>
-      </div>
-    </div>
-  </form>
-
+      </form>
+    </article>
     <UModal v-model="isUploading">
       <div class="p-4 flex flex-col items-center">
         <p>Uploading files, please wait...</p>
       </div>
     </UModal>
   </div>
-
 </template>
