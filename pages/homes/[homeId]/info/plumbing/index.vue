@@ -17,17 +17,17 @@ const router = useRouter();
 
 const links = [{
   label: 'Pipes',
-  icon: 'i-heroicons-home',
+  icon: 'i-mdi-pipe-disconnected',
   to: 'plumbing/pipes',
   id: 'info.plumbing.pipes'
 }, {
   label: 'Water Heater',
-  icon: 'i-heroicons-home',
+  icon: 'i-mdi-water-boiler',
   to: 'plumbing/water-heater',
   id: 'info.plumbing.waterHeater'
 }, {
   label: 'Plumbing Fixtures',
-  icon: 'i-mdi-home',
+  icon: 'i-mdi-faucet-variant',
   to: 'plumbing/plumbing-fixtures',
   id: 'info.plumbing.fixtures'
 },

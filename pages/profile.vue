@@ -26,8 +26,9 @@ const newHome = ref({
 
 // Add a new document with a generated id.
 async function addNewHome() {
-  newHome.value.ownerId = user.value.uid
-  const newHomeRef = await addDoc(collection(db, "properties"), newHome.value);
+  router.push('/homes/new')
+  //newHome.value.ownerId = user.value.uid
+  //const newHomeRef = await addDoc(collection(db, "properties"), newHome.value);
 }
 
 

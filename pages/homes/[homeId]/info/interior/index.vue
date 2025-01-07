@@ -17,28 +17,28 @@ const router = useRouter();
 
 const links = [{
   label: 'Caulk and Grout',
-  icon: 'i-heroicons-home',
+  icon: 'i-mdi-bathtub-outline',
   to: 'interior/caulk-and-grout',
   id: 'info.interior.caulkAndGrout'
 }, {
   label: 'Flooring',
-  icon: 'i-heroicons-home',
+  icon: 'i-mdi-floor-plan',
   to: 'interior/flooring',
   id: 'info.interior.flooring'
 }, {
   label: 'Garage',
-  icon: 'i-mdi-home',
+  icon: 'i-mdi-car-outline',
   to: 'interior/garage',
   id: 'info.interior.garage'
 },
 {
   label: 'Interior Walls',
-  icon: 'i-mdi-home',
+  icon: 'i-mdi-wall',
   to: 'interior/interior-walls',
   id: 'info.interior.interiorWalls'
 },{
   label: 'Main Structure Doors',
-  icon: 'i-mdi-home',
+  icon: 'i-mdi-door',
   to: 'interior/main-structure-doors',
   id: 'info.interior.mainStructureDoors'
 },{
@@ -48,7 +48,7 @@ const links = [{
   id: 'info.interior.windows'
 },{
   label: 'Fireplace',
-  icon: 'i-mdi-home',
+  icon: 'i-mdi-fireplace',
   to: 'interior/fireplace',
   id: 'info.interior.fireplace'
 }
