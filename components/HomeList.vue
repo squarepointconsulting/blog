@@ -42,7 +42,6 @@ async function deleteHome(homeId) {
     if (confirm('Are you sure you want to delete this home?') == true) {
         await deleteAllFiles(`properties/${homeId}`)
         await deleteDoc(doc($db, "properties", homeId))
-        router.push('/profile');
     }
 }
 

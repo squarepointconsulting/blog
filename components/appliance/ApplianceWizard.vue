@@ -507,7 +507,8 @@ const createAppliance = async () => {
   } finally {
     isProcessing.value = false;
     isUploading.value = false;
-        emit('complete');
+    emit('complete');
+    router.push(`/homes/${homeId}/appliances/`);
   }
 };
 

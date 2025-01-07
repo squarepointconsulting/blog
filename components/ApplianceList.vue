@@ -40,7 +40,7 @@ async function addAppliance() {
   console.log(applianceRecord)
   const docRef = await addDoc(collection($db, "properties", homeId, "appliances"), applianceRecord);
   console.log("Document written with ID: ", docRef.id);
-  // router.push(`./appliances/${docRef.id`); // Adjust the path as necessary
+  router.push(`/homes/${homeId}/appliances/`);
 
 }
 
@@ -50,7 +50,7 @@ async function addAppliance() {
 
   <div class="space-y-4">
 
-    <UButton @click="showWizard = true" class="bg-blue-500 text-white hover:bg-blue-600">
+    <UButton @click="router.push(`/homes/${homeId}/appliances/new`)" class="bg-blue-500 text-white hover:bg-blue-600">
       Add New Appliance
     </UButton>
   </div>
