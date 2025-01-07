@@ -41,7 +41,6 @@ async function addAppliance() {
   const docRef = await addDoc(collection($db, "properties", homeId, "appliances"), applianceRecord);
   console.log("Document written with ID: ", docRef.id);
   router.push(`/homes/${homeId}/appliances/`);
-
 }
 
 </script>
@@ -59,7 +58,7 @@ async function addAppliance() {
 
 
     <article class="p-4 bg-gray-100 shadow-md rounded-md" v-for="appliance in appliances" :key="appliance.id">
-      <NuxtLink :to="`../appliances/${appliance.id}`"
+      <NuxtLink :to="`/homes/${homeId}/appliances/${appliance.id}`"
       class="text-blue-600 hover:text-blue-800 text-sm mt-1"> 
       <div class="flex items-center space-x-4">
        
