@@ -31,7 +31,6 @@ async function addNewHome() {
   //const newHomeRef = await addDoc(collection(db, "properties"), newHome.value);
 }
 
-
 function handleSignOut() {
   signOut(auth)
     .then(() => router.replace('/'))

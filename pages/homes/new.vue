@@ -37,7 +37,6 @@
 
 </template>
 
-
 <script setup>
 import { collection, addDoc } from 'firebase/firestore';
 const { $db } = useNuxtApp();
@@ -67,8 +66,7 @@ async function addNewHome() {
   editHome.value.ownerId = user.value.uid
   const newHomeRef = await addDoc(collection($db, "properties"), editHome.value);
   console.log("Document written with ID: ", newHomeRef.id);
-  router.push('/profile')
-
+  router.push({ name: 'homes-homeId', params: {homeId: newHomeRef.id }})
 }
 </script>
 
