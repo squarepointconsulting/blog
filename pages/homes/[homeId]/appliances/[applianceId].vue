@@ -254,6 +254,13 @@ const handleFileUpload = (event) => {
 </script>
 
 <template>
+          <article class="p-4 bg-white shadow-md rounded-md">
+            <h2 class="text-lg font-bold flex items-center gap-3">
+                <UButton icon="i-heroicons-arrow-left" variant="soft" color="gray" class="rounded-full h-8 w-8"
+                    @click="() => router.back()" />
+                Appliances
+            </h2>
+        </article>
   <article v-if="appliance" class="p-4 bg-white shadow-md rounded-md">
       <div class="flex w-full">
         <!-- Inner Div 1 -->
