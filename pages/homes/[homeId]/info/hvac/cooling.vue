@@ -164,7 +164,7 @@ const cancelChanges = () => {
     <UModal v-model="isEditing">
         <div class="flex flex-col h-full">
             <div class="p-4 border-b">
-                <h3 class="text-lg font-bold">Home Devices</h3>
+                <h3 class="text-lg font-bold">{{ page_title }}</h3>
                 <h4>{{ editType === 'basic' ? 'Basic' : 'Detailed' }} Information</h4>
             </div>
             <div v-if="editType === 'basic'" class="flex-1 p-4 overflow-y-auto space-y-4">
