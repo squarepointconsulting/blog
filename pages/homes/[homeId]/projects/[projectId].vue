@@ -101,7 +101,6 @@ const deleteProject = async () => {
         try { await deleteObject(fileRef); }
         catch (error) {
           console.log('Error deleting file:', error);
-          //alert("An error occurred while deleting the project.");
         }
 
         // If it's a PDF, also delete the thumbnail
@@ -111,7 +110,6 @@ const deleteProject = async () => {
           try { await deleteObject(thumbnailRef); }
           catch (error) {
             console.log('Error deleting file:', error);
-            //alert("An error occurred while deleting the project.");
           }
         }
       }

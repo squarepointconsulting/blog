@@ -1,0 +1,72 @@
+<template>
+    <div class="space-y-4">
+        <article class="p-4 bg-white shadow-md rounded-md">
+            <h2 class="text-lg font-bold flex items-center gap-3">
+                <UButton icon="i-heroicons-arrow-left" variant="soft" color="gray" class="rounded-full h-8 w-8"
+                    @click="() => router.back()" />
+                New Home
+            </h2>
+        </article>
+        <article v-if="editHome" class="p-4 bg-white shadow-md rounded-md relative">
+            <div class="flex flex-col space-y-2">
+                <UInput v-model="editHome.address.street1" type="text" placeholder="Street 1"
+                    class="p-2 border-gray-300 rounded-md" />
+                <UInput v-model="editHome.address.street2" type="text" placeholder="Street 2"
+                    class="p-2  border-gray-300 rounded-md" />
+                <UInput v-model="editHome.address.city" type="text" placeholder="City"
+                    class="p-2 border-gray-300 rounded-md" />
+                <UInput v-model="editHome.address.state" type="text" placeholder="State"
+                    class="p-2 border-gray-300 rounded-md" />
+                <UInput v-model="editHome.address.zip" type="text" placeholder="Zip Code"
+                    class="p-2 border-gray-300 rounded-md" />
+            </div>
+            <div class="p-4 border-t mt-auto">
+                <div class="flex justify-end gap-2">
+                    <UButton color="gray" variant="soft" label="Cancel" @click="() => router.back()" />
+                    <UButton color="blue" label="Save" @click="addNewHome" />
+                </div>
+            </div>
+        </article>        
+    </div>
+    <UModal v-model="isLoading">
+        <div class="p-4 flex items-center justify-center">
+            <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
+            <span class="ml-2">Loading...</span>
+        </div>
+    </UModal>
+
+</template>
+
+<script setup>
+import { collection, addDoc } from 'firebase/firestore';
+const { $db } = useNuxtApp();
+
+const isLoading = ref(false)
+const router = useRouter()
+const user = useCurrentUser()
+
+const editHome = ref({
+    address: {
+        city: "",
+        state: "",
+        street1: "",
+        street2: "",
+        zip: "",
+    },
+    currentAppraisedValue: 0,
+    geoip: "",
+    villaFactScore: 500,
+    imageUrl: "/images/home-placeholder.png",
+    ownerId: "",
+    updated_at: null,
+    project_records: [],
+})
+
+async function addNewHome() {
+  editHome.value.ownerId = user.value.uid
+  const newHomeRef = await addDoc(collection($db, "properties"), editHome.value);
+  console.log("Document written with ID: ", newHomeRef.id);
+  router.push({ name: 'homes-homeId', params: {homeId: newHomeRef.id }})
+}
+</script>
+

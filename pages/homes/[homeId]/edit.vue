@@ -40,7 +40,7 @@ const sectionLinks = [{
 }, {
   label: 'Appliances',
   icon:  'i-mdi-fridge-outline',
-  to: './info/appliances'
+  to: './appliances'
 },
 {
   label: 'Plumbing',

@@ -17,22 +17,22 @@ const router = useRouter();
 
 const links = [{
   label: 'Heating System',
-  icon: 'i-heroicons-home',
+  icon: 'i-mdi-heater',
   to: 'hvac/heating',
   id: 'info.hvac.heating'
 }, {
   label: 'Cooling System',
-  icon: 'i-heroicons-home',
+  icon: 'i-mdi-air-conditioner',
   to: 'hvac/cooling',
   id: 'info.hvac.cooling'
 }, {
   label: 'Air Ducts',
-  icon: 'i-mdi-home',
+  icon: 'i-mdi-distribute-vertical-center',
   to: 'hvac/air-ducts',
   id: 'info.hvac.airDucts'
 }, {
   label: 'Air Filter',
-  icon: 'i-mdi-home',
+  icon: 'i-mdi-air-filter',
   to: 'hvac/air-filter',
   id: 'info.hvac.airFilter'
 },

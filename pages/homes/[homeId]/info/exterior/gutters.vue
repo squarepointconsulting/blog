@@ -16,17 +16,12 @@ const openBasicEditModal = async () => {
     isEditing.value = true
 }
 
-const openDetailedEditModal = async () => {
-    editType.value = 'detailed'
-    isEditing.value = true
-}
-
 const saveChanges = async () => {
     isLoading.value = true
     try {
         const docRef = doc($db, "properties", homeId);
         await updateDoc(docRef, {
-            "info.interior.garage": {
+            "info.exterior.roof": {
                 ...pageEdit.value
             }
         }, { merge: true });
@@ -40,19 +35,16 @@ const saveChanges = async () => {
     }
 }
 
-
-
 const pageSource = ref()
 const pageEdit = ref()
-const page_title = ref("Garage")
-const project_type = ref("garage_inspection")
+const page_title = ref("Gutters")
+const project_type = ref("gutter_inspection")
 const pageTemplate = ref({
     basicInformation: {
-        installationYear: '',
-        carSpaces: '',
+        fireExtinguishersPerFloor: '',
     },
     detailedInformation: {
-        smartOpener: '',
+
     },
 });
 
@@ -61,8 +53,8 @@ onMounted(() => {
     getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
             const property = docSnap.data()
-            if (property.info && property.info.interior && property.info.interior.garage) {
-                pageSource.value = property.info.interior.garage
+            if (property.info && property.info.protection && property.info.protection.fireExtinguishers) {
+                pageSource.value = property.info.protection.fireExtinguishers
             }
             else {
             pageSource.value = {
@@ -78,7 +70,6 @@ onMounted(() => {
         pageEdit.value = cloneDeep(pageSource.value)
     })
 })
-
 
 const cancelChanges = () => {
     pageEdit.value = cloneDeep(pageSource.value)
@@ -101,27 +92,9 @@ const cancelChanges = () => {
                     class="rounded-full h-8 w-8 absolute top-2 right-2" />
                 <div class="space-y-2">
                     <h2 class="text-lg font-bold">Basic information</h2>
-                    <p class="font-medium">Installation year</p>
+                    <p class="font-medium">Fire extinguishers per floor</p>
                     <p class="text-gray-500">
-                        {{ pageSource.basicInformation.installationYear }}
-                    </p>
-                    <p class="font-medium">Car spaces</p>
-                    <p class="text-gray-500">
-                        {{ pageSource.basicInformation.carSpaces }}
-                    </p>
-                </div>
-            </div>
-        </article>
-        <article class="p-4 bg-white shadow-md rounded-md">
-            <div class="space-y-3 relative p-4 rounded-lg hover:bg-gray-50 cursor-pointer"
-                @click="openDetailedEditModal">
-                <UButton icon="i-heroicons-pencil" variant="soft" color="gray"
-                    class="rounded-full h-8 w-8 absolute top-2 right-2" />
-                <div class="space-y-2">
-                    <h2 class="text-lg font-bold">Detailed information</h2>
-                    <p class="font-medium">Smart water monitor</p>
-                    <p class="text-gray-500">
-                        {{ pageSource.detailedInformation.smartOpener }}
+                        {{ pageSource.basicInformation.fireExtinguishersPerFloor }}
                     </p>
                 </div>
             </div>
@@ -151,68 +124,27 @@ const cancelChanges = () => {
             <div v-if="editType === 'basic'" class="flex-1 p-4 overflow-y-auto space-y-4">
                 <div class="space-y-4">
                     <label class="block text-sm font-bold text-gray-700 mb-2">
-                        Installation year
+                        Fire extinguishers per floor
                     </label>
-                    <select 
-                        v-model="pageEdit.basicInformation.installationYear"
-                        class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        <option value="">Select year</option>
-                        <option 
-                            v-for="year in Array.from({length: 100}, (_, i) => new Date().getFullYear() - i)" 
-                            :key="year" 
-                            :value="year"
-                        >
-                            {{ year }}
-                        </option>
-                    </select>
-                </div>
-                <div class="space-y-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Car spaces
-                    </label>
-                    <div class="space-y-3">
-                        <div v-for="option in ['1', '2', '3', 'More']"
-                            :key="option" :class="[
-                                'flex items-center justify-between p-4 rounded-lg border',
-                                pageEdit.basicInformation.carSpaces === option ? 'border-blue-500' : 'border-gray-200'
-                            ]" @click="pageEdit.basicInformation.carSpaces = option">
-                            <span class="text-base">{{ option }}</span>
-                            <div :class="[
-                                'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.basicInformation.carSpaces === option ? 'border-blue-500' : 'border-gray-300'
-                            ]">
-                                <div v-if="pageEdit.basicInformation.carSpaces === option"
-                                    class="w-3 h-3 rounded-full bg-blue-500" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <div v-else class="flex-1 p-4 overflow-y-auto space-y-4">
-                <div class="space-y-4">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">
-                        Smart opener
-                    </label>
-                    <p class="text-sm text-gray-500">Indicate whether the home has a smart opener.</p>
+                    <p class="text-sm text-gray-500">Indicate wether you have at least one fire extinguisher on each floor of your home.</p>
 
                     <div class="space-y-3">
-                        <div v-for="option in ['Yes', 'No']" :key="option" :class="[
+                        <div v-for="option in ['All', 'Some', 'None']" :key="option" :class="[
                             'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.detailedInformation.smartOpener === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.detailedInformation.smartOpener = option">
+                            pageEdit.basicInformation.fireExtinguishersPerFloor === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.basicInformation.fireExtinguishersPerFloor = option">
                             <span class="text-base">{{ option }}</span>
                             <div :class="[
                                 'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                pageEdit.detailedInformation.smartOpener === option ? 'border-blue-500' : 'border-gray-300'
+                                    pageEdit.basicInformation.fireExtinguishersPerFloor === option ? 'border-blue-500' : 'border-gray-300'
                             ]">
-                                <div v-if="pageEdit.detailedInformation.smartOpener === option"
+                                <div v-if="pageEdit.basicInformation.fireExtinguishersPerFloor === option"
                                     class="w-3 h-3 rounded-full bg-blue-500" />
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
             <div class="p-4 border-t mt-auto">
                 <div class="flex justify-end gap-2">
