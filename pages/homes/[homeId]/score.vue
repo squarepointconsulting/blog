@@ -82,7 +82,9 @@
                                     minute: 'numeric',
                                     hour12: true,
                                     }) }}</div>
-                                <div class="text-sm text-green-600">+{{ quest.change }} pts</div>
+                                <div v-if="parseInt(quest.change) > 0" class="text-sm text-green-600">+{{ quest.change }} pts</div>
+                                <div v-else-if="parseInt(quest.change) < 0" class="text-sm text-red-600">-{{ quest.change }} pts</div>
+                                <div v-else class="text-sm text-gray-600"></div>
 
                             </article>
 

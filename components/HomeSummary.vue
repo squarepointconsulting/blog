@@ -8,7 +8,7 @@ const { $db, $storage } = useNuxtApp();
 const homeSource = ref()
 const router = useRouter();
 const isEditing = ref(false);
-
+const isLoading = ref(false);
 const editHome = ref({
     address: {
         city: "",
@@ -98,6 +98,7 @@ const updatePhoto = () => {
 
 // Function to handle the file upload
 const handleFileUpload = (event) => {
+    isLoading.value = true;
     const file = event.target.files[0]
     if (file) {
         console.log('Selected file:', file)
@@ -132,6 +133,7 @@ const handleFileUpload = (event) => {
                             }
                         }).then(() => { 
                             updateHome().then(() => {
+                                isLoading.value = false;
                                 addProject()
                             })
                         })
@@ -141,6 +143,7 @@ const handleFileUpload = (event) => {
         catch (error) {
             console.error('Error uploading files:', error);
             alert('Failed to upload files.');
+            isLoading.value = false;
         }
     }
 }
@@ -220,6 +223,12 @@ const handleFileUpload = (event) => {
 
 
     </article>
+    <UModal v-model="isLoading">
+        <div class="p-4 flex items-center justify-center">
+            <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
+            <span class="ml-2">Loading...</span>
+        </div>
+    </UModal>
 </template>
 
 <style scoped>
