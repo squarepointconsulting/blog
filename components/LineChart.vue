@@ -43,7 +43,7 @@
           display: false, // This hides the legend
         },title: {
             display: true,
-            text: 'Net Asset Value',
+            text: 'Real Market Value',
           },
           tooltip: {
             enabled: true,
