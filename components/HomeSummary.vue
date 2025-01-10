@@ -63,22 +63,6 @@ async function addProject() {
         attachments: [],
     }
 
-    const villaFactRecord = ref({
-        timestamp: updated_at_timestamp,
-        value: homeSource.value.villaFactScore,
-        description: `Congratulations! You've updated your property avatar. You have increased your VillaFact score by 10% to ${ homeSource.value.villaFactScore }.`,
-        completedByUserUid: user.value.uid,
-        completedByUserDisplayName: user.value.displayName,
-    });
-
-    // Only add the VillaFact record if they haven't completed this task before. 
-    const q = query(collection( $db, 'properties', props.homeId, 'project_records'), where('type', '==', 'property_avatar'));
-    const querySnapshot = await getDocs(q);
-    if (querySnapshot.empty) {
-        const villaFactDocRef = await addDoc(collection($db, "properties", props.homeId, "villafact_records"), villaFactRecord.value);
-        console.log("VillaFact Score written with ID: ", villaFactDocRef.id);
-    }
-
     console.log(projectRecord)
     const docRef = await addDoc(collection($db, "properties", props.homeId, "project_records"), projectRecord);
     console.log("Project Record written with ID: ", docRef.id);
@@ -111,6 +95,7 @@ const updatePhoto = () => {
     fileInput.value.click()
 }
 
+
 // Function to handle the file upload
 const handleFileUpload = (event) => {
     const file = event.target.files[0]
@@ -125,15 +110,30 @@ const handleFileUpload = (event) => {
                         homeSource.value.imageUrl = url
                         editHome.value.imageUrl = url
                         editHome.value.updated_at = serverTimestamp()
-                        const q = query(collection( $db, 'properties', props.homeId, 'project_records'), where('type', '==', 'property_avatar'));
+                        const q = query(collection($db, 'properties', props.homeId, 'villafact_records'), where('type', '==', 'Avatar Quest'));
                         getDocs(q).then((querySnapshot) => {
                             if (querySnapshot.empty) {
-                                editHome.value.villaFactScore =  homeSource.value.villaFactScore * 1.1
+                                const oldValue = homeSource.value.villaFactScore
+                                editHome.value.villaFactScore = homeSource.value.villaFactScore * 1.1
                                 homeSource.value.villaFactScore = editHome.value.villaFactScore
+                                const user = useCurrentUser()
+                                const villaFactRecord = {
+                                    timestamp: serverTimestamp(),
+                                    type: "Avatar Quest",
+                                    value: homeSource.value.villaFactScore,
+                                    change: parseInt(homeSource.value.villaFactScore) - parseInt(oldValue),
+                                    description: `Congratulations! You've updated your property avatar. You have increased your VillaFact score by 10% to ${homeSource.value.villaFactScore}.`,
+                                    completedByUserUid: user.value.uid,
+                                    completedByUserDisplayName: user.value.displayName,
+                                }
+                                addDoc(collection($db, "properties", props.homeId, "villafact_records"), villaFactRecord).then((villaFactDocRef) => {
+                                    console.log("VillaFact Score written with ID: ", villaFactDocRef.id);
+                                })
                             }
-                        })
-                        updateHome().then(() => {
-                            addProject()
+                        }).then(() => { 
+                            updateHome().then(() => {
+                                addProject()
+                            })
                         })
                     })
             });
@@ -168,44 +168,45 @@ const handleFileUpload = (event) => {
 
             <!-- Edit Button -->
             <div class="relative top-2 right-2">
-                <UButton @click="isEditing = true" icon="i-heroicons-pencil-square" class="focus:outline-none" v-if="false">
+                <UButton @click="isEditing = true" icon="i-heroicons-pencil-square" class="focus:outline-none"
+                    v-if="false">
                 </UButton>
             </div>
 
         </div>
     </article>
-        <article v-if="homeSource && isEditing" class="p-4 bg-white shadow-md rounded-md relative">
-            <div class="flex flex-col space-y-2">
-                <UInput v-model="homeSource.address.street1" type="text" placeholder="Street 1"
-                    class="p-2 border-gray-300 rounded-md" />
-                <UInput v-model="homeSource.address.street2" type="text" placeholder="Street 2"
-                    class="p-2  border-gray-300 rounded-md" />
-                <UInput v-model="homeSource.address.city" type="text" placeholder="City"
-                    class="p-2 border-gray-300 rounded-md" />
-                <UInput v-model="homeSource.address.state" type="text" placeholder="State"
-                    class="p-2 border-gray-300 rounded-md" />
-                <UInput v-model="homeSource.address.zip" type="text" placeholder="Zip Code"
-                    class="p-2 border-gray-300 rounded-md" />
-            </div>
-            <div class="absolute top-2 right-2">
-                <UButton @click="isEditing = false" icon="i-heroicons-x-circle" class="focus:outline-none">
-                </UButton>
-            </div>
-            <div class="flex place-content-center space-x-4">
-                <!-- Right slot for icons -->
-                <slot name="right-icons">
-                    <span>
-                        <UButton @click="updateHome" icon="i-heroicons-check-circle" class="" />
-                    </span>
-                    <span>
-                        <UButton @click="deleteHome" label="Delete Home" class=" bg-red-700 " />
-                    </span>
-                </slot>
-            </div>
+    <article v-if="homeSource && isEditing" class="p-4 bg-white shadow-md rounded-md relative">
+        <div class="flex flex-col space-y-2">
+            <UInput v-model="homeSource.address.street1" type="text" placeholder="Street 1"
+                class="p-2 border-gray-300 rounded-md" />
+            <UInput v-model="homeSource.address.street2" type="text" placeholder="Street 2"
+                class="p-2  border-gray-300 rounded-md" />
+            <UInput v-model="homeSource.address.city" type="text" placeholder="City"
+                class="p-2 border-gray-300 rounded-md" />
+            <UInput v-model="homeSource.address.state" type="text" placeholder="State"
+                class="p-2 border-gray-300 rounded-md" />
+            <UInput v-model="homeSource.address.zip" type="text" placeholder="Zip Code"
+                class="p-2 border-gray-300 rounded-md" />
+        </div>
+        <div class="absolute top-2 right-2">
+            <UButton @click="isEditing = false" icon="i-heroicons-x-circle" class="focus:outline-none">
+            </UButton>
+        </div>
+        <div class="flex place-content-center space-x-4">
+            <!-- Right slot for icons -->
+            <slot name="right-icons">
+                <span>
+                    <UButton @click="updateHome" icon="i-heroicons-check-circle" class="" />
+                </span>
+                <span>
+                    <UButton @click="deleteHome" label="Delete Home" class=" bg-red-700 " />
+                </span>
+            </slot>
+        </div>
 
-            <!-- Hidden File Input -->
-            <input ref="fileInput" type="file" class="hidden" @change="handleFileChange" />
-        </article>
+        <!-- Hidden File Input -->
+        <input ref="fileInput" type="file" class="hidden" @change="handleFileChange" />
+    </article>
 
     <article v-if="!homeSource" class="p-4 bg-white shadow-md rounded-md">
 

@@ -73,56 +73,47 @@ var dataTotalValue = ref([])
 var dataTotalAssessedValue = ref([])
 
 watch(
-  () => home.value, 
+  () => home.value,
   (newValue) => {
     if (newValue) {
-      console.log('Document loaded:', newValue);
+      const q = query(collection($db, 'properties', homeId, 'market_history'));
+      getDocs(q).then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          labels.value.push(doc.id.substring(0, 4))
+          dataRealMarketValueLand.value.push(doc.data().realMarketValueLand)
+          dataRealMarketValueStructures.value.push(doc.data().realMarketValueStructures)
+          dataTotalValue.value.push(parseInt(doc.data().realMarketValueLand) + parseInt(doc.data().realMarketValueStructures))
+          dataTotalAssessedValue.value.push(doc.data().totalAssessedValue)
+        });
+      }).then(() => {
+        chartData.value.labels = labels
+        chartData.value.datasets = [
+          {
+            label: 'Property Value',
+            data: dataTotalValue.value,
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderWidth: 2,
+          },
+          // {
+          //   label: 'Structure Value',
+          //   data: dataRealMarketValueStructures.value,  
+          //   borderColor: 'rgba(255, 99, 132, 1)',
+          //   backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          //   borderWidth: 2,
+          // },
+          {
+            label: 'Total Assessed Value',
+            data: dataTotalAssessedValue.value,
+            borderColor: 'rgba(54, 162, 235, 1)',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderWidth: 2,
+          }
+        ]
+        isLoading.value = false
+        renderLineChart()
+      })
 
-    const q = query(collection( $db, 'properties', homeId, 'market_history'));
-
-    getDocs(q).then((querySnapshot) => {
-
-      // chartData.value.labels = []
-      // chartData.value.datasets = []
-      querySnapshot.forEach((doc) => {
-        labels.value.push(doc.id.substring(0, 4))
-        dataRealMarketValueLand.value.push(doc.data().realMarketValueLand)
-        dataRealMarketValueStructures.value.push(doc.data().realMarketValueStructures)
-        dataTotalValue.value.push(parseInt(doc.data().realMarketValueLand) + parseInt(doc.data().realMarketValueStructures))
-        dataTotalAssessedValue.value.push(doc.data().totalAssessedValue)
-        
-        console.log(doc.id, " => ", doc.data());
-        // chartData.value = transformToChartData(doc.data())
-      });
-    }).then(() => {
-      chartData.value.labels = labels
-      chartData.value.datasets = [
-        {
-          label: 'Property Value',
-          data: dataTotalValue.value,
-          borderColor: 'rgba(75, 192, 192, 1)',
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderWidth: 2,
-        },
-        // {
-        //   label: 'Structure Value',
-        //   data: dataRealMarketValueStructures.value,  
-        //   borderColor: 'rgba(255, 99, 132, 1)',
-        //   backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        //   borderWidth: 2,
-        // },
-        {
-          label: 'Total Assessed Value',
-          data: dataTotalAssessedValue.value,
-          borderColor: 'rgba(54, 162, 235, 1)',
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderWidth: 2,
-        }
-      ]
-      isLoading.value = false
-      renderLineChart() 
-    })
-      
     }
   }
 );

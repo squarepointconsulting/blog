@@ -70,26 +70,22 @@
                             </UTable>
                         </div>
                         <div v-if="item.key === 'quests'" class="space-y-3">
-                            <article class="p-4 bg-white shadow-md rounded-md">
-                                <h2 class="text-lg font-bold">Avatar Quest</h2>
-                                <p class="text-gray-700 mb-3">You have taken the first step towards maximizing your investment. Well done!
+                            <article v-for="quest in quests" class="p-4 bg-white shadow-md rounded-md">
+                                <h2 class="text-lg font-bold">{{ quest.type }}</h2>
+                                <p class="text-gray-700 mb-3">{{ quest.description }}
                                 </p>
-                                <div class="text-sm text-blue-600">✓ Completed on March 15, 2024</div>
-                                <div class="text-sm text-green-600">+50 pts</div>
+                                <div class="text-sm text-blue-600">✓ Completed on {{ quest.timestamp.toDate().toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: 'numeric',
+                                    minute: 'numeric',
+                                    hour12: true,
+                                    }) }}</div>
+                                <div class="text-sm text-green-600">+{{ quest.change }} pts</div>
 
                             </article>
-                            <article class="p-4 bg-white shadow-md rounded-md">
-                                <h2 class="text-lg font-bold">Sink or Swim Quest</h2>
-                                <p class="text-gray-700 mb-3">Protect your home from water damage by completing these
-                                    essential
-                                    maintenance tasks:</p>
-                                <ul class="list-disc ml-6 mb-4 text-gray-700">
-                                    <li>Check for leaks under sinks</li>
-                                    <li>Inspect water heater connections</li>
-                                    <li>Test sump pump functionality</li>
-                                </ul>
-                                <p class="text-sm text-gray-500 mt-2">1 of 3 tasks completed</p>
-                            </article>
+
 
 
                         </div>
@@ -132,8 +128,11 @@ const tasksRef = collection($db, 'properties', homeId, 'project_records');
 const tasksQuery = query(tasksRef, orderBy('timestamp', 'desc'));
 const tasks = useCollection(tasksQuery);
 
-const featuredQuestId = ref('gutter-cleaning') // You can set this from your data
+const questsRef = collection($db, 'properties', homeId, 'villafact_records');
+const questsQuery = query(questsRef, orderBy('timestamp', 'desc'));
+const quests = useCollection(questsQuery);
 
+const featuredQuestId = ref('gutter-cleaning') 
 
 const items = [{
     label: 'Projects',

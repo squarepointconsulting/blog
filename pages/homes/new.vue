@@ -65,8 +65,10 @@ const editHome = ref({
 const updated_at_timestamp = serverTimestamp()
 const villaFactRecord = ref({
     timestamp: updated_at_timestamp,
+    type: "New Property",
     value: 500,
-    description: "Welcome to VillaFact! - VillaFact Score starts at 500. Improve it by completing more quests!",
+    change: 0,
+    description: "Congratulations! You've added a new home. Your home's VillaFact Score starts at 500. Improve it by completing more quests!",
     completedByUserUid: user.value.uid,
     completedByUserDisplayName: user.value.displayName,
 });
