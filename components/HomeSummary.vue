@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import { collection, addDoc, getDoc, doc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
+import { collection, addDoc, getDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import GaugeChart from '~/components/GaugeChart.vue'
 
@@ -62,11 +62,26 @@ async function addProject() {
         completedByUserDisplayName: user.value.displayName,
         attachments: [],
     }
-    // Get a reference to the home document. Or do we have that already?
+
+    const villaFactRecord = ref({
+        timestamp: updated_at_timestamp,
+        value: homeSource.value.villaFactScore,
+        description: `Congratulations! You've updated your property avatar. You have increased your VillaFact score by 10% to ${ homeSource.value.villaFactScore }.`,
+        completedByUserUid: user.value.uid,
+        completedByUserDisplayName: user.value.displayName,
+    });
+
+    // Only add the VillaFact record if they haven't completed this task before. 
+    const q = query(collection( $db, 'properties', props.homeId, 'project_records'), where('type', '==', 'property_avatar'));
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+        const villaFactDocRef = await addDoc(collection($db, "properties", props.homeId, "villafact_records"), villaFactRecord.value);
+        console.log("VillaFact Score written with ID: ", villaFactDocRef.id);
+    }
 
     console.log(projectRecord)
     const docRef = await addDoc(collection($db, "properties", props.homeId, "project_records"), projectRecord);
-    console.log("Document written with ID: ", docRef.id);
+    console.log("Project Record written with ID: ", docRef.id);
 }
 
 async function deleteHome() {
@@ -110,8 +125,13 @@ const handleFileUpload = (event) => {
                         homeSource.value.imageUrl = url
                         editHome.value.imageUrl = url
                         editHome.value.updated_at = serverTimestamp()
-                        editHome.value.villaFactScore =  homeSource.value.villaFactScore * 1.1
-                        homeSource.value.villaFactScore = editHome.value.villaFactScore
+                        const q = query(collection( $db, 'properties', props.homeId, 'project_records'), where('type', '==', 'property_avatar'));
+                        getDocs(q).then((querySnapshot) => {
+                            if (querySnapshot.empty) {
+                                editHome.value.villaFactScore =  homeSource.value.villaFactScore * 1.1
+                                homeSource.value.villaFactScore = editHome.value.villaFactScore
+                            }
+                        })
                         updateHome().then(() => {
                             addProject()
                         })

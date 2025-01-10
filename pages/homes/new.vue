@@ -26,7 +26,7 @@
                     <UButton color="blue" label="Save" @click="addNewHome" />
                 </div>
             </div>
-        </article>        
+        </article>
     </div>
     <UModal v-model="isLoading">
         <div class="p-4 flex items-center justify-center">
@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 const { $db } = useNuxtApp();
 
 const isLoading = ref(false)
@@ -62,11 +62,24 @@ const editHome = ref({
     project_records: [],
 })
 
+const updated_at_timestamp = serverTimestamp()
+const villaFactRecord = ref({
+    timestamp: updated_at_timestamp,
+    value: 500,
+    description: "Welcome to VillaFact! - VillaFact Score starts at 500. Improve it by completing more quests!",
+    completedByUserUid: user.value.uid,
+    completedByUserDisplayName: user.value.displayName,
+});
+
+
 async function addNewHome() {
-  editHome.value.ownerId = user.value.uid
-  const newHomeRef = await addDoc(collection($db, "properties"), editHome.value);
-  console.log("Document written with ID: ", newHomeRef.id);
-  router.push({ name: 'homes-homeId', params: {homeId: newHomeRef.id }})
+    editHome.value.ownerId = user.value.uid
+    const newHomeRef = await addDoc(collection($db, "properties"), editHome.value);
+    console.log("Document written with ID: ", newHomeRef.id);
+    // Record the VillaFact Score
+    const docRef = await addDoc(collection($db, "properties", newHomeRef.id, "villafact_records"), villaFactRecord.value);
+    console.log("VillaFact Score written with ID: ", docRef.id);
+
+    router.push({ name: 'homes-homeId', params: { homeId: newHomeRef.id } })
 }
 </script>
-

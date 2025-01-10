@@ -69,6 +69,7 @@ const isLoading = ref(true)
 var labels = ref([])
 var dataRealMarketValueLand = ref([])
 var dataRealMarketValueStructures = ref([])
+var dataTotalValue = ref([])
 var dataTotalAssessedValue = ref([])
 
 watch(
@@ -87,6 +88,7 @@ watch(
         labels.value.push(doc.id.substring(0, 4))
         dataRealMarketValueLand.value.push(doc.data().realMarketValueLand)
         dataRealMarketValueStructures.value.push(doc.data().realMarketValueStructures)
+        dataTotalValue.value.push(parseInt(doc.data().realMarketValueLand) + parseInt(doc.data().realMarketValueStructures))
         dataTotalAssessedValue.value.push(doc.data().totalAssessedValue)
         
         console.log(doc.id, " => ", doc.data());
@@ -96,19 +98,19 @@ watch(
       chartData.value.labels = labels
       chartData.value.datasets = [
         {
-          label: 'Land Value',
-          data: dataRealMarketValueLand.value,
+          label: 'Property Value',
+          data: dataTotalValue.value,
           borderColor: 'rgba(75, 192, 192, 1)',
           backgroundColor: 'rgba(75, 192, 192, 0.2)',
           borderWidth: 2,
         },
-        {
-          label: 'Structure Value',
-          data: dataRealMarketValueStructures.value,  
-          borderColor: 'rgba(255, 99, 132, 1)',
-          backgroundColor: 'rgba(255, 99, 132, 0.2)',
-          borderWidth: 2,
-        },
+        // {
+        //   label: 'Structure Value',
+        //   data: dataRealMarketValueStructures.value,  
+        //   borderColor: 'rgba(255, 99, 132, 1)',
+        //   backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        //   borderWidth: 2,
+        // },
         {
           label: 'Total Assessed Value',
           data: dataTotalAssessedValue.value,
