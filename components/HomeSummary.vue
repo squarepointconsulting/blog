@@ -49,11 +49,24 @@ async function updateHome() {
     isEditing.value = false
 }
 
-
+const deleteSubcollection = async (homeId, collectionName) => {
+    const propertyRef = doc($db, 'properties', homeId);
+    
+    // Get all subcollections
+    const collections = await getDocs(collection($db, 'properties', homeId, collectionName));
+    
+    // Delete all documents in subcollections
+    const deleteSubcollections = collections.docs.map(async (d) => {
+        await deleteDoc(d.ref);
+    });
+    
+    // Wait for all subcollection deletions to complete
+    await Promise.all(deleteSubcollections);
+    
+}
 
 async function addProject() {
     const user = await useCurrentUser()
-    console.log(user.value)
     const updated_at_timestamp = serverTimestamp()
     const projectRecord = {
         type: "property_avatar",
@@ -62,13 +75,15 @@ async function addProject() {
         completedByUserDisplayName: user.value.displayName,
         attachments: [],
     }
-
-    console.log(projectRecord)
     const docRef = await addDoc(collection($db, "properties", props.homeId, "project_records"), projectRecord);
-    console.log("Project Record written with ID: ", docRef.id);
 }
 
+// TODO: Delete all subcollections
 async function deleteHome() {
+    await deleteSubcollection(props.homeId, 'villafact_records')
+    await deleteSubcollection(props.homeId, 'project_records')
+    await deleteSubcollection(props.homeId, 'appliances')
+    await deleteSubcollection(props.homeId, 'market_history')
     await deleteDoc(doc($db, "properties", props.homeId))
     router.push('/profile');
 }
@@ -101,7 +116,6 @@ const handleFileUpload = (event) => {
     isLoading.value = true;
     const file = event.target.files[0]
     if (file) {
-        console.log('Selected file:', file)
 
         try {
             const fileRef = storageRef($storage, `properties/${props.homeId}/${file.name}`);
@@ -111,25 +125,58 @@ const handleFileUpload = (event) => {
                         homeSource.value.imageUrl = url
                         editHome.value.imageUrl = url
                         editHome.value.updated_at = serverTimestamp()
-                        const q = query(collection($db, 'properties', props.homeId, 'villafact_records'), where('type', '==', 'Avatar Quest'));
+                        // figure out if the avatar quest has been completed
+                        const q = query(collection($db, 'properties', props.homeId, 'villafact_records'), where('type', '==', 'Avatar Quest'), where('completedTimestamp', '!=', null));
                         getDocs(q).then((querySnapshot) => {
                             if (querySnapshot.empty) {
                                 const oldValue = homeSource.value.villaFactScore
                                 editHome.value.villaFactScore = homeSource.value.villaFactScore * 1.1
                                 homeSource.value.villaFactScore = editHome.value.villaFactScore
                                 const user = useCurrentUser()
-                                const villaFactRecord = {
-                                    timestamp: serverTimestamp(),
-                                    type: "Avatar Quest",
-                                    value: homeSource.value.villaFactScore,
-                                    change: parseInt(homeSource.value.villaFactScore) - parseInt(oldValue),
-                                    description: `Congratulations! You've updated your property avatar. You have increased your VillaFact score by 10% to ${homeSource.value.villaFactScore}.`,
-                                    completedByUserUid: user.value.uid,
-                                    completedByUserDisplayName: user.value.displayName,
-                                }
-                                addDoc(collection($db, "properties", props.homeId, "villafact_records"), villaFactRecord).then((villaFactDocRef) => {
-                                    console.log("VillaFact Score written with ID: ", villaFactDocRef.id);
-                                })
+                                // Get the current villaFact record
+                                const q = query(collection($db, 'properties', props.homeId, 'villafact_records'), where('type', '==', 'Avatar Quest'));
+                                getDocs(q).then((querySnapshot) => {
+                                    querySnapshot.forEach((item) => {
+                                        if (item.data().completedTimestamp === null) {
+
+                                            // Complete the avatar quest
+                                            const villaFactRecord = {
+                                                completedTimestamp: serverTimestamp(),
+                                                type: "Avatar Quest",
+                                                value: homeSource.value.villaFactScore,
+                                                change: parseInt(homeSource.value.villaFactScore) - parseInt(oldValue),
+                                                description: `Congratulations! You've updated your property avatar. You have increased your VillaFact score by 10% to ${homeSource.value.villaFactScore}.`,
+                                                completedByUserUid: user.value.uid,
+                                                completedByUserDisplayName: user.value.displayName,
+                                            }
+                                            const questRef = doc($db, 'properties', props.homeId, 'villafact_records', item.id)
+                                            updateDoc(questRef, {
+                                                ...villaFactRecord,
+                                            })
+                                            // Subscribe them to a new quest here...
+                                            const questRecord = {
+                                                enrolledTimestamp: serverTimestamp(),
+                                                completedTimestamp: null,
+                                                type: "Home Information",
+                                                projectType: "home-profile",
+                                                ctaValue: "Up to 100 points",
+                                                value: 0,
+                                                change: 0,
+                                                callToAction: "Complete your home profile. The more complete, the more you can score!",
+                                                description: "",
+                                                completedByUserUid: null,
+                                                completedByUserDisplayName: null,
+                                            }
+                                            
+                                            addDoc(collection($db, "properties", props.homeId, "villafact_records"), questRecord).then((docRef) => {    
+                                                console.log("Home Profile Quest written with ID: ", docRef.id);
+                                            })
+                                        }
+                                    });
+                                });
+
+                                
+
                             }
                         }).then(() => { 
                             updateHome().then(() => {

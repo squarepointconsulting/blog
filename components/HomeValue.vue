@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useCollection } from 'vuefire'
 import { collection, query, orderBy, doc, getDoc, where, serverTimestamp, addDoc, getDocs } from 'firebase/firestore'
 
@@ -35,7 +35,6 @@ const chartData = ref(
 
 const renderLineChart = () => {
   const ctx = lineChart.value.getContext('2d')
-
   new Chart(ctx, {
     type: 'line',
     data: chartData.value,
@@ -78,15 +77,15 @@ watch(
     if (newValue) {
       const q = query(collection($db, 'properties', homeId, 'market_history'));
       getDocs(q).then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach((doc) => {
           labels.value.push(doc.id.substring(0, 4))
           dataRealMarketValueLand.value.push(doc.data().realMarketValueLand)
           dataRealMarketValueStructures.value.push(doc.data().realMarketValueStructures)
           dataTotalValue.value.push(parseInt(doc.data().realMarketValueLand) + parseInt(doc.data().realMarketValueStructures))
           dataTotalAssessedValue.value.push(doc.data().totalAssessedValue)
-        });
-      }).then(() => {
-        chartData.value.labels = labels
+        })
+                chartData.value.labels = labels
         chartData.value.datasets = [
           {
             label: 'Property Value',
@@ -95,13 +94,6 @@ watch(
             backgroundColor: 'rgba(75, 192, 192, 0.2)',
             borderWidth: 2,
           },
-          // {
-          //   label: 'Structure Value',
-          //   data: dataRealMarketValueStructures.value,  
-          //   borderColor: 'rgba(255, 99, 132, 1)',
-          //   backgroundColor: 'rgba(255, 99, 132, 0.2)',
-          //   borderWidth: 2,
-          // },
           {
             label: 'Total Assessed Value',
             data: dataTotalAssessedValue.value,
@@ -110,6 +102,8 @@ watch(
             borderWidth: 2,
           }
         ]
+        }
+      }).then(() => {
         isLoading.value = false
         renderLineChart()
       })

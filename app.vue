@@ -59,7 +59,6 @@ const mainClass = computed(() => {
 function navigateToHome() {
   
   if (homeIdRef) { 
-    // console.log(homeIdRef.value)
     router.push({ name: 'homes-homeId', params: { homeId: homeIdRef.value } })
   }
   else {

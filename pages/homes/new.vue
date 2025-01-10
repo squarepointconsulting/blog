@@ -63,15 +63,33 @@ const editHome = ref({
 })
 
 const updated_at_timestamp = serverTimestamp()
+
 const villaFactRecord = ref({
-    timestamp: updated_at_timestamp,
+    enrolledTimestamp: updated_at_timestamp,
+    completedTimestamp: updated_at_timestamp,
     type: "New Property",
     value: 500,
     change: 0,
+    callToAction: "Add your new home to now to get 500 points!",
     description: "Congratulations! You've added a new home. Your home's VillaFact Score starts at 500. Improve it by completing more quests!",
     completedByUserUid: user.value.uid,
     completedByUserDisplayName: user.value.displayName,
 });
+
+const villaFactAvatarRecord = ref({
+    enrolledTimestamp: updated_at_timestamp,
+    completedTimestamp: null,
+    type: "Avatar Quest",
+    projectType: "property-avatar",
+    ctaValue: "Increase your VillaFact score by 10%",
+    value: 0,
+    change: 0,
+    callToAction: "Update your avatar to increase your score!",
+    description: "",
+    completedByUserUid: null,
+    completedByUserDisplayName: null,
+});
+
 
 
 async function addNewHome() {
@@ -81,7 +99,9 @@ async function addNewHome() {
     // Record the VillaFact Score
     const docRef = await addDoc(collection($db, "properties", newHomeRef.id, "villafact_records"), villaFactRecord.value);
     console.log("VillaFact Score written with ID: ", docRef.id);
-
+    // Record the Avatar Quest
+    const questRef = await addDoc(collection($db, "properties", newHomeRef.id, "villafact_records"), villaFactAvatarRecord.value);
+    console.log("VillaFact Avatar Quest written with ID: ", questRef.id);
     router.push({ name: 'homes-homeId', params: { homeId: newHomeRef.id } })
 }
 </script>
