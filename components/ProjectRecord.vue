@@ -140,22 +140,18 @@ const submitForm = async () => {
     }
     isUploading.value = true;
     const docRef = await addDoc(collection($db, "properties", props.homeId, "project_records"), projectRecord.value);
-    console.log("Document written with ID: ", docRef.id);
 
     try {
         isAccepted.value = false;
         // Create an array of promises for file uploads
         const uploadPromises = uploadedFiles.value.map(async (file) => {
             const fileRef = storageRef($storage, `properties/${props.homeId}/project_records/${docRef.id}/${file.name}`);
-            console.log(`Filename: ${file.name}`);
             const snapshot = await uploadBytes(fileRef, file.file);
             const url = await getDownloadURL(fileRef);
-            console.log(`File type: ${file.type}`)
             if (file.type.startsWith('application/pdf')) {
                 const thumbnailRef = storageRef($storage, `properties/${props.homeId}/project_records/${docRef.id}/${file.name}-thumbnail.png`);
                 const thumbnailSnapshot = await uploadBytes(thumbnailRef, file.preview_file);
                 const thumbnailUrl = await getDownloadURL(thumbnailRef);
-                console.log('Thumbnail uploaded:', thumbnailUrl);
                 return {
                     name: file.name,
                     url: url,
@@ -179,6 +175,12 @@ const submitForm = async () => {
         projectRecord.value.inspectionCondition = inspectionCondition
         await setDoc(docRef, {...projectRecord.value}, { merge: true });
 
+        // Check for any quests that are completed by this project record
+        // const questRef = collection($db, "properties", props.homeId, "quests");
+        // const questQuery = query(questRef, where('type', '==', 'project_record'), where('completedByUserUid', '==', user.value.uid));
+        // const quest = await getDocs(questQuery);
+        // console.log(quest);
+
     } catch (error) {
         console.error('Error in submitForm:', error);
     } finally {
@@ -198,8 +200,6 @@ const setInspectionCondition = (option) => {
     inspectionCondition.value = option;
     isAccepted.value = true
 }
-
-
 </script>
 
 <template>

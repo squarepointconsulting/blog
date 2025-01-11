@@ -32,7 +32,6 @@ async function deleteAllFiles(storagePath) {
     for (const folderRef of result.prefixes) {
       await deleteAllFiles(folderRef.fullPath);
     }
-    console.log(`All files and subfolders deleted from: ${storagePath}`);
   } catch (error) {
     console.error("Error deleting files:", error);
   }

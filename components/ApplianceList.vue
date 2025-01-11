@@ -17,7 +17,6 @@ const showWizard = ref(false);
 
 async function addAppliance() {
   const user = await useCurrentUser()
-  console.log(user.value)
   const updated_at_timestamp = serverTimestamp()
   const applianceRecord = {
     category: "Dishwasher",
@@ -35,11 +34,7 @@ async function addAppliance() {
     imageUrl: "https://placehold.co/60x60?text=icon",
     attachments: [],
   }
-  // Get a reference to the home document. Or do we have that already?
-
-  console.log(applianceRecord)
   const docRef = await addDoc(collection($db, "properties", homeId, "appliances"), applianceRecord);
-  console.log("Document written with ID: ", docRef.id);
   router.push(`/homes/${homeId}/appliances/`);
 }
 

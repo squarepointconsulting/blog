@@ -36,15 +36,12 @@ function dataURLToBlob(dataURL) {
 
 async function uploadImageToFirebase(dataURL) {
   try {
-    console.log("In function: uploadImageToFirebase")
     // Convert the Data URL to a Blob
     const blob = dataURLToBlob(dataURL);
     const { $storage } = useNuxtApp();
     const storageRef = ref($storage, 'images/' + Date.now() + '.png'); // Adjust the path and filename as needed
     uploadBytes(storageRef, blob).then((snapshot) => {
-      console.log('Uploaded a blob or file!');
     });
-    console.log(storageRef)
   } catch (error) {
     console.error('Error uploading image:', error);
     throw error;
@@ -94,7 +91,6 @@ export default {
 
       ctx.restore();
 
-      console.log("Smile...")
       const dataURL = canva.toDataURL("image/png")
       this.photos.push({
         id: this.counter++,
@@ -107,7 +103,6 @@ export default {
         // Good enough for now. Just needed to prove that point. 
         // Uncomment the following line to renenable:
         //const imageUrl = await uploadImageToFirebase(dataURL);
-        console.log('Image uploaded successfully!');
       } catch (error) {
         console.error('Error uploading image:', error);
       }

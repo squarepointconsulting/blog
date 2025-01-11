@@ -133,7 +133,4 @@ const project_type = ref("property_avatar")
             </div>
         </section>
     </article>
-    <ProjectRecord :homeId="homeId" :projectType="project_type" />
-
-
 </template>
