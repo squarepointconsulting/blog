@@ -53,21 +53,22 @@ function handleSignOut() {
         </div>
 
         <div class="flex-1 flex flex-col justify-center items-center">
-          <div class="w-full flex justify-center items-center p-4">
-            <div class="">
-              <span>
-                <UButton @click="addNewHome">New Home</UButton>
-              </span>
-            </div>
-          </div>
           <div class="w-full flex justify-center items-center">
             <span v-if="user">
-              <UButton @click="handleSignOut">Log Out</UButton>
+              <UButton @click="handleSignOut" class="bg-blue-500 text-white hover:bg-blue-600">Log Out</UButton>
             </span>
           </div>
         </div>
       </div>
     </article>
+
+      <div class="flex w-full">
+        <UButton @click="addNewHome" class="bg-blue-500 text-white hover:bg-blue-600">
+      New Home
+    </UButton>
+      </div>
+
+
     <HomeList />
   </div>
 </template>

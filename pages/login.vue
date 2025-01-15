@@ -217,35 +217,27 @@ const validateEmail = () => {
 
 </script>
 
-<template>
-  <div class="container space-y-4">
-    <UCard>
-      <template #header>
-        Please log in to continue
-      </template>
-      <div class="space-y-4">
-        <UButton @click="signInWithGoogle">Sign in with Google</UButton>
-        <hr />
+  <template>
+    <div class="container space-y-4">
+      <h3 class="text-center">Please log in to continue</h3>
+      <div class="space-y-4 text-center">
+        <UButton class="bg-blue-500 text-white hover:bg-blue-600" @click="signInWithGoogle">Sign in with Google</UButton>
+
+      </div>
+      <div class="text-center space-y-4">
         <h3>Sign in with email</h3>
-      <UInput
-        v-model="email"
-        label="Email"
-        type="email"
-        placeholder="Enter your email"
-        :rules="[
+      </div>
+      <div class="space-y-4">
+        <UInput v-model="email" label="Email" type="email" placeholder="Enter your email" :rules="[
           { required: true, message: 'Email is required' },
           { email: true, message: 'Please enter a valid email' }
-        ]"
-        @blur="validateEmail"
-      />
-      <UButton 
-        @click="signInWithEmail"
-        :disabled="!isValidEmail"
-      >
-        Send Sign In Link
-      </UButton>
+        ]" @blur="validateEmail" />
+        <div class="text-center">
+          <UButton class="bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-500 disabled:text-gray-300" @click="signInWithEmail" :disabled="!isValidEmail">
+            Send Sign In Link
+          </UButton>
+        </div>
         <p v-if="error" class="text-red-500">{{ error }}</p>
       </div>
-    </UCard>
-  </div>
-</template>
+    </div>
+  </template>
