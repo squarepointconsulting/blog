@@ -207,28 +207,87 @@ const cancelChanges = () => {
             </div>
             <div v-if="editType === 'basic'" class="flex-1 p-4 overflow-y-auto space-y-4">
                 <div class="space-y-4">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">
-                        Fire extinguishers per floor
+                    <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Square feet
                     </label>
-                    <p class="text-sm text-gray-500">Indicate wether you have at least one fire extinguisher on each floor of your home.</p>
-
+                    <input 
+                                type="number" 
+                                v-model="pageEdit.basicInformation.squareFeet"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Square feet of roof"
+                            />
+                </div>
                     <div class="space-y-3">
-                        <div v-for="option in ['All', 'Some', 'None']" :key="option" :class="[
+                        <label class="block text-sm font-bold text-gray-700 mb-2">
+                            Roof materials
+                        </label>
+                        <p class="text-sm text-gray-500">Indicate the type of roof your home has.</p>
+                        <div class="space-y-3">
+                        <div v-for="option in ['Asphalt', 'Tile', 'Wood', 'Metal', 'Asphalt and Metal', 'Other']" :key="option" :class="[
                             'flex items-center justify-between p-4 rounded-lg border',
-                            pageEdit.basicInformation.fireExtinguishersPerFloor === option ? 'border-blue-500' : 'border-gray-200'
-                        ]" @click="pageEdit.basicInformation.fireExtinguishersPerFloor = option">
+                            pageEdit.basicInformation.materials === option ? 'border-blue-500' : 'border-gray-200'
+                        ]" @click="pageEdit.basicInformation.materials = option">
                             <span class="text-base">{{ option }}</span>
                             <div :class="[
                                 'w-6 h-6 rounded-full border-2 flex items-center justify-center',
-                                    pageEdit.basicInformation.fireExtinguishersPerFloor === option ? 'border-blue-500' : 'border-gray-300'
+                                    pageEdit.basicInformation.materials === option ? 'border-blue-500' : 'border-gray-300'
                             ]">
-                                <div v-if="pageEdit.basicInformation.fireExtinguishersPerFloor === option"
+                                <div v-if="pageEdit.basicInformation.materials === option"
                                     class="w-3 h-3 rounded-full bg-blue-500" />
+                            </div>
                             </div>
                         </div>
                     </div>
+                    <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Installation date
+                    </label>
+                    <input 
+                                type="date" 
+                                v-model="pageEdit.basicInformation.dateInstalled"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Date roof was installed"
+                            />
+                    </div>
                 </div>
-
+            </div>
+            <div v-else-if="editType === 'detailed'" class="flex-1 p-4 overflow-y-auto space-y-4">
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Installer
+                    </label>
+                    <input 
+                                type="text" 
+                                v-model="pageEdit.detailedInformation.installer"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Installer of roof"
+                            />
+                </div>
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Price
+                    </label>
+                    <input 
+                                type="number" 
+                                v-model="pageEdit.detailedInformation.price"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Price of roof"
+                            />
+                </div>
+            </div>
+            <div v-else class="flex-1 p-4 overflow-y-auto space-y-4">
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Notes
+                    </label>
+                    <input 
+                                type="text" 
+                                v-model="pageEdit.notes"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Notes about roof"
+                            />
+                </div>
             </div>
             <div class="p-4 border-t mt-auto">
                 <div class="flex justify-end gap-2">
